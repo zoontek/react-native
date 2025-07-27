@@ -12,7 +12,6 @@ import android.content.Context
 import android.content.ContextWrapper
 import android.inputmethodservice.InputMethodService
 import android.util.DisplayMetrics
-import android.util.Log
 import android.view.WindowManager
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -55,25 +54,6 @@ public object DisplayMetricsHolder {
     screenDisplayMetrics = displayMetrics
   }
 
-  private fun isUiContext(context: Context): Boolean {
-    var iterator = context
-
-    while (iterator is ContextWrapper) {
-      when (iterator) {
-        is Activity,
-        is InputMethodService -> return true
-      }
-
-      if (iterator.baseContext == null) {
-        break
-      }
-
-      iterator = iterator.baseContext
-    }
-
-    return false
-  }
-
   @JvmStatic
   public fun initScreenDisplayMetricsIfNotInitialized(context: Context) {
     if (screenDisplayMetrics == null) {
@@ -82,11 +62,9 @@ public object DisplayMetricsHolder {
   }
 
   @JvmStatic
-  public fun initWindowDisplayMetricsIfNotInitialized(context: Context, id: String) {
+  public fun initWindowDisplayMetricsIfNotInitialized(context: Context) {
     if (windowDisplayMetrics == null) {
-      initWindowDisplayMetrics(context, id)
-    } else {
-      Log.i("UI_CONTEXT", "$id: ${isUiContext(context)}")
+      initWindowDisplayMetrics(context)
     }
   }
 
@@ -106,9 +84,7 @@ public object DisplayMetricsHolder {
   }
 
   @JvmStatic
-  public fun initWindowDisplayMetrics(context: Context, id: String) {
-    Log.i("UI_CONTEXT", "$id: ${isUiContext(context)}")
-
+  public fun initWindowDisplayMetrics(context: Context) {
     val displayMetrics = DisplayMetrics()
     displayMetrics.setTo(context.resources.displayMetrics)
 
