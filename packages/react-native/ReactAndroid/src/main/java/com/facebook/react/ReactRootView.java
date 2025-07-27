@@ -995,8 +995,8 @@ public class ReactRootView extends FrameLayout implements RootView, ReactRoot {
         return;
       }
       mDeviceRotation = rotation;
-      DisplayMetricsHolder.initScreenDisplayMetrics(getContext().getApplicationContext());
-      DisplayMetricsHolder.initWindowDisplayMetrics(getContext().getApplicationContext(), "ReactRootView:998");
+      DisplayMetricsHolder.initScreenDisplayMetrics(getContext());
+      DisplayMetricsHolder.initWindowDisplayMetrics(getContext(), "ReactRootView:998");
       emitOrientationChanged(rotation);
     }
 
