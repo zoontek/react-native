@@ -130,7 +130,7 @@ public class UIManagerModule extends ReactContextBaseJavaModule
     DisplayMetricsHolder.initScreenDisplayMetricsIfNotInitialized(reactContext);
     Activity currentActivity = reactContext.getCurrentActivity();
     if (currentActivity != null) {
-      DisplayMetricsHolder.initWindowDisplayMetricsIfNotInitialized(currentActivity, "UIManagerModule:130");
+      DisplayMetricsHolder.initWindowDisplayMetricsIfNotInitialized(currentActivity);
     }
     mEventDispatcher = new EventDispatcherImpl(reactContext);
     mModuleConstants = createConstants(viewManagerResolver);
@@ -154,7 +154,7 @@ public class UIManagerModule extends ReactContextBaseJavaModule
     DisplayMetricsHolder.initScreenDisplayMetricsIfNotInitialized(reactContext);
     Activity currentActivity = reactContext.getCurrentActivity();
     if (currentActivity != null) {
-      DisplayMetricsHolder.initWindowDisplayMetricsIfNotInitialized(currentActivity, "UIManagerModule:151");
+      DisplayMetricsHolder.initWindowDisplayMetricsIfNotInitialized(currentActivity);
     }
     mEventDispatcher = new EventDispatcherImpl(reactContext);
     mCustomDirectEvents = MapBuilder.newHashMap();

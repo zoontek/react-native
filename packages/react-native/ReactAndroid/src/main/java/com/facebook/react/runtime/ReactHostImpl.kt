@@ -626,7 +626,7 @@ public class ReactHostImpl(
     val currentReactContext = this.currentReactContext
     if (currentReactContext != null) {
       DisplayMetricsHolder.initScreenDisplayMetrics(currentReactContext)
-      currentReactContext.currentActivity?.let { DisplayMetricsHolder.initWindowDisplayMetrics(it, "ReactHostImpl:630") }
+      currentReactContext.currentActivity?.let { DisplayMetricsHolder.initWindowDisplayMetrics(it) }
 
       val appearanceModule = currentReactContext.getNativeModule(AppearanceModule::class.java)
       appearanceModule?.onConfigurationChanged(context)

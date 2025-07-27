@@ -261,7 +261,7 @@ public class ReactInstanceManager {
 
     DisplayMetricsHolder.initScreenDisplayMetricsIfNotInitialized(applicationContext);
     if (currentActivity != null) {
-      DisplayMetricsHolder.initWindowDisplayMetricsIfNotInitialized(currentActivity, "ReactInstanceManager:263");
+      DisplayMetricsHolder.initWindowDisplayMetricsIfNotInitialized(currentActivity);
     }
 
     // See {@code ReactInstanceManagerBuilder} for description of all flags here.
@@ -931,7 +931,7 @@ public class ReactInstanceManager {
       Activity currentActivity = currentReactContext.getCurrentActivity();
 
       if (currentActivity != null) {
-        DisplayMetricsHolder.initWindowDisplayMetrics(currentActivity, "ReactInstanceManager:934");
+        DisplayMetricsHolder.initWindowDisplayMetrics(currentActivity);
       }
 
       AppearanceModule appearanceModule =

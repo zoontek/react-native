@@ -243,8 +243,7 @@ internal class ReactInstance(
 
     // Misc initialization that needs to be done before Fabric init
     DisplayMetricsHolder.initScreenDisplayMetricsIfNotInitialized(context)
-    // DisplayMetricsHolder.initWindowDisplayMetricsIfNotInitialized(context, "ReactInstance:244") // Crash on Android 7, debug mode
-    activity?.let { DisplayMetricsHolder.initWindowDisplayMetricsIfNotInitialized(it, "ReactInstance:244") } // OK
+    activity?.let { DisplayMetricsHolder.initWindowDisplayMetricsIfNotInitialized(it) }
 
     val binding = FabricUIManagerBinding()
     binding.register(

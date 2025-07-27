@@ -9,8 +9,6 @@ package com.facebook.react.uimanager
 
 import android.app.Activity
 import android.content.Context
-import android.content.ContextWrapper
-import android.inputmethodservice.InputMethodService
 import android.util.DisplayMetrics
 import android.view.WindowManager
 import androidx.core.view.ViewCompat

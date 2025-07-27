@@ -136,7 +136,7 @@ public class ReactRootView extends FrameLayout implements RootView, ReactRoot {
     setRootViewTag(ReactRootViewTagGenerator.getNextRootViewTag());
     setClipChildren(false);
     DisplayMetricsHolder.initScreenDisplayMetrics(getContext());
-    DisplayMetricsHolder.initWindowDisplayMetrics(getContext(), "ReactRootView:141");
+    DisplayMetricsHolder.initWindowDisplayMetrics(getContext());
   }
 
   @Override
@@ -868,8 +868,7 @@ public class ReactRootView extends FrameLayout implements RootView, ReactRoot {
 
     /* package */ CustomGlobalLayoutListener() {
       DisplayMetricsHolder.initScreenDisplayMetricsIfNotInitialized(getContext());
-      // DisplayMetricsHolder.initWindowDisplayMetricsIfNotInitialized(getContext().getApplicationContext(), "ReactRootView:874"); // Crash on Android 7, debug mode
-      DisplayMetricsHolder.initWindowDisplayMetricsIfNotInitialized(getContext(), "ReactRootView:874"); // OK
+      DisplayMetricsHolder.initWindowDisplayMetricsIfNotInitialized(getContext());
       mVisibleViewArea = new Rect();
       mMinKeyboardHeightDetected = (int) PixelUtil.toPixelFromDIP(60);
     }
@@ -993,7 +992,7 @@ public class ReactRootView extends FrameLayout implements RootView, ReactRoot {
       }
       mDeviceRotation = rotation;
       DisplayMetricsHolder.initScreenDisplayMetrics(getContext());
-      DisplayMetricsHolder.initWindowDisplayMetrics(getContext(), "ReactRootView:998");
+      DisplayMetricsHolder.initWindowDisplayMetrics(getContext());
       emitOrientationChanged(rotation);
     }
 
