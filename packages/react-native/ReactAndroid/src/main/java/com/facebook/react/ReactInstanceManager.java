@@ -927,6 +927,13 @@ public class ReactInstanceManager {
 
     ReactContext currentReactContext = getCurrentReactContext();
     if (currentReactContext != null) {
+      DisplayMetricsHolder.initScreenDisplayMetrics(currentReactContext);
+      Activity currentActivity = currentReactContext.getCurrentActivity();
+
+      if (currentActivity != null) {
+        DisplayMetricsHolder.initWindowDisplayMetrics(currentActivity, "ReactInstanceManager:934");
+      }
+
       AppearanceModule appearanceModule =
           currentReactContext.getNativeModule(AppearanceModule.class);
 
