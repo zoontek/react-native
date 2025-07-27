@@ -72,7 +72,7 @@ class RootViewTest {
     reactContext.initializeWithInstance(catalystInstanceMock)
 
     DisplayMetricsHolder.initScreenDisplayMetricsIfNotInitialized(reactContext)
-    DisplayMetricsHolder.initWindowDisplayMetricsIfNotInitialized(reactContext, "RootViewTest:75")
+    DisplayMetricsHolder.initWindowDisplayMetricsIfNotInitialized(reactContext)
     val uiManagerModuleMock: UIManagerModule = mock()
     whenever(catalystInstanceMock.getNativeModule(UIManagerModule::class.java))
         .thenReturn(uiManagerModuleMock)
