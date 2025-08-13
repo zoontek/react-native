@@ -15,6 +15,7 @@ import com.facebook.react.bridge.ReactSoftExceptionLogger
 import com.facebook.react.bridge.ReadableMap
 import com.facebook.react.module.annotations.ReactModule
 import com.facebook.react.uimanager.DisplayMetricsHolder.getDisplayMetricsWritableMap
+import com.facebook.react.uimanager.DisplayMetricsHolder.getWindowDisplayMetrics
 import com.facebook.react.uimanager.DisplayMetricsHolder.initDisplayMetricsIfNotInitialized
 import com.facebook.react.views.view.isEdgeToEdgeFeatureFlagOn
 
@@ -31,7 +32,9 @@ internal class DeviceInfoModule(reactContext: ReactApplicationContext) :
   }
 
   public override fun getTypedExportedConstants(): Map<String, Any> {
-    val displayMetrics = getDisplayMetricsWritableMap(fontScale.toDouble())
+    val windowDisplayMetrics =
+        getWindowDisplayMetrics(reactApplicationContext, reactApplicationContext.currentActivity)
+    val displayMetrics = getDisplayMetricsWritableMap(windowDisplayMetrics, fontScale.toDouble())
 
     // Cache the initial dimensions for later comparison in emitUpdateDimensionsEvent
     previousDisplayMetrics = displayMetrics.copy()
@@ -58,7 +61,13 @@ internal class DeviceInfoModule(reactContext: ReactApplicationContext) :
     reactApplicationContext.let { context ->
       if (context.hasActiveReactInstance()) {
         // Don't emit an event to JS if the dimensions haven't changed
-        val displayMetrics = getDisplayMetricsWritableMap(fontScale.toDouble())
+        val windowDisplayMetrics =
+            getWindowDisplayMetrics(
+                reactApplicationContext,
+                reactApplicationContext.currentActivity,
+            )
+        val displayMetrics =
+            getDisplayMetricsWritableMap(windowDisplayMetrics, fontScale.toDouble())
         if (previousDisplayMetrics == null) {
           previousDisplayMetrics = displayMetrics.copy()
         } else if (displayMetrics != previousDisplayMetrics) {

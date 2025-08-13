@@ -14,9 +14,11 @@ import android.util.DisplayMetrics
 import android.view.WindowManager
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.window.layout.WindowMetricsCalculator
 import com.facebook.react.bridge.WritableMap
 import com.facebook.react.bridge.WritableNativeMap
 import com.facebook.react.uimanager.PixelUtil.pxToDp
+import com.facebook.react.views.view.isEdgeToEdgeFeatureFlagOn
 
 /**
  * Holds an instance of the current DisplayMetrics so we don't have to thread it through all the
@@ -26,19 +28,25 @@ public object DisplayMetricsHolder {
   private const val INITIALIZATION_MISSING_MESSAGE =
       "DisplayMetricsHolder must be initialized with initDisplayMetricsIfNotInitialized or initDisplayMetrics"
 
-  @JvmStatic private var windowDisplayMetrics: DisplayMetrics? = null
   @JvmStatic private var screenDisplayMetrics: DisplayMetrics? = null
 
   /** The metrics of the window associated to the Context used to initialize ReactNative */
   @JvmStatic
-  public fun getWindowDisplayMetrics(): DisplayMetrics {
-    checkNotNull(windowDisplayMetrics) { INITIALIZATION_MISSING_MESSAGE }
-    return windowDisplayMetrics as DisplayMetrics
-  }
+  public fun getWindowDisplayMetrics(context: Context, activity: Activity?): DisplayMetrics {
+    val displayMetrics = context.resources.displayMetrics
+    val windowDisplayMetrics = DisplayMetrics()
+    windowDisplayMetrics.setTo(displayMetrics)
 
-  @JvmStatic
-  public fun setWindowDisplayMetrics(displayMetrics: DisplayMetrics?) {
-    windowDisplayMetrics = displayMetrics
+    if (isEdgeToEdgeFeatureFlagOn) {
+      activity?.let { activity ->
+        WindowMetricsCalculator.getOrCreate().computeCurrentWindowMetrics(activity).let {
+          windowDisplayMetrics.widthPixels = it.bounds.width()
+          windowDisplayMetrics.heightPixels = it.bounds.height()
+        }
+      }
+    }
+
+    return windowDisplayMetrics
   }
 
   /** Screen metrics returns the metrics of the default screen on the device. */
@@ -62,11 +70,10 @@ public object DisplayMetricsHolder {
   }
 
   @JvmStatic
-  @SuppressLint("DeprecatedMethod") // for Andriod Lint
+  @SuppressLint("DeprecatedMethod") // for Android Lint
   @Suppress("DEPRECATION") // for Kotlin compiler
   public fun initDisplayMetrics(context: Context) {
     val displayMetrics = context.resources.displayMetrics
-    windowDisplayMetrics = displayMetrics
     val screenDisplayMetrics = DisplayMetrics()
     screenDisplayMetrics.setTo(displayMetrics)
     try {
@@ -85,14 +92,16 @@ public object DisplayMetricsHolder {
   }
 
   @JvmStatic
-  public fun getDisplayMetricsWritableMap(fontScale: Double): WritableMap {
-    checkNotNull(windowDisplayMetrics) { INITIALIZATION_MISSING_MESSAGE }
+  public fun getDisplayMetricsWritableMap(
+      windowDisplayMetrics: DisplayMetrics,
+      fontScale: Double,
+  ): WritableMap {
     checkNotNull(screenDisplayMetrics) { INITIALIZATION_MISSING_MESSAGE }
 
     return WritableNativeMap().apply {
       putMap(
           "windowPhysicalPixels",
-          getPhysicalPixelsWritableMap(windowDisplayMetrics as DisplayMetrics, fontScale),
+          getPhysicalPixelsWritableMap(windowDisplayMetrics, fontScale),
       )
       putMap(
           "screenPhysicalPixels",

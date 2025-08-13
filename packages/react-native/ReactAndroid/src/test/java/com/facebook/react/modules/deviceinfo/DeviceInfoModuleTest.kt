@@ -9,6 +9,7 @@
 
 package com.facebook.react.modules.deviceinfo
 
+import android.util.DisplayMetrics
 import com.facebook.react.bridge.BridgeReactContext
 import com.facebook.react.bridge.JavaOnlyMap
 import com.facebook.react.bridge.ReactContext
@@ -111,8 +112,15 @@ class DeviceInfoModuleTest : TestCase() {
   }
 
   private fun givenDisplayMetricsHolderContains(fakeDisplayMetrics: WritableMap?) {
+    val windowDisplayMetrics = DisplayMetrics()
+
     displayMetricsHolder
-        .`when`<WritableMap> { DisplayMetricsHolder.getDisplayMetricsWritableMap(1.0) }
+        .`when`<DisplayMetrics> { DisplayMetricsHolder.getWindowDisplayMetrics(reactContext, null) }
+        .thenAnswer { windowDisplayMetrics }
+    displayMetricsHolder
+        .`when`<WritableMap> {
+          DisplayMetricsHolder.getDisplayMetricsWritableMap(windowDisplayMetrics, 1.0)
+        }
         .thenAnswer { fakeDisplayMetrics }
   }
 
