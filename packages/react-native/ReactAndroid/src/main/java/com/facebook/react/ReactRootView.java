@@ -13,6 +13,7 @@ import static com.facebook.react.uimanager.common.UIManagerType.FABRIC;
 import static com.facebook.react.uimanager.common.UIManagerType.LEGACY;
 import static com.facebook.systrace.Systrace.TRACE_TAG_REACT;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.BlendMode;
 import android.graphics.Canvas;
@@ -962,8 +963,13 @@ public class ReactRootView extends FrameLayout implements RootView, ReactRoot {
           }
         }
       }
+
+      final ReactContext reactContext = getCurrentReactContext();
+      final Activity currentActivity =
+        reactContext != null ? reactContext.getCurrentActivity() : null;
+
       final int heightDiff =
-          DisplayMetricsHolder.getWindowDisplayMetrics().heightPixels
+          DisplayMetricsHolder.getWindowDisplayMetrics(getContext(), currentActivity).heightPixels
               - mVisibleViewArea.bottom
               + notchHeight;
 
