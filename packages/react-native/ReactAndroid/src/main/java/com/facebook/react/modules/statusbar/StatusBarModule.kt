@@ -7,7 +7,6 @@
 
 package com.facebook.react.modules.statusbar
 
-import android.graphics.Color
 import android.view.Window
 import android.view.WindowManager
 import androidx.core.view.ViewCompat
@@ -36,16 +35,8 @@ internal class StatusBarModule(reactContext: ReactApplicationContext?) :
 
   private val extrasWindows = mutableSetOf<Window>()
 
-  private object CurrentState {
-    var color = Color.BLACK
-    var hidden = false
-    var style = "default"
-    var translucent = false
-  }
-
   init {
     reactApplicationContext.addWindowEventListener(this)
-    reactApplicationContext.currentActivity?.window?.let { initializeState(it) }
   }
 
   override fun invalidate() {
@@ -54,27 +45,25 @@ internal class StatusBarModule(reactContext: ReactApplicationContext?) :
   }
 
   @Suppress("DEPRECATION")
-  fun initializeState(window: Window) {
-    val controller = WindowCompat.getInsetsController(window, window.decorView)
-    val insets = ViewCompat.getRootWindowInsets(window.decorView)
-    val visible = insets?.isVisible(WindowInsetsCompat.Type.statusBars()) ?: true
-
-    CurrentState.apply {
-      color = window.statusBarColor
-      hidden = !visible
-      style = if (controller.isAppearanceLightStatusBars) "dark-content" else "light-content"
-      translucent =
-          (window.attributes.flags and WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS) != 0
-    }
-  }
-
   override fun onWindowCreated(window: Window) {
     extrasWindows.add(window)
 
-    window.setStatusBarColor(CurrentState.color, false)
-    window.setStatusBarVisibility(CurrentState.hidden)
-    window.setStatusBarStyle(CurrentState.style)
-    window.setStatusBarTranslucency(CurrentState.translucent)
+    UiThreadUtil.runOnUiThread {
+      val controller = WindowCompat.getInsetsController(window, window.decorView)
+      val insets = ViewCompat.getRootWindowInsets(window.decorView)
+      val style = if (controller.isAppearanceLightStatusBars) "dark-content" else "light-content"
+      val visible = insets?.isVisible(WindowInsetsCompat.Type.statusBars()) ?: true
+
+      window.setStatusBarStyle(style)
+      window.setStatusBarVisibility(!visible)
+
+      if (!isEdgeToEdgeFeatureFlagOn) {
+        window.setStatusBarColor(window.statusBarColor, false)
+        window.setStatusBarTranslucency(
+            (window.attributes.flags and WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS) != 0
+        )
+      }
+    }
   }
 
   override fun onWindowDestroyed(window: Window) {
@@ -95,7 +84,7 @@ internal class StatusBarModule(reactContext: ReactApplicationContext?) :
   }
 
   override fun setColor(colorDouble: Double, animated: Boolean) {
-    CurrentState.color = colorDouble.toInt()
+    val color = colorDouble.toInt()
     val activity = reactApplicationContext.getCurrentActivity()
     if (activity == null) {
       FLog.w(
@@ -112,13 +101,12 @@ internal class StatusBarModule(reactContext: ReactApplicationContext?) :
       return
     }
     UiThreadUtil.runOnUiThread {
-      activity.window?.setStatusBarColor(CurrentState.color, animated)
-      extrasWindows.forEach { it.setStatusBarColor(CurrentState.color, animated) }
+      activity.window?.setStatusBarColor(color, animated)
+      extrasWindows.forEach { it.setStatusBarColor(color, animated) }
     }
   }
 
   override fun setTranslucent(translucent: Boolean) {
-    CurrentState.translucent = translucent
     val activity = reactApplicationContext.getCurrentActivity()
     if (activity == null) {
       FLog.w(
@@ -135,13 +123,12 @@ internal class StatusBarModule(reactContext: ReactApplicationContext?) :
       return
     }
     UiThreadUtil.runOnUiThread {
-      activity.window?.setStatusBarTranslucency(CurrentState.translucent)
-      extrasWindows.forEach { it.setStatusBarTranslucency(CurrentState.translucent) }
+      activity.window?.setStatusBarTranslucency(translucent)
+      extrasWindows.forEach { it.setStatusBarTranslucency(translucent) }
     }
   }
 
   override fun setHidden(hidden: Boolean) {
-    CurrentState.hidden = hidden
     val activity = reactApplicationContext.getCurrentActivity()
     if (activity == null) {
       FLog.w(
@@ -151,13 +138,12 @@ internal class StatusBarModule(reactContext: ReactApplicationContext?) :
       return
     }
     UiThreadUtil.runOnUiThread {
-      activity.window?.setStatusBarVisibility(CurrentState.hidden)
-      extrasWindows.forEach { it.setStatusBarVisibility(CurrentState.hidden) }
+      activity.window?.setStatusBarVisibility(hidden)
+      extrasWindows.forEach { it.setStatusBarVisibility(hidden) }
     }
   }
 
   override fun setStyle(style: String?) {
-    CurrentState.style = style ?: "default"
     val activity = reactApplicationContext.getCurrentActivity()
     if (activity == null) {
       FLog.w(
@@ -167,8 +153,8 @@ internal class StatusBarModule(reactContext: ReactApplicationContext?) :
       return
     }
     UiThreadUtil.runOnUiThread {
-      activity.window?.setStatusBarStyle(CurrentState.style)
-      extrasWindows.forEach { it.setStatusBarStyle(CurrentState.style) }
+      activity.window?.setStatusBarStyle(style)
+      extrasWindows.forEach { it.setStatusBarStyle(style) }
     }
   }
 
