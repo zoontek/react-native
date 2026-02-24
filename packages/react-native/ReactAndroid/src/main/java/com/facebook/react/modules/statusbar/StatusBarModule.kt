@@ -45,12 +45,27 @@ internal class StatusBarModule(reactContext: ReactApplicationContext?) :
 
   init {
     reactApplicationContext.addWindowEventListener(this)
-    reactApplicationContext.currentActivity?.window?.let { readInitialState(it) }
+    reactApplicationContext.currentActivity?.window?.let { initializeState(it) }
   }
 
   override fun invalidate() {
     super.invalidate()
     reactApplicationContext.removeWindowEventListener(this)
+  }
+
+  @Suppress("DEPRECATION")
+  fun initializeState(window: Window) {
+    val controller = WindowCompat.getInsetsController(window, window.decorView)
+    val insets = ViewCompat.getRootWindowInsets(window.decorView)
+    val visible = insets?.isVisible(WindowInsetsCompat.Type.statusBars()) ?: true
+
+    CurrentState.apply {
+      color = window.statusBarColor
+      hidden = !visible
+      style = if (controller.isAppearanceLightStatusBars) "dark-content" else "light-content"
+      translucent =
+          (window.attributes.flags and WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS) != 0
+    }
   }
 
   override fun onWindowCreated(window: Window) {
@@ -64,21 +79,6 @@ internal class StatusBarModule(reactContext: ReactApplicationContext?) :
 
   override fun onWindowDestroyed(window: Window) {
     extrasWindows.remove(window)
-  }
-
-  @Suppress("DEPRECATION")
-  fun readInitialState(window: Window) {
-    val controller = WindowCompat.getInsetsController(window, window.decorView)
-    val insets = ViewCompat.getRootWindowInsets(window.decorView)
-    val visible = insets?.isVisible(WindowInsetsCompat.Type.statusBars()) ?: true
-
-    CurrentState.apply {
-      color = window.statusBarColor
-      hidden = !visible
-      style = if (controller.isAppearanceLightStatusBars) "dark-content" else "light-content"
-      translucent =
-          (window.attributes.flags and WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS) != 0
-    }
   }
 
   @Suppress("DEPRECATION")
