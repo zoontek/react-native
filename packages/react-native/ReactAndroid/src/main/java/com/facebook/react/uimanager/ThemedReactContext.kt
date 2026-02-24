@@ -11,6 +11,7 @@ package com.facebook.react.uimanager
 
 import android.app.Activity
 import android.content.Context
+import android.view.Window
 import com.facebook.react.bridge.Callback
 import com.facebook.react.bridge.CatalystInstance
 import com.facebook.react.bridge.JavaScriptContextHolder
@@ -20,6 +21,7 @@ import com.facebook.react.bridge.NativeModule
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContext
 import com.facebook.react.bridge.ScrollEndedListeners
+import com.facebook.react.bridge.WindowEventListener
 import com.facebook.react.bridge.UIManager
 import com.facebook.react.common.annotations.internal.LegacyArchitecture
 import com.facebook.react.turbomodule.core.interfaces.CallInvokerHolder
@@ -65,6 +67,22 @@ public class ThemedReactContext(
 
   override fun removeLifecycleEventListener(listener: LifecycleEventListener) {
     reactApplicationContext.removeLifecycleEventListener(listener)
+  }
+
+  override fun addWindowEventListener(listener: WindowEventListener) {
+    reactApplicationContext.addWindowEventListener(listener)
+  }
+
+  override fun removeWindowEventListener(listener: WindowEventListener) {
+    reactApplicationContext.removeWindowEventListener(listener)
+  }
+
+  override fun onWindowCreated(window: Window) {
+    reactApplicationContext.onWindowCreated(window)
+  }
+
+  override fun onWindowDestroyed(window: Window) {
+    reactApplicationContext.onWindowDestroyed(window)
   }
 
   override fun hasCurrentActivity(): Boolean = reactApplicationContext.hasCurrentActivity()

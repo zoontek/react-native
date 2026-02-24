@@ -15,6 +15,7 @@ import android.content.ContextWrapper;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Window;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.facebook.common.logging.FLog;
@@ -48,6 +49,8 @@ public abstract class ReactContext extends ContextWrapper {
       new CopyOnWriteArraySet<>();
   private final CopyOnWriteArraySet<ActivityEventListener> mActivityEventListeners =
       new CopyOnWriteArraySet<>();
+  private final CopyOnWriteArraySet<WindowEventListener> mWindowEventListeners =
+    new CopyOnWriteArraySet<>();
   private final CopyOnWriteArraySet<WindowFocusChangeListener> mWindowFocusEventListeners =
       new CopyOnWriteArraySet<>();
   private final ScrollEndedListeners mScrollEndedListeners = new ScrollEndedListeners();
@@ -246,6 +249,14 @@ public abstract class ReactContext extends ContextWrapper {
     mActivityEventListeners.remove(listener);
   }
 
+  public void addWindowEventListener(WindowEventListener listener) {
+    mWindowEventListeners.add(listener);
+  }
+
+  public void removeWindowEventListener(WindowEventListener listener) {
+    mWindowEventListeners.remove(listener);
+  }
+
   public void addWindowFocusChangeListener(WindowFocusChangeListener listener) {
     mWindowFocusEventListeners.add(listener);
   }
@@ -350,6 +361,30 @@ public abstract class ReactContext extends ContextWrapper {
     for (ActivityEventListener listener : mActivityEventListeners) {
       try {
         listener.onActivityResult(activity, requestCode, resultCode, data);
+      } catch (RuntimeException e) {
+        handleException(e);
+      }
+    }
+  }
+
+  @ThreadConfined(UI)
+  public void onWindowCreated(Window window) {
+    UiThreadUtil.assertOnUiThread();
+    for (WindowEventListener listener : mWindowEventListeners) {
+      try {
+        listener.onWindowCreated(window);
+      } catch (RuntimeException e) {
+        handleException(e);
+      }
+    }
+  }
+
+  @ThreadConfined(UI)
+  public void onWindowDestroyed(Window window) {
+    UiThreadUtil.assertOnUiThread();
+    for (WindowEventListener listener : mWindowEventListeners) {
+      try {
+        listener.onWindowDestroyed(window);
       } catch (RuntimeException e) {
         handleException(e);
       }
