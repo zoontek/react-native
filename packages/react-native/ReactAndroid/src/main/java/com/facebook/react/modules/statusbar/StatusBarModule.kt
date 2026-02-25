@@ -43,7 +43,6 @@ internal class StatusBarModule(reactContext: ReactApplicationContext?) :
     reactApplicationContext.removeWindowEventListener(this)
   }
 
-  @Suppress("DEPRECATION")
   override fun onWindowCreated(window: Window) {
     extrasWindows.add(window)
 
