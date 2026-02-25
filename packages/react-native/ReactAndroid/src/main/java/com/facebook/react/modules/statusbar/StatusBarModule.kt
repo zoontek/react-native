@@ -8,7 +8,6 @@
 package com.facebook.react.modules.statusbar
 
 import android.view.Window
-import android.view.WindowManager
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -56,13 +55,6 @@ internal class StatusBarModule(reactContext: ReactApplicationContext?) :
 
       window.setStatusBarStyle(style)
       window.setStatusBarVisibility(!visible)
-
-      if (!isEdgeToEdgeFeatureFlagOn) {
-        window.setStatusBarColor(window.statusBarColor, false)
-        window.setStatusBarTranslucency(
-            (window.attributes.flags and WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS) != 0
-        )
-      }
     }
   }
 
@@ -100,10 +92,7 @@ internal class StatusBarModule(reactContext: ReactApplicationContext?) :
       )
       return
     }
-    UiThreadUtil.runOnUiThread {
-      activity.window?.setStatusBarColor(color, animated)
-      extrasWindows.forEach { it.setStatusBarColor(color, animated) }
-    }
+    UiThreadUtil.runOnUiThread { activity.window?.setStatusBarColor(color, animated) }
   }
 
   override fun setTranslucent(translucent: Boolean) {
@@ -122,10 +111,7 @@ internal class StatusBarModule(reactContext: ReactApplicationContext?) :
       )
       return
     }
-    UiThreadUtil.runOnUiThread {
-      activity.window?.setStatusBarTranslucency(translucent)
-      extrasWindows.forEach { it.setStatusBarTranslucency(translucent) }
-    }
+    UiThreadUtil.runOnUiThread { activity.window?.setStatusBarTranslucency(translucent) }
   }
 
   override fun setHidden(hidden: Boolean) {
