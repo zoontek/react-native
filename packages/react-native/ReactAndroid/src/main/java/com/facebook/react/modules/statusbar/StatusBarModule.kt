@@ -13,10 +13,10 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import com.facebook.common.logging.FLog
 import com.facebook.fbreact.specs.NativeStatusBarManagerAndroidSpec
+import com.facebook.react.bridge.ExtraWindowListener
 import com.facebook.react.bridge.NativeModule
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.UiThreadUtil
-import com.facebook.react.bridge.WindowEventListener
 import com.facebook.react.common.ReactConstants
 import com.facebook.react.module.annotations.ReactModule
 import com.facebook.react.uimanager.DisplayMetricsHolder.getStatusBarHeightPx
@@ -30,20 +30,20 @@ import com.facebook.react.views.view.setStatusBarVisibility
 /** [NativeModule] that allows changing the appearance of the status bar. */
 @ReactModule(name = NativeStatusBarManagerAndroidSpec.NAME)
 internal class StatusBarModule(reactContext: ReactApplicationContext?) :
-    NativeStatusBarManagerAndroidSpec(reactContext), WindowEventListener {
+    NativeStatusBarManagerAndroidSpec(reactContext), ExtraWindowListener {
 
   private val extrasWindows = mutableSetOf<Window>()
 
   init {
-    reactApplicationContext.addWindowEventListener(this)
+    reactApplicationContext.addExtraWindowListener(this)
   }
 
   override fun invalidate() {
     super.invalidate()
-    reactApplicationContext.removeWindowEventListener(this)
+    reactApplicationContext.removeExtraWindowListener(this)
   }
 
-  override fun onWindowCreated(window: Window) {
+  override fun onExtraWindowRegistered(window: Window) {
     extrasWindows.add(window)
 
     UiThreadUtil.runOnUiThread {
@@ -57,7 +57,7 @@ internal class StatusBarModule(reactContext: ReactApplicationContext?) :
     }
   }
 
-  override fun onWindowDestroyed(window: Window) {
+  override fun onExtraWindowUnregistered(window: Window) {
     extrasWindows.remove(window)
   }
 

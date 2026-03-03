@@ -49,7 +49,7 @@ public abstract class ReactContext extends ContextWrapper {
       new CopyOnWriteArraySet<>();
   private final CopyOnWriteArraySet<ActivityEventListener> mActivityEventListeners =
       new CopyOnWriteArraySet<>();
-  private final CopyOnWriteArraySet<WindowEventListener> mWindowEventListeners =
+  private final CopyOnWriteArraySet<ExtraWindowListener> mExtraWindowListeners =
     new CopyOnWriteArraySet<>();
   private final CopyOnWriteArraySet<WindowFocusChangeListener> mWindowFocusEventListeners =
       new CopyOnWriteArraySet<>();
@@ -249,12 +249,12 @@ public abstract class ReactContext extends ContextWrapper {
     mActivityEventListeners.remove(listener);
   }
 
-  public void addWindowEventListener(WindowEventListener listener) {
-    mWindowEventListeners.add(listener);
+  public void addExtraWindowListener(ExtraWindowListener listener) {
+    mExtraWindowListeners.add(listener);
   }
 
-  public void removeWindowEventListener(WindowEventListener listener) {
-    mWindowEventListeners.remove(listener);
+  public void removeExtraWindowListener(ExtraWindowListener listener) {
+    mExtraWindowListeners.remove(listener);
   }
 
   public void addWindowFocusChangeListener(WindowFocusChangeListener listener) {
@@ -368,11 +368,11 @@ public abstract class ReactContext extends ContextWrapper {
   }
 
   @ThreadConfined(UI)
-  public void onWindowCreated(Window window) {
+  public void registerExtraWindow(Window window) {
     UiThreadUtil.assertOnUiThread();
-    for (WindowEventListener listener : mWindowEventListeners) {
+    for (ExtraWindowListener listener : mExtraWindowListeners) {
       try {
-        listener.onWindowCreated(window);
+        listener.onExtraWindowRegistered(window);
       } catch (RuntimeException e) {
         handleException(e);
       }
@@ -380,11 +380,11 @@ public abstract class ReactContext extends ContextWrapper {
   }
 
   @ThreadConfined(UI)
-  public void onWindowDestroyed(Window window) {
+  public void unregisterExtraWindow(Window window) {
     UiThreadUtil.assertOnUiThread();
-    for (WindowEventListener listener : mWindowEventListeners) {
+    for (ExtraWindowListener listener : mExtraWindowListeners) {
       try {
-        listener.onWindowDestroyed(window);
+        listener.onExtraWindowUnregistered(window);
       } catch (RuntimeException e) {
         handleException(e);
       }

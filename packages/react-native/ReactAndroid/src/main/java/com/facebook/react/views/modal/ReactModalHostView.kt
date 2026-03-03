@@ -197,7 +197,7 @@ public class ReactModalHostView(context: ThemedReactContext) :
 
     dialog?.let { nonNullDialog ->
       nonNullDialog.window?.let { window ->
-        (context as ThemedReactContext).onWindowDestroyed(window)
+        (context as ThemedReactContext).unregisterExtraWindow(window)
       }
       if (nonNullDialog.isShowing) {
         val dialogContext =
@@ -344,7 +344,7 @@ public class ReactModalHostView(context: ThemedReactContext) :
       newDialog.show()
       updateSystemAppearance()
       window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE)
-      (context as ThemedReactContext).onWindowCreated(window)
+      (context as ThemedReactContext).registerExtraWindow(window)
     }
   }
 

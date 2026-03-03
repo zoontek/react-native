@@ -14,6 +14,7 @@ import android.content.Context
 import android.view.Window
 import com.facebook.react.bridge.Callback
 import com.facebook.react.bridge.CatalystInstance
+import com.facebook.react.bridge.ExtraWindowListener
 import com.facebook.react.bridge.JavaScriptContextHolder
 import com.facebook.react.bridge.JavaScriptModule
 import com.facebook.react.bridge.LifecycleEventListener
@@ -21,7 +22,6 @@ import com.facebook.react.bridge.NativeModule
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContext
 import com.facebook.react.bridge.ScrollEndedListeners
-import com.facebook.react.bridge.WindowEventListener
 import com.facebook.react.bridge.UIManager
 import com.facebook.react.common.annotations.internal.LegacyArchitecture
 import com.facebook.react.turbomodule.core.interfaces.CallInvokerHolder
@@ -69,20 +69,20 @@ public class ThemedReactContext(
     reactApplicationContext.removeLifecycleEventListener(listener)
   }
 
-  override fun addWindowEventListener(listener: WindowEventListener) {
-    reactApplicationContext.addWindowEventListener(listener)
+  override fun addExtraWindowListener(listener: ExtraWindowListener) {
+    reactApplicationContext.addExtraWindowListener(listener)
   }
 
-  override fun removeWindowEventListener(listener: WindowEventListener) {
-    reactApplicationContext.removeWindowEventListener(listener)
+  override fun removeExtraWindowListener(listener: ExtraWindowListener) {
+    reactApplicationContext.removeExtraWindowListener(listener)
   }
 
-  override fun onWindowCreated(window: Window) {
-    reactApplicationContext.onWindowCreated(window)
+  override fun registerExtraWindow(window: Window) {
+    reactApplicationContext.registerExtraWindow(window)
   }
 
-  override fun onWindowDestroyed(window: Window) {
-    reactApplicationContext.onWindowDestroyed(window)
+  override fun unregisterExtraWindow(window: Window) {
+    reactApplicationContext.unregisterExtraWindow(window)
   }
 
   override fun hasCurrentActivity(): Boolean = reactApplicationContext.hasCurrentActivity()
