@@ -196,9 +196,6 @@ public class ReactModalHostView(context: ThemedReactContext) :
     UiThreadUtil.assertOnUiThread()
 
     dialog?.let { nonNullDialog ->
-      nonNullDialog.window?.let { window ->
-        (context as ThemedReactContext).unregisterExtraWindow(window)
-      }
       if (nonNullDialog.isShowing) {
         val dialogContext =
             ContextUtils.findContextOfType(nonNullDialog.context, Activity::class.java)

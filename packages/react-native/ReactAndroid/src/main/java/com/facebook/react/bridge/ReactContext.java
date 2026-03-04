@@ -29,6 +29,7 @@ import com.facebook.react.common.LifecycleState;
 import com.facebook.react.turbomodule.core.interfaces.CallInvokerHolder;
 import java.lang.ref.WeakReference;
 import java.util.Collection;
+import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
@@ -49,10 +50,9 @@ public abstract class ReactContext extends ContextWrapper {
       new CopyOnWriteArraySet<>();
   private final CopyOnWriteArraySet<ActivityEventListener> mActivityEventListeners =
       new CopyOnWriteArraySet<>();
-  private final CopyOnWriteArraySet<ExtraWindowListener> mExtraWindowListeners =
-    new CopyOnWriteArraySet<>();
   private final CopyOnWriteArraySet<WindowFocusChangeListener> mWindowFocusEventListeners =
       new CopyOnWriteArraySet<>();
+  private final ExtraWindows mExtraWindows = new ExtraWindows();
   private final ScrollEndedListeners mScrollEndedListeners = new ScrollEndedListeners();
 
   private LifecycleState mLifecycleState = LifecycleState.BEFORE_CREATE;
@@ -208,6 +208,10 @@ public abstract class ReactContext extends ContextWrapper {
     return mScrollEndedListeners;
   }
 
+  public Set<Window> getExtraWindows() {
+    return mExtraWindows.getAll();
+  }
+
   public void addLifecycleEventListener(final LifecycleEventListener listener) {
     mLifecycleEventListeners.add(listener);
     if (hasActiveReactInstance() || isBridgeless()) {
@@ -250,11 +254,15 @@ public abstract class ReactContext extends ContextWrapper {
   }
 
   public void addExtraWindowListener(ExtraWindowListener listener) {
-    mExtraWindowListeners.add(listener);
+    mExtraWindows.addListener(listener);
   }
 
   public void removeExtraWindowListener(ExtraWindowListener listener) {
-    mExtraWindowListeners.remove(listener);
+    mExtraWindows.removeListener(listener);
+  }
+
+  public void registerExtraWindow(Window window) {
+    mExtraWindows.register(window, this::handleException);
   }
 
   public void addWindowFocusChangeListener(WindowFocusChangeListener listener) {
@@ -361,30 +369,6 @@ public abstract class ReactContext extends ContextWrapper {
     for (ActivityEventListener listener : mActivityEventListeners) {
       try {
         listener.onActivityResult(activity, requestCode, resultCode, data);
-      } catch (RuntimeException e) {
-        handleException(e);
-      }
-    }
-  }
-
-  @ThreadConfined(UI)
-  public void registerExtraWindow(Window window) {
-    UiThreadUtil.assertOnUiThread();
-    for (ExtraWindowListener listener : mExtraWindowListeners) {
-      try {
-        listener.onExtraWindowRegistered(window);
-      } catch (RuntimeException e) {
-        handleException(e);
-      }
-    }
-  }
-
-  @ThreadConfined(UI)
-  public void unregisterExtraWindow(Window window) {
-    UiThreadUtil.assertOnUiThread();
-    for (ExtraWindowListener listener : mExtraWindowListeners) {
-      try {
-        listener.onExtraWindowUnregistered(window);
       } catch (RuntimeException e) {
         handleException(e);
       }

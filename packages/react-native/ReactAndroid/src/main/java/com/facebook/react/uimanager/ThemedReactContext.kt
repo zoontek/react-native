@@ -81,10 +81,6 @@ public class ThemedReactContext(
     reactApplicationContext.registerExtraWindow(window)
   }
 
-  override fun unregisterExtraWindow(window: Window) {
-    reactApplicationContext.unregisterExtraWindow(window)
-  }
-
   override fun hasCurrentActivity(): Boolean = reactApplicationContext.hasCurrentActivity()
 
   override fun getCurrentActivity(): Activity? = reactApplicationContext.getCurrentActivity()
@@ -176,4 +172,6 @@ public class ThemedReactContext(
 
   override fun getScrollEndedListeners(): ScrollEndedListeners =
       reactApplicationContext.scrollEndedListeners
+
+  override fun getExtraWindows(): Set<Window> = reactApplicationContext.extraWindows
 }

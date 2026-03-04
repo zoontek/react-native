@@ -32,8 +32,6 @@ import com.facebook.react.views.view.setStatusBarVisibility
 internal class StatusBarModule(reactContext: ReactApplicationContext?) :
     NativeStatusBarManagerAndroidSpec(reactContext), ExtraWindowListener {
 
-  private val extrasWindows = mutableSetOf<Window>()
-
   init {
     reactApplicationContext.addExtraWindowListener(this)
   }
@@ -44,8 +42,6 @@ internal class StatusBarModule(reactContext: ReactApplicationContext?) :
   }
 
   override fun onExtraWindowRegistered(window: Window) {
-    extrasWindows.add(window)
-
     UiThreadUtil.runOnUiThread {
       val controller = WindowCompat.getInsetsController(window, window.decorView)
       val insets = ViewCompat.getRootWindowInsets(window.decorView)
@@ -55,10 +51,6 @@ internal class StatusBarModule(reactContext: ReactApplicationContext?) :
       window.setStatusBarStyle(style)
       window.setStatusBarVisibility(!visible)
     }
-  }
-
-  override fun onExtraWindowUnregistered(window: Window) {
-    extrasWindows.remove(window)
   }
 
   @Suppress("DEPRECATION")
@@ -124,7 +116,7 @@ internal class StatusBarModule(reactContext: ReactApplicationContext?) :
     }
     UiThreadUtil.runOnUiThread {
       activity.window?.setStatusBarVisibility(hidden)
-      extrasWindows.forEach { it.setStatusBarVisibility(hidden) }
+      reactApplicationContext.extraWindows.forEach { it.setStatusBarVisibility(hidden) }
     }
   }
 
@@ -139,7 +131,7 @@ internal class StatusBarModule(reactContext: ReactApplicationContext?) :
     }
     UiThreadUtil.runOnUiThread {
       activity.window?.setStatusBarStyle(style)
-      extrasWindows.forEach { it.setStatusBarStyle(style) }
+      reactApplicationContext.extraWindows.forEach { it.setStatusBarStyle(style) }
     }
   }
 
