@@ -213,7 +213,13 @@ async function buildFile(
         emitTypeScriptDefs
           ? fs.writeFile(
               buildPath.replace(/\.js$/, '') + '.d.ts',
-              await translate.translateFlowToTSDef(source, prettierConfig),
+              (await translate.translateFlowToTSDef(source, prettierConfig))
+                // flow-api-translator doesn't translate Flow's @@xxx notation
+                // in interfaces. Replace it with [Symbol.xxx] computed syntax
+                .replace(
+                  /@@(iterator|asyncIterator|dispose|asyncDispose)/g,
+                  '[Symbol.$1]',
+                ),
             )
           : null,
       ]);
