@@ -106,23 +106,40 @@ private fun Window.statusBarShow() {
 internal fun Window.enableEdgeToEdge() {
   WindowCompat.setDecorFitsSystemWindows(this, false)
 
+  val insetsController = WindowInsetsControllerCompat(this, decorView)
   val isDarkMode = UiModeUtils.isDarkMode(context)
 
-  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-    isStatusBarContrastEnforced = false
-    isNavigationBarContrastEnforced = true
-  }
-
   statusBarColor = Color.TRANSPARENT
-  navigationBarColor =
-      when {
-        Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> Color.TRANSPARENT
-        Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && !isDarkMode -> LightNavigationBarColor
-        else -> DarkNavigationBarColor
-      }
 
-  WindowInsetsControllerCompat(this, decorView).run {
-    isAppearanceLightNavigationBars = !isDarkMode
+  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+    navigationBarColor = Color.TRANSPARENT
+
+    val attrs = intArrayOf(android.R.attr.enforceNavigationBarContrast)
+    val typedArray = context.theme.obtainStyledAttributes(attrs)
+
+    val isContrastEnforced =
+        try {
+          typedArray.getBoolean(0, true)
+        } finally {
+          typedArray.recycle()
+        }
+
+    isStatusBarContrastEnforced = false
+    isNavigationBarContrastEnforced = isContrastEnforced
+
+    if (isContrastEnforced) {
+      insetsController.isAppearanceLightNavigationBars = !isDarkMode
+    }
+  } else {
+    val isAppearanceLight = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && !isDarkMode
+
+    navigationBarColor =
+        when {
+          isAppearanceLight -> LightNavigationBarColor
+          else -> DarkNavigationBarColor
+        }
+
+    insetsController.isAppearanceLightNavigationBars = isAppearanceLight
   }
 
   if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
