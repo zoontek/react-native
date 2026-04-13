@@ -117,7 +117,7 @@ internal fun Window.enableEdgeToEdge() {
     val attrs = intArrayOf(android.R.attr.enforceNavigationBarContrast)
     val typedArray = context.theme.obtainStyledAttributes(attrs)
 
-    val isContrastEnforced =
+    val enforceNavigationBarContrast =
         try {
           typedArray.getBoolean(0, true)
         } finally {
@@ -125,15 +125,18 @@ internal fun Window.enableEdgeToEdge() {
         }
 
     isStatusBarContrastEnforced = false
-    isNavigationBarContrastEnforced = isContrastEnforced
+    isNavigationBarContrastEnforced = enforceNavigationBarContrast
 
-    if (isContrastEnforced) {
+    if (enforceNavigationBarContrast) {
       insetsController.isAppearanceLightNavigationBars = !isDarkMode
     }
   } else {
-    val isAppearanceLight = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && !isDarkMode
-    navigationBarColor = if (isAppearanceLight) LightNavigationBarColor else DarkNavigationBarColor
-    insetsController.isAppearanceLightNavigationBars = isAppearanceLight
+    val isAppearanceLightNavigationBars =
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && !isDarkMode
+
+    navigationBarColor =
+        if (isAppearanceLightNavigationBars) LightNavigationBarColor else DarkNavigationBarColor
+    insetsController.isAppearanceLightNavigationBars = isAppearanceLightNavigationBars
   }
 
   if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
