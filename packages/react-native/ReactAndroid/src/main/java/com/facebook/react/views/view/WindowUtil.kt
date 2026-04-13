@@ -132,13 +132,7 @@ internal fun Window.enableEdgeToEdge() {
     }
   } else {
     val isAppearanceLight = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && !isDarkMode
-
-    navigationBarColor =
-        when {
-          isAppearanceLight -> LightNavigationBarColor
-          else -> DarkNavigationBarColor
-        }
-
+    navigationBarColor = if (isAppearanceLight) LightNavigationBarColor else DarkNavigationBarColor
     insetsController.isAppearanceLightNavigationBars = isAppearanceLight
   }
 
