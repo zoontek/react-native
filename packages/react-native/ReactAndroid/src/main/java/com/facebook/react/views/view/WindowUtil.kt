@@ -114,8 +114,8 @@ internal fun Window.enableEdgeToEdge() {
   if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
     navigationBarColor = Color.TRANSPARENT
 
-    val attrs = intArrayOf(android.R.attr.enforceNavigationBarContrast)
-    val typedArray = context.theme.obtainStyledAttributes(attrs)
+    val attributes = intArrayOf(android.R.attr.enforceNavigationBarContrast)
+    val typedArray = context.theme.obtainStyledAttributes(attributes)
 
     val enforceNavigationBarContrast =
         try {
