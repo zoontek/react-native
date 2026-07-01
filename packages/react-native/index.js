@@ -39,6 +39,12 @@ module.exports = {
     return require('./Libraries/Components/Button').default;
   },
   get DrawerLayoutAndroid() {
+    warnOnce(
+      'drawer-layout-android-deprecated',
+      'DrawerLayoutAndroid is deprecated and will be removed in a future release. ' +
+        "Use 'react-native-drawer-layout' instead. " +
+        'See https://reactnavigation.org/docs/drawer-layout/',
+    );
     return require('./Libraries/Components/DrawerAndroid/DrawerLayoutAndroid')
       .default;
   },
