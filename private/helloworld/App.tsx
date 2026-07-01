@@ -9,7 +9,6 @@
 
 import * as React from 'react';
 import {
-  SafeAreaView,
   ScrollView,
   StatusBar,
   StyleSheet,
@@ -22,14 +21,14 @@ function App(): React.ReactNode {
   const isDarkMode = useColorScheme() === 'dark';
 
   return (
-    <SafeAreaView>
+    <View>
       <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
       <ScrollView contentInsetAdjustmentBehavior="automatic">
         <View>
           <Text style={styles.title}>Hello, World!</Text>
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
