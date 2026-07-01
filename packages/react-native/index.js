@@ -389,4 +389,20 @@ if (__DEV__) {
       );
     },
   });
+
+  /* $FlowFixMe[prop-missing] This is intentional: Flow will error when
+   * attempting to access SafeAreaView. */
+  /* $FlowFixMe[invalid-export] This is intentional: Flow will error when
+   * attempting to access SafeAreaView. */
+  Object.defineProperty(module.exports, 'SafeAreaView', {
+    configurable: true,
+    get() {
+      invariant(
+        false,
+        'SafeAreaView has been removed from react-native core. ' +
+          "Please use 'react-native-safe-area-context' instead. " +
+          'See https://github.com/AppAndFlow/react-native-safe-area-context',
+      );
+    },
+  });
 }
