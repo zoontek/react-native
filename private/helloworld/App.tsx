@@ -13,7 +13,6 @@ import {
   StatusBar,
   StyleSheet,
   Text,
-  View,
   useColorScheme,
 } from 'react-native';
 
@@ -21,14 +20,12 @@ function App(): React.ReactNode {
   const isDarkMode = useColorScheme() === 'dark';
 
   return (
-    <View>
+    <>
       <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
       <ScrollView contentInsetAdjustmentBehavior="automatic">
-        <View>
-          <Text style={styles.title}>Hello, World!</Text>
-        </View>
+        <Text style={styles.title}>Hello, World!</Text>
       </ScrollView>
-    </View>
+    </>
   );
 }
 
