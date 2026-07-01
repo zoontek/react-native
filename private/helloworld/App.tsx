@@ -8,20 +8,12 @@
  */
 
 import * as React from 'react';
-import {
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-} from 'react-native';
+import {ScrollView, StatusBar, StyleSheet, Text} from 'react-native';
 
 function App(): React.ReactNode {
-  const isDarkMode = useColorScheme() === 'dark';
-
   return (
     <>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
+      <StatusBar barStyle="auto" />
       <ScrollView contentInsetAdjustmentBehavior="automatic">
         <Text style={styles.title}>Hello, World!</Text>
       </ScrollView>
