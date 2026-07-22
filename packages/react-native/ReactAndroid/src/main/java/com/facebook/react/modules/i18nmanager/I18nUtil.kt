@@ -19,8 +19,8 @@ public class I18nUtil private constructor() {
    * * allows RTL layout when using RTL locale
    */
   public fun isRTL(context: Context): Boolean =
-    applicationHasRtlSupport(context) &&
-      (isRTLForced(context) || (isRTLAllowed(context) && isDevicePreferredLanguageRTL(context)))
+      applicationHasRtlSupport(context) &&
+          (isRTLForced(context) || (isRTLAllowed(context) && isDevicePreferredLanguageRTL(context)))
 
   /**
    * Android relies on the presence of `android:supportsRtl="true"` being set in order to resolve
