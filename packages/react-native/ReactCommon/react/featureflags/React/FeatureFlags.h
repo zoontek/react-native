@@ -13,8 +13,12 @@
 //   #include <React/FeatureFlags.h>
 //
 // Re-exports the module's public interface headers. React Native's own code
-// should keep using the fine-grained `<react/featureflags/...>` includes; only
-// outside consumers use this umbrella.
+// should keep using the fine-grained `<react/featureflags/...>` includes,
+// except in headers it exports to consumers: those are preprocessed in the
+// consumer's translation unit, where the fine-grained include hits this
+// module's <react/cxxstableapi/UmbrellaGuard.h>. `RN_ALLOW_FRAMEWORKS` does not
+// suppress that guard, so a "for frameworks" header must reach this module
+// through the umbrella.
 //
 // The headers below are generated from
 // `scripts/featureflags/ReactNativeFeatureFlags.config.js`, but this file is
