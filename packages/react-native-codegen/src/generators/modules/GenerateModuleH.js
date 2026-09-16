@@ -213,7 +213,7 @@ const FileTemplate = ({
 #pragma once
 
 #include <ReactCommon/TurboModule.h>
-#include <React/Bridging.h>
+#include <react/bridging/Bridging.h>
 
 namespace facebook::react {
 
