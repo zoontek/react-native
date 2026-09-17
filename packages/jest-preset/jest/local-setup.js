@@ -13,10 +13,8 @@
 
 import './setup';
 
-// $FlowFixMe[incompatible-type]
-const consoleError: (...data: ReadonlyArray<unknown>) => void = console.error;
-// $FlowFixMe[incompatible-type]
-const consoleWarn: (...data: ReadonlyArray<unknown>) => void = console.warn;
+const consoleError = console.error;
+const consoleWarn = console.warn;
 
 // $FlowFixMe[cannot-write]
 console.error = (...args) => {
