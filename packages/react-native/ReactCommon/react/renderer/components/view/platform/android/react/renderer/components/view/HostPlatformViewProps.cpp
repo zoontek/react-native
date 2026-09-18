@@ -418,7 +418,13 @@ inline static void updateAccessibilityStateProp(
   }
 
   if (!oldState.has_value() || newState->selected != oldState->selected) {
-    resultState["selected"] = newState->selected;
+    // Omitting the key when `selected` is unset is what tells the platform the
+    // component is not selectable. BaseViewManager#setViewState falls back to
+    // `setSelected(false)` for an absent key, so the rendered result is
+    // unchanged from when this was a plain `bool`.
+    if (newState->selected.has_value()) {
+      resultState["selected"] = newState->selected.value();
+    }
   }
 
   if (!oldState.has_value() || newState->busy != oldState->busy) {

@@ -609,7 +609,7 @@ describe('<Text>', () => {
         expect(
           root.getRenderedOutput({props: ['accessibilityState']}).toJSX(),
         ).toEqual(
-          <rn-paragraph accessibilityState="{disabled:true,selected:false,checked:None,busy:false,expanded:null}">
+          <rn-paragraph accessibilityState="{disabled:true,selected:null,checked:None,busy:false,expanded:null}">
             {TEST_TEXT}
           </rn-paragraph>,
         );
@@ -818,7 +818,7 @@ describe('<Text>', () => {
       expect(root.getRenderedOutput({props: PRESS_PROPS}).toJSX())
         .toMatchInlineSnapshot(`
         <rn-paragraph
-          accessibilityState="{disabled:true,selected:false,checked:None,busy:false,expanded:null}"
+          accessibilityState="{disabled:true,selected:null,checked:None,busy:false,expanded:null}"
         >
           the text
         </rn-paragraph>
