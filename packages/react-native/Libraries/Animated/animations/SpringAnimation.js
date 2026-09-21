@@ -366,6 +366,7 @@ export default class SpringAnimation extends Animation {
 
   stop(): void {
     super.stop();
+    // $FlowFixMe[incompatible-type]
     clearTimeout(this._timeout);
     if (this._animationFrame != null) {
       global.cancelAnimationFrame(this._animationFrame);

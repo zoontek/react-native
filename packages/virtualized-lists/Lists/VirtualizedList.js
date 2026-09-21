@@ -708,6 +708,7 @@ class VirtualizedList extends StateSafePureComponent<
     if (this._isNestedWithSameOrientation()) {
       this.context.unregisterAsNestedChild({ref: this});
     }
+    // $FlowFixMe[incompatible-type]
     clearTimeout(this._updateCellsToRenderTimeoutID);
     this._viewabilityTuples.forEach(tuple => {
       tuple.viewabilityHelper.dispose();
