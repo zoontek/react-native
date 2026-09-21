@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- * @generated SignedSource<<6ad9c99b513e5482b907ff75f6784818>>
+ * @generated SignedSource<<3e79a789a79e89cfc278df106b1dc555>>
  * @flow strict
  * @noformat
  */
@@ -72,6 +72,7 @@ export type ReactNativeFeatureFlags = Readonly<{
   enableEagerRootViewAttachment: Getter<boolean>,
   enableExclusivePropsUpdateAndroid: Getter<boolean>,
   enableFabricCommitBranching: Getter<boolean>,
+  enableFabricCommitBranchingMergeOnMainThread: Getter<boolean>,
   enableFabricLogs: Getter<boolean>,
   enableFlexboxAutoMinSizeInStrictMode: Getter<boolean>,
   enableFontScaleChangesUpdatingLayout: Getter<boolean>,
@@ -302,9 +303,13 @@ export const enableEagerRootViewAttachment: Getter<boolean> = createNativeFlagGe
  */
 export const enableExclusivePropsUpdateAndroid: Getter<boolean> = createNativeFlagGetter('enableExclusivePropsUpdateAndroid', false);
 /**
- * Enables Fabric commit branching to fix starvation problems and atomic JS updates.
+ * Enables Fabric commit branching to fix atomic JS updates.
  */
 export const enableFabricCommitBranching: Getter<boolean> = createNativeFlagGetter('enableFabricCommitBranching', false);
+/**
+ * Enables Fabric commit branching merge to happen on the main thread to fix starvation problems.
+ */
+export const enableFabricCommitBranchingMergeOnMainThread: Getter<boolean> = createNativeFlagGetter('enableFabricCommitBranchingMergeOnMainThread', false);
 /**
  * This feature flag enables logs for Fabric.
  */

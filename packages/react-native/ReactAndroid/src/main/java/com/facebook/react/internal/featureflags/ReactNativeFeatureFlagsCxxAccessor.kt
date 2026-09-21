@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- * @generated SignedSource<<c07cb2f4489ba94f267d0c76616ee718>>
+ * @generated SignedSource<<e69290c5801d6f796d368c643f9e8072>>
  */
 
 /**
@@ -43,6 +43,7 @@ internal class ReactNativeFeatureFlagsCxxAccessor : ReactNativeFeatureFlagsAcces
   private var enableEagerRootViewAttachmentCache: Boolean? = null
   private var enableExclusivePropsUpdateAndroidCache: Boolean? = null
   private var enableFabricCommitBranchingCache: Boolean? = null
+  private var enableFabricCommitBranchingMergeOnMainThreadCache: Boolean? = null
   private var enableFabricLogsCache: Boolean? = null
   private var enableFlexboxAutoMinSizeInStrictModeCache: Boolean? = null
   private var enableFontScaleChangesUpdatingLayoutCache: Boolean? = null
@@ -312,6 +313,15 @@ internal class ReactNativeFeatureFlagsCxxAccessor : ReactNativeFeatureFlagsAcces
     if (cached == null) {
       cached = ReactNativeFeatureFlagsCxxInterop.enableFabricCommitBranching()
       enableFabricCommitBranchingCache = cached
+    }
+    return cached
+  }
+
+  override fun enableFabricCommitBranchingMergeOnMainThread(): Boolean {
+    var cached = enableFabricCommitBranchingMergeOnMainThreadCache
+    if (cached == null) {
+      cached = ReactNativeFeatureFlagsCxxInterop.enableFabricCommitBranchingMergeOnMainThread()
+      enableFabricCommitBranchingMergeOnMainThreadCache = cached
     }
     return cached
   }

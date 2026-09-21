@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- * @generated SignedSource<<e0a3634ebf5db2e89bb5ab26d59a54c1>>
+ * @generated SignedSource<<017e077f16de57249c1ab774bdb5eb96>>
  */
 
 /**
@@ -252,6 +252,15 @@ class ReactNativeFeatureFlagsDynamicProvider : public ReactNativeFeatureFlagsDef
     }
 
     return ReactNativeFeatureFlagsDefaults::enableFabricCommitBranching();
+  }
+
+  bool enableFabricCommitBranchingMergeOnMainThread() override {
+    auto value = values_["enableFabricCommitBranchingMergeOnMainThread"];
+    if (!value.isNull()) {
+      return value.getBool();
+    }
+
+    return ReactNativeFeatureFlagsDefaults::enableFabricCommitBranchingMergeOnMainThread();
   }
 
   bool enableFabricLogs() override {

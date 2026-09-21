@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- * @generated SignedSource<<0050c3fd04df99633d455ee88e0cf789>>
+ * @generated SignedSource<<f1b250f538d8d5c39dfa1217fc359c00>>
  */
 
 /**
@@ -57,6 +57,7 @@ class ReactNativeFeatureFlagsAccessor {
   bool enableEagerRootViewAttachment();
   bool enableExclusivePropsUpdateAndroid();
   bool enableFabricCommitBranching();
+  bool enableFabricCommitBranchingMergeOnMainThread();
   bool enableFabricLogs();
   bool enableFlexboxAutoMinSizeInStrictMode();
   bool enableFontScaleChangesUpdatingLayout();
@@ -133,7 +134,7 @@ class ReactNativeFeatureFlagsAccessor {
   std::unique_ptr<ReactNativeFeatureFlagsProvider> currentProvider_;
   bool wasOverridden_;
 
-  std::array<std::atomic<const char*>, 88> accessedFeatureFlags_;
+  std::array<std::atomic<const char*>, 89> accessedFeatureFlags_;
 
   std::atomic<std::optional<bool>> commonTestFlag_;
   std::atomic<std::optional<bool>> cdpInteractionMetricsEnabled_;
@@ -158,6 +159,7 @@ class ReactNativeFeatureFlagsAccessor {
   std::atomic<std::optional<bool>> enableEagerRootViewAttachment_;
   std::atomic<std::optional<bool>> enableExclusivePropsUpdateAndroid_;
   std::atomic<std::optional<bool>> enableFabricCommitBranching_;
+  std::atomic<std::optional<bool>> enableFabricCommitBranchingMergeOnMainThread_;
   std::atomic<std::optional<bool>> enableFabricLogs_;
   std::atomic<std::optional<bool>> enableFlexboxAutoMinSizeInStrictMode_;
   std::atomic<std::optional<bool>> enableFontScaleChangesUpdatingLayout_;

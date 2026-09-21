@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- * @generated SignedSource<<18ffa42c9d28304df99548a350b014ac>>
+ * @generated SignedSource<<a9eed3dc15b11bd5708439de0dc46cf9>>
  */
 
 /**
@@ -68,6 +68,8 @@ public interface ReactNativeFeatureFlagsProvider {
   @DoNotStrip public fun enableExclusivePropsUpdateAndroid(): Boolean
 
   @DoNotStrip public fun enableFabricCommitBranching(): Boolean
+
+  @DoNotStrip public fun enableFabricCommitBranchingMergeOnMainThread(): Boolean
 
   @DoNotStrip public fun enableFabricLogs(): Boolean
 

@@ -290,7 +290,17 @@ const definitions: FeatureFlagDefinitions = {
       defaultValue: false,
       metadata: {
         description:
-          'Enables Fabric commit branching to fix starvation problems and atomic JS updates.',
+          'Enables Fabric commit branching to fix atomic JS updates.',
+        expectedReleaseValue: true,
+        purpose: 'release',
+      },
+      ossReleaseStage: 'none',
+    },
+    enableFabricCommitBranchingMergeOnMainThread: {
+      defaultValue: false,
+      metadata: {
+        description:
+          'Enables Fabric commit branching merge to happen on the main thread to fix starvation problems.',
         expectedReleaseValue: true,
         purpose: 'release',
       },
