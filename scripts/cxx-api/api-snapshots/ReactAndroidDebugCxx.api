@@ -4614,7 +4614,6 @@ class facebook::react::Scheduler : public facebook::react::UIManagerDelegate {
   public virtual void uiManagerDidDispatchCommand(const std::shared_ptr<const facebook::react::ShadowNode>& shadowNode, const std::string& commandName, const folly::dynamic& args) override;
   public virtual void uiManagerDidFinishReactCommit(const facebook::react::ShadowTree& shadowTree) override;
   public virtual void uiManagerDidFinishTransaction(std::shared_ptr<const facebook::react::MountingCoordinator> mountingCoordinator, bool mountSynchronously) override;
-  public virtual void uiManagerDidPromoteReactRevision(const facebook::react::ShadowTree& shadowTree) override;
   public virtual void uiManagerDidSendAccessibilityEvent(const std::shared_ptr<const facebook::react::ShadowNode>& shadowNode, const std::string& eventType) override;
   public virtual void uiManagerDidSetIsJSResponder(const std::shared_ptr<const facebook::react::ShadowNode>& shadowNode, bool isJSResponder, bool blockNativeResponder) override;
   public virtual void uiManagerDidSetViewSnapshot(facebook::react::Tag sourceTag, facebook::react::Tag targetTag, facebook::react::SurfaceId surfaceId) override;
@@ -4820,6 +4819,7 @@ enum facebook::react::ShadowNodeTraits::Trait : int32_t {
 
 class facebook::react::ShadowTree {
   public ShadowTree(facebook::react::SurfaceId surfaceId, const facebook::react::LayoutConstraints& layoutConstraints, const facebook::react::LayoutContext& layoutContext, const facebook::react::ShadowTreeDelegate& delegate, const facebook::react::ContextContainer& contextContainer);
+  public bool promoteReactRevision() const;
   public facebook::react::CommitMode getCommitMode() const;
   public facebook::react::CommitStatus commit(const facebook::react::ShadowTreeCommitTransaction& transaction, const facebook::react::ShadowTree::CommitOptions& commitOptions) const;
   public facebook::react::CommitStatus tryCommit(const facebook::react::ShadowTreeCommitTransaction& transaction, const facebook::react::ShadowTree::CommitOptions& commitOptions) const;
@@ -4835,7 +4835,6 @@ class facebook::react::ShadowTree {
   public void commitEmptyTree() const;
   public void mergeReactRevision() const;
   public void notifyDelegatesOfUpdates() const;
-  public void promoteReactRevision() const;
   public void setCommitMode(facebook::react::CommitMode commitMode) const;
   public ~ShadowTree();
 }
@@ -4845,7 +4844,6 @@ class facebook::react::ShadowTreeDelegate {
   public virtual void shadowTreeDidCommit(const facebook::react::ShadowTree&, const facebook::react::RootShadowNode::Shared&, const std::vector<const facebook::react::LayoutableShadowNode*>&) const;
   public virtual void shadowTreeDidFinishReactCommit(const facebook::react::ShadowTree& shadowTree) const = 0;
   public virtual void shadowTreeDidFinishTransaction(std::shared_ptr<const facebook::react::MountingCoordinator> mountingCoordinator, bool mountSynchronously) const = 0;
-  public virtual void shadowTreeDidPromoteReactRevision(const facebook::react::ShadowTree& shadowTree) const = 0;
   public virtual ~ShadowTreeDelegate() noexcept = default;
 }
 
@@ -5357,7 +5355,6 @@ class facebook::react::UIManager : public facebook::react::ShadowTreeDelegate {
   public virtual void shadowTreeDidCommit(const facebook::react::ShadowTree& shadowTree, const facebook::react::RootShadowNode::Shared& rootShadowNode, const std::vector<const facebook::react::LayoutableShadowNode*>& affectedLayoutableNodes) const noexcept override;
   public virtual void shadowTreeDidFinishReactCommit(const facebook::react::ShadowTree& shadowTree) const override;
   public virtual void shadowTreeDidFinishTransaction(std::shared_ptr<const facebook::react::MountingCoordinator> mountingCoordinator, bool mountSynchronously) const override;
-  public virtual void shadowTreeDidPromoteReactRevision(const facebook::react::ShadowTree& shadowTree) const override;
   public void addEventListener(std::shared_ptr<const facebook::react::EventListener> listener);
   public void addOnSurfaceStartCallback(facebook::react::UIManagerDelegate::OnSurfaceStartCallback&& callback);
   public void animationTick() const;
@@ -5438,7 +5435,6 @@ class facebook::react::UIManagerDelegate {
   public virtual void uiManagerDidDispatchCommand(const std::shared_ptr<const facebook::react::ShadowNode>& shadowNode, const std::string& commandName, const folly::dynamic& args) = 0;
   public virtual void uiManagerDidFinishReactCommit(const facebook::react::ShadowTree& shadowTree) = 0;
   public virtual void uiManagerDidFinishTransaction(std::shared_ptr<const facebook::react::MountingCoordinator> mountingCoordinator, bool mountSynchronously) = 0;
-  public virtual void uiManagerDidPromoteReactRevision(const facebook::react::ShadowTree& shadowTree) = 0;
   public virtual void uiManagerDidSendAccessibilityEvent(const std::shared_ptr<const facebook::react::ShadowNode>& shadowNode, const std::string& eventType) = 0;
   public virtual void uiManagerDidSetIsJSResponder(const std::shared_ptr<const facebook::react::ShadowNode>& shadowNode, bool isJSResponder, bool blockNativeResponder) = 0;
   public virtual void uiManagerDidSetViewSnapshot(facebook::react::Tag sourceTag, facebook::react::Tag targetTag, facebook::react::SurfaceId surfaceId) = 0;

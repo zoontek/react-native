@@ -417,19 +417,24 @@ void Scheduler::uiManagerShouldRemoveEventListener(
 }
 
 void Scheduler::uiManagerDidFinishReactCommit(const ShadowTree& shadowTree) {
+  if (delegate_ == nullptr) {
+    return;
+  }
+
   auto surfaceId = shadowTree.getSurfaceId();
   runtimeScheduler_->scheduleRenderingUpdate(
-      surfaceId, [surfaceId, uiManager = uiManager_]() {
-        uiManager->getShadowTreeRegistry().visit(
-            surfaceId,
-            [](const ShadowTree& tree) { tree.promoteReactRevision(); });
-      });
-}
+      surfaceId, [surfaceId, uiManager = uiManager_, delegate = delegate_]() {
+        bool promoted = false;
 
-void Scheduler::uiManagerDidPromoteReactRevision(const ShadowTree& shadowTree) {
-  if (delegate_ != nullptr) {
-    delegate_->schedulerShouldMergeReactRevision(shadowTree.getSurfaceId());
-  }
+        uiManager->getShadowTreeRegistry().visit(
+            surfaceId, [&](const ShadowTree& tree) {
+              promoted = tree.promoteReactRevision();
+            });
+
+        if (promoted) {
+          delegate->schedulerShouldMergeReactRevision(surfaceId);
+        }
+      });
 }
 
 void Scheduler::uiManagerDidStartSurface(const ShadowTree& shadowTree) {

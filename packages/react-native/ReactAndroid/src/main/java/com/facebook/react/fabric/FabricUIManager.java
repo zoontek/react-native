@@ -1628,7 +1628,7 @@ public class FabricUIManager
 
       // Drain pending React revision merges first so that animations,
       // preallocation, and mount items operate against the latest revision.
-      if (ReactNativeFeatureFlags.enableFabricCommitBranching()) {
+      if (ReactNativeFeatureFlags.enableFabricCommitBranchingMergeOnMainThread()) {
         FabricUIManagerBinding binding = mBinding;
         if (binding != null) {
           Integer mergeSurfaceId;

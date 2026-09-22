@@ -673,13 +673,6 @@ void UIManager::shadowTreeDidFinishReactCommit(
   }
 }
 
-void UIManager::shadowTreeDidPromoteReactRevision(
-    const ShadowTree& shadowTree) const {
-  if (delegate_ != nullptr) {
-    delegate_->uiManagerDidPromoteReactRevision(shadowTree);
-  }
-}
-
 void UIManager::shadowTreeDidCommit(
     const ShadowTree& shadowTree,
     const RootShadowNode::Shared& rootShadowNode,

@@ -101,7 +101,7 @@ class ReactRevisionMergeRunLoopObserverDelegate final : public RunLoopObserver::
     _mountingManager.contextContainer = contextContainer;
     _mountingManager.delegate = self;
 
-    if (ReactNativeFeatureFlags::enableFabricCommitBranching()) {
+    if (ReactNativeFeatureFlags::enableFabricCommitBranchingMergeOnMainThread()) {
       _mergeRunLoopObserverDelegate = std::make_shared<ReactRevisionMergeRunLoopObserverDelegate>(self);
       _mergeRunLoopObserver = std::make_unique<const MainRunLoopObserver>(
           RunLoopObserver::Activity::BeforeWaiting, _mergeRunLoopObserverDelegate);
@@ -350,7 +350,7 @@ class ReactRevisionMergeRunLoopObserverDelegate final : public RunLoopObserver::
 
 - (void)schedulerShouldMergeReactRevision:(SurfaceId)surfaceId
 {
-  if (RCTIsMainQueue()) {
+  if (RCTIsMainQueue() || !ReactNativeFeatureFlags::enableFabricCommitBranchingMergeOnMainThread()) {
     [self _mergeReactRevisionForSurfaceId:surfaceId];
     return;
   }
@@ -369,7 +369,6 @@ class ReactRevisionMergeRunLoopObserverDelegate final : public RunLoopObserver::
 
 - (void)_mergeReactRevisionForSurfaceId:(SurfaceId)surfaceId
 {
-  RCTAssertMainQueue();
   RCTScheduler *scheduler = [self scheduler];
   if (!scheduler) {
     return;

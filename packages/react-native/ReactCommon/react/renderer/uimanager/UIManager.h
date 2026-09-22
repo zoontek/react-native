@@ -143,8 +143,6 @@ class UIManager final : public ShadowTreeDelegate {
 
   void shadowTreeDidFinishReactCommit(const ShadowTree &shadowTree) const override;
 
-  void shadowTreeDidPromoteReactRevision(const ShadowTree &shadowTree) const override;
-
   void shadowTreeDidCommit(
       const ShadowTree &shadowTree,
       const RootShadowNode::Shared &rootShadowNode,
