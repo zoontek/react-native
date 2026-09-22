@@ -33,6 +33,17 @@ if ENV['USE_FRAMEWORKS']
     "\"$(PODS_TARGET_SRCROOT)/react/renderer/components/text/platform/cxx\"",
     "\"$(PODS_TARGET_SRCROOT)/react/renderer/components/view/platform/cxx\"",
   ]
+
+  if ReactNativeCoreUtils.build_rncore_from_source()
+    # Stable umbrellas consumed by exported component headers.
+    header_search_path = header_search_path + [
+      "\"$(PODS_TARGET_SRCROOT)/react/debug\"",
+      "\"$(PODS_TARGET_SRCROOT)/react/renderer/components/view\"",
+      "\"$(PODS_TARGET_SRCROOT)/react/renderer/core\"",
+      "\"$(PODS_TARGET_SRCROOT)/react/renderer/debug\"",
+      "\"$(PODS_TARGET_SRCROOT)/react/utils\"",
+    ]
+  end
 end
 
 Pod::Spec.new do |s|

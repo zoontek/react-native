@@ -355,6 +355,20 @@ class ReactNativePodsUtils
         return search_paths
     end
 
+    def self.create_header_search_paths_for_stable_umbrellas(base_folder)
+        return [] unless ReactNativeCoreUtils.build_rncore_from_source()
+
+        [
+            ["React-Fabric", "React_Fabric"],
+            ["React-debug", "React_debug"],
+            ["React-rendererdebug", "React_rendererdebug"],
+            ["React-timing", "React_timing"],
+            ["React-utils", "React_utils"],
+        ].flat_map { |pod_name, framework_name|
+            self.create_header_search_path_for_frameworks(base_folder, pod_name, framework_name, [])
+        }
+    end
+
     # Add a new dependency to an existing spec, configuring also the headers search paths
     def self.add_dependency(spec, dependency_name, base_folder_for_frameworks, framework_name, additional_paths: [], version: nil, subspec_dependency: nil)
         # Update Search Path
@@ -397,6 +411,7 @@ class ReactNativePodsUtils
                         "react/renderer/components/scrollview/platform/cxx",
                         "react/renderer/components/scrollview/platform/ios",
                     ], false))
+                    .concat(ReactNativePodsUtils.create_header_search_paths_for_stable_umbrellas("PODS_CONFIGURATION_BUILD_DIR"))
                     .concat(ReactNativePodsUtils.create_header_search_path_for_frameworks("PODS_CONFIGURATION_BUILD_DIR", "React-FabricComponents", "React_FabricComponents", [
                         "react/renderer/textlayoutmanager/platform/ios",
                         "react/renderer/components/text/platform/cxx",
