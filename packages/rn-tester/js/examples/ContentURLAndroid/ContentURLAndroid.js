@@ -46,7 +46,7 @@ const ContentSelector = (): React.Node => {
   const imageSelector = useCallback(async () => {
     try {
       const NativeSampleTurboModule =
-        require('../TurboModule/RNTesterSampleTurboModule').default;
+        require('../TurboModule/NativeSampleTurboModule').default;
       const uri = await NativeSampleTurboModule.getImageUrl?.();
       if (uri != null) {
         console.log({uri});

@@ -8,34 +8,26 @@
  * @format
  */
 
-import type {
-  RootTag,
-  TurboModule,
-} from '../../../../Libraries/TurboModule/RCTExport';
-import type {
-  EventEmitter,
-  UnsafeObject,
-} from '../../../../Libraries/Types/CodegenTypes';
+import type {CodegenTypes, RootTag, TurboModule} from 'react-native';
 
-import * as TurboModuleRegistry from '../../../../Libraries/TurboModule/TurboModuleRegistry';
+import {TurboModuleRegistry} from 'react-native';
 
 export enum EnumInt {
   A = 23,
   B = 42,
 }
 
-export type ObjectStruct = {
+type ObjectStruct = {
   a: number,
   b: string,
   c?: ?string,
 };
 
 export interface Spec extends TurboModule {
-  readonly onPress: EventEmitter<void>;
-  readonly onClick: EventEmitter<string>;
-  readonly onChange: EventEmitter<ObjectStruct>;
-  readonly onSubmit: EventEmitter<ObjectStruct[]>;
-  // Exported methods.
+  readonly onPress: CodegenTypes.EventEmitter<void>;
+  readonly onClick: CodegenTypes.EventEmitter<string>;
+  readonly onChange: CodegenTypes.EventEmitter<ObjectStruct>;
+  readonly onSubmit: CodegenTypes.EventEmitter<ObjectStruct[]>;
   readonly getConstants: () => {
     const1: boolean,
     const2: number,
@@ -47,26 +39,37 @@ export interface Spec extends TurboModule {
   readonly getNumber: (arg: number) => number;
   readonly getString: (arg: string) => string;
   readonly getArray: (arg: Array<unknown>) => Array<unknown>;
-  readonly getObject: (arg: UnsafeObject) => UnsafeObject;
-  readonly getUnsafeObject: (arg: UnsafeObject) => UnsafeObject;
+  readonly getObject: (
+    arg: CodegenTypes.UnsafeObject,
+  ) => CodegenTypes.UnsafeObject;
+  readonly getUnsafeObject: (
+    arg: CodegenTypes.UnsafeObject,
+  ) => CodegenTypes.UnsafeObject;
   readonly getRootTag: (arg: RootTag) => RootTag;
-  readonly getValue: (x: number, y: string, z: UnsafeObject) => UnsafeObject;
+  readonly getValue: (
+    x: number,
+    y: string,
+    z: CodegenTypes.UnsafeObject,
+  ) => CodegenTypes.UnsafeObject;
   readonly getArrayBuffer: (buffer: ArrayBuffer) => ArrayBuffer;
   readonly createNativeBuffer: (size: number) => ArrayBuffer;
   readonly processAsyncBuffer: (payload: ArrayBuffer) => Promise<number>;
   readonly getValueWithCallback: (callback: (value: string) => void) => void;
   readonly getValueWithPromise: (error: boolean) => Promise<string>;
   readonly voidFuncThrows?: () => void;
-  readonly getObjectThrows?: (arg: UnsafeObject) => UnsafeObject;
+  readonly getObjectThrows?: (
+    arg: CodegenTypes.UnsafeObject,
+  ) => CodegenTypes.UnsafeObject;
   readonly promiseThrows?: () => Promise<void>;
   readonly voidFuncAssert?: () => void;
-  readonly getObjectAssert?: (arg: UnsafeObject) => UnsafeObject;
+  readonly getObjectAssert?: (
+    arg: CodegenTypes.UnsafeObject,
+  ) => CodegenTypes.UnsafeObject;
   readonly promiseAssert?: () => Promise<void>;
-
-  // Android-only
   readonly getImageUrl?: () => Promise<string | null>;
 }
 
-export default TurboModuleRegistry.getEnforcing<Spec>(
-  'SampleTurboModule',
-) as Spec;
+const RNTesterSampleTurboModule: Spec =
+  TurboModuleRegistry.getEnforcing<Spec>('SampleTurboModule');
+
+export default RNTesterSampleTurboModule;
