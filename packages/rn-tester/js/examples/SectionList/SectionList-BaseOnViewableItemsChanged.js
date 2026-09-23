@@ -27,6 +27,9 @@ export function SectionList_BaseOnViewableItemsChanged(props: {
   waitForInteraction?: ?boolean,
 }): React.Node {
   const {offScreen, horizontal, useScrollRefScroll, waitForInteraction} = props;
+  const exampleTestID = `section-list-viewability-${
+    horizontal === true ? 'horizontal' : 'vertical'
+  }-${waitForInteraction === true ? 'wait' : 'no-wait'}`;
   const [output, setOutput] = useState('');
   const viewabilityConfig: ViewabilityConfig = {
     ...BASE_VIEWABILITY_CONFIG,
@@ -59,6 +62,7 @@ export function SectionList_BaseOnViewableItemsChanged(props: {
     <SectionListBaseExample
       ref={ref}
       exampleProps={exampleProps}
+      exampleTestID={exampleTestID}
       onTest={onTest}
       testOutput={output}>
       {offScreen === true ? <View style={styles.offScreen} /> : null}
