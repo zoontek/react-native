@@ -246,8 +246,8 @@ of module `React`, closing a cycle:
 React -> ReactNativeHeaders_react -> React
 ```
 
-Found empirically: `react/timing/primitives.h` -> `<React/Debug.h>`. This is
-the same two-module-ownership failure as `UMBRELLA_CXX_GUARDED_EXCLUSIONS`
+Found empirically: `react/timing/primitives.h` -> `<React/Debug.h>`. This is the
+same two-module-ownership failure as `UMBRELLA_CXX_GUARDED_EXCLUSIONS`
 (`RCTFrameTimingsObserver.h`, which reaches the same `primitives.h`), in the
 opposite direction. They are `objc-blocked` by construction (they re-export
 their module's C++ surface), so they were never R4 umbrella or R5 module
