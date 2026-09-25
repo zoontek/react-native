@@ -39,6 +39,8 @@ flow-typed/
 packages/react-native/flow/
 
 [options]
+builtin_lib=core-only
+
 emoji=true
 
 format.bracket_spacing=false
@@ -94,4 +96,4 @@ untyped-import
 untyped-type-import
 
 [version]
-^0.332.0
+^0.333.0
