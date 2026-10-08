@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <react/cxxstableapi/FrameworksGuard.h>
+#include <react/cxxstableapi/UmbrellaGuard.h>
 
 #include <folly/Portability.h>
 #include <cstdint>

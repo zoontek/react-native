@@ -31,6 +31,7 @@
 #define RN_UMBRELLA_CONTEXT 1
 
 #include <cxxreact/JSBigString.h>
+#include <cxxreact/JSBundleType.h>
 
 #undef RN_UMBRELLA_CONTEXT
 #pragma pop_macro("RN_UMBRELLA_CONTEXT")
