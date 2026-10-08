@@ -178,6 +178,27 @@ def find_boundary_breaks(graph: HeaderGraph) -> list[BoundaryBreak]:
     return breaks
 
 
+def skipped_headers(graph: HeaderGraph) -> set[str]:
+    """
+    Private and frameworks headers that no public header reaches. A header
+    reachable from a public one is public in practice, whatever its guard says.
+    """
+    reachable = {path for path, tier in graph.tiers.items() if tier == Tier.PUBLIC}
+    queue = deque(reachable)
+    while queue:
+        node = queue.popleft()
+        for target in graph.includes.get(node, []):
+            if target not in reachable:
+                reachable.add(target)
+                queue.append(target)
+
+    return {
+        path
+        for path, tier in graph.tiers.items()
+        if tier in (Tier.PRIVATE, Tier.FRAMEWORKS) and path not in reachable
+    }
+
+
 def _chain_to(target: str, parents: dict[str, str | None]) -> tuple[str, ...]:
     chain = []
     node: str | None = target

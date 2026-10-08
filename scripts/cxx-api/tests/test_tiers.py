@@ -14,6 +14,7 @@ from ..parser.tiers import (
     classify_headers,
     collect_headers,
     find_boundary_breaks,
+    skipped_headers,
     Tier,
 )
 
@@ -214,3 +215,31 @@ class TestTiers(unittest.TestCase):
     def test_build_header_graph_ignores_self_include(self):
         path = self.write("A.h", '#include "A.h"\n')
         self.assertEqual(build_header_graph([path]).includes[path], [])
+
+    # =========================================================================
+    # Skipped headers
+    # =========================================================================
+
+    def skipped(self):
+        return {os.path.relpath(p, self.root) for p in skipped_headers(self.graph())}
+
+    def test_skips_unreached_private_and_frameworks_headers(self):
+        self.write("Public.h", PUBLIC)
+        self.write("Frameworks.h", FRAMEWORKS + '#include "Private.h"\n')
+        self.write("Private.h", PRIVATE)
+        self.write("Unguarded.h", '#include "Private.h"\n')
+
+        self.assertEqual(self.skipped(), {"Frameworks.h", "Private.h"})
+
+    def test_keeps_headers_reached_from_public(self):
+        self.write("Public.h", PUBLIC + '#include "Middle.h"\n')
+        self.write("Middle.h", '#include "Frameworks.h"\n')
+        self.write("Frameworks.h", FRAMEWORKS + '#include "Private.h"\n')
+        self.write("Private.h", PRIVATE)
+        self.write("Other.h", PRIVATE)
+
+        self.assertEqual(self.skipped(), {"Other.h"})
+
+    def test_never_skips_unclassified_headers(self):
+        self.write("Unguarded.h")
+        self.assertEqual(self.skipped(), set())
