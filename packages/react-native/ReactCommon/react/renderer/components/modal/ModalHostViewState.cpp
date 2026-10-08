@@ -6,12 +6,8 @@
  */
 
 #include "ModalHostViewState.h"
-#include "ModalHostViewUtils.h"
 
 namespace facebook::react {
-
-ModalHostViewState::ModalHostViewState()
-    : screenSize(ModalHostViewScreenSize()) {}
 
 #ifdef RN_SERIALIZABLE_STATE
 folly::dynamic ModalHostViewState::getDynamic() const {
