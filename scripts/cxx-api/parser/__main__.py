@@ -25,6 +25,10 @@ from .doxygen import get_doxygen_bin, run_doxygen
 from .main import build_snapshot
 from .path_utils import get_react_native_dir
 from .snapshot_diff import validate_snapshots
+from .tiers import classify_headers, find_boundary_breaks
+
+# Mirrors the fixed EXCLUDE_PATTERNS in .doxygen.config.template.
+_TEMPLATE_EXCLUDE_PATTERNS = ["*/tests/*", "*/samples/*"]
 
 
 def run_command(
@@ -142,6 +146,47 @@ def build_snapshot_for_view(
     return snapshot_string
 
 
+def _display_path(path: str, react_native_dir: str) -> str:
+    relative = os.path.relpath(path, react_native_dir)
+    return path if relative.startswith("..") else relative
+
+
+def log_boundary_breaks(
+    configs: list[ApiViewSnapshotConfig],
+    codegen_dirs: dict[str, str],
+    react_native_dir: str,
+    enabled: bool,
+) -> None:
+    if not enabled:
+        return
+
+    # Variants of a view differ only in preprocessor definitions, which the
+    # textual include scan ignores, so classify each distinct input set once.
+    groups: dict[tuple, list[str]] = {}
+    for config in configs:
+        codegen_dir = codegen_dirs.get(config.codegen_platform)
+        key = (
+            tuple(config.inputs + ([codegen_dir] if codegen_dir else [])),
+            tuple(config.exclude_patterns),
+        )
+        groups.setdefault(key, []).append(config.snapshot_name)
+
+    for (inputs, exclude_patterns), view_names in groups.items():
+        label = ", ".join(view_names)
+        graph = classify_headers(
+            list(inputs), _TEMPLATE_EXCLUDE_PATTERNS + list(exclude_patterns)
+        )
+        breaks = find_boundary_breaks(graph)
+        print(f"[{label}] {len(breaks)} tier boundary break(s)")
+        for boundary_break in breaks:
+            chain = [_display_path(p, react_native_dir) for p in boundary_break.chain]
+            print(
+                f"  {boundary_break.source_tier.name.lower()} {chain[0]}"
+                + "".join(f"\n    -> {p}" for p in chain[1:-1])
+                + f"\n    -> {boundary_break.target_tier.name.lower()} {chain[-1]}"
+            )
+
+
 def build_snapshots(
     snapshot_configs: list[ApiViewSnapshotConfig],
     react_native_dir: str,
@@ -151,6 +196,7 @@ def build_snapshots(
     view_filter: str | None = None,
     is_test: bool = False,
     keep_xml: bool = False,
+    log_breaks: bool = False,
 ) -> None:
     if not is_test:
         configs_to_build = [
@@ -176,6 +222,10 @@ def build_snapshots(
                         output_path=codegen_output,
                         label=platform,
                     )
+
+            log_boundary_breaks(
+                configs_to_build, codegen_dirs, react_native_dir, log_breaks
+            )
 
             with concurrent.futures.ThreadPoolExecutor() as executor:
                 futures = {}
@@ -285,6 +335,11 @@ def main():
         action="store_true",
         help="Keep the generated Doxygen XML files next to the .api output in a xml/ directory",
     )
+    parser.add_argument(
+        "--log-boundary-breaks",
+        action="store_true",
+        help="Log headers whose includes cross the C++ stable API tier boundaries",
+    )
     args = parser.parse_args()
 
     verbose = not args.validate
@@ -343,6 +398,7 @@ def main():
             view_filter=args.view,
             is_test=args.test,
             keep_xml=args.xml,
+            log_breaks=args.log_boundary_breaks,
         )
 
         if args.validate:
