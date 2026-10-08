@@ -7,8 +7,6 @@
 
 #pragma once
 
-#include <react/cxxstableapi/FrameworksGuard.h>
-
 #ifndef RCT_REMOVE_LEGACY_MODULE_INTEROP
 
 #import <string>

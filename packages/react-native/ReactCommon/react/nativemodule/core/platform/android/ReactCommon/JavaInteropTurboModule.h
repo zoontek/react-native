@@ -7,16 +7,18 @@
 
 #pragma once
 
-#include <react/cxxstableapi/FrameworksGuard.h>
+#include <react/cxxstableapi/UmbrellaGuard.h>
 
 #ifndef RCT_REMOVE_LEGACY_MODULE_INTEROP
 
 #include <string>
 #include <vector>
 
-#include <React/NativeModuleCore.h>
+#include <ReactCommon/TurboModule.h>
 #include <fbjni/fbjni.h>
 #include <jsi/jsi.h>
+
+#include "JavaTurboModule.h"
 
 namespace facebook::react {
 
