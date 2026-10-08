@@ -220,8 +220,11 @@ class TestTiers(unittest.TestCase):
     # Skipped headers
     # =========================================================================
 
-    def skipped(self):
-        return {os.path.relpath(p, self.root) for p in skipped_headers(self.graph())}
+    def skipped(self, *included_tiers):
+        args = (frozenset(included_tiers),) if included_tiers else ()
+        return {
+            os.path.relpath(p, self.root) for p in skipped_headers(self.graph(), *args)
+        }
 
     def test_skips_unreached_private_and_frameworks_headers(self):
         self.write("Public.h", PUBLIC)
@@ -243,3 +246,21 @@ class TestTiers(unittest.TestCase):
     def test_never_skips_unclassified_headers(self):
         self.write("Unguarded.h")
         self.assertEqual(self.skipped(), set())
+
+    def test_keeps_included_tiers(self):
+        self.write("Public.h", PUBLIC)
+        self.write("Frameworks.h", FRAMEWORKS)
+        self.write("Private.h", PRIVATE)
+
+        self.assertEqual(self.skipped(Tier.PUBLIC, Tier.FRAMEWORKS), {"Private.h"})
+        self.assertEqual(
+            self.skipped(Tier.PUBLIC, Tier.FRAMEWORKS, Tier.PRIVATE), set()
+        )
+
+    def test_keeps_headers_reached_from_included_tiers(self):
+        self.write("Public.h", PUBLIC)
+        self.write("Frameworks.h", FRAMEWORKS + '#include "Private.h"\n')
+        self.write("Private.h", PRIVATE)
+        self.write("Other.h", PRIVATE)
+
+        self.assertEqual(self.skipped(Tier.PUBLIC, Tier.FRAMEWORKS), {"Other.h"})

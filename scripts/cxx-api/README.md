@@ -4,7 +4,7 @@ Python build pipeline for React Native's C++ (and Objective-C) API snapshots.
 
 ## Overview
 
-`scripts/cxx-api` generates human-readable snapshots of React Native's public C++ API surface. It uses [Doxygen](https://www.doxygen.nl/) to parse C/C++/Objective-C headers and a custom Python parser to produce a simplified, sorted representation of every public symbol. Symbols declared in headers that the C++ stable API classifies as private or "for frameworks" are left out (see [Tier filtering](#tier-filtering)).
+`scripts/cxx-api` generates human-readable snapshots of React Native's public C++ API surface. It uses [Doxygen](https://www.doxygen.nl/) to parse C/C++/Objective-C headers and a custom Python parser to produce a simplified, sorted representation of every public symbol. Symbols declared in headers that the C++ stable API classifies as private or "for frameworks" are left out by default (see [Tier filtering](#tier-filtering)).
 
 The pipeline produces one `.api` snapshot file per configured **API view × variant** combination:
 
@@ -76,7 +76,7 @@ The Python parser (`parser/`) reads the Doxygen XML output and builds a scope tr
 
 ## Tier filtering
 
-A private or for-frameworks header is skipped unless a public header reaches it, directly or through other includes: anything a public header includes is public in practice, whatever its own guard says. Unclassified headers are never skipped.
+Each view includes the tiers listed in its `visibility` config (`public`, `frameworks`, `private`), only `public` by default. A header in any other tier is skipped unless a header in an included tier reaches it, directly or through other includes: anything a public header includes is public in practice, whatever its own guard says. Unclassified headers are never skipped.
 
 A boundary break is a public header that reaches a for-frameworks or private header, or a for-frameworks header that reaches a private one. `--log-boundary-breaks` reports them at the edge where visibility drops.
 
@@ -102,8 +102,9 @@ All API views and their variants are defined in `config.yml`. Each view specifie
 | `codegen` | Optional codegen platform (`android`, `ios`) to generate TurboModule/Component headers before scanning |
 | `exclude_symbols` | Regex patterns for symbols to skip |
 | `input_filter` | Whether to run Doxygen through the input filters in `parser/input_filters/` |
+| `visibility` | C++ stable API tiers to include (`public`, `frameworks`, `private`); defaults to `[public]`. See [Tier filtering](#tier-filtering) |
 
-`exclude_patterns` and `exclude_symbols` can also be set at the top level, in which case they apply to every view.
+`exclude_patterns` and `exclude_symbols` can also be set at the top level, in which case they apply to every view. A top-level `visibility` applies to every view that does not set its own.
 
 ## Snapshot format
 

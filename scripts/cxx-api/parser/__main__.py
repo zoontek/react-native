@@ -163,67 +163,87 @@ def _display_path(path: str, react_native_dir: str) -> str:
 def classify_views(
     configs: list[ApiViewSnapshotConfig],
     codegen_dirs: dict[str, str],
-) -> list[tuple[list[str], HeaderGraph]]:
+) -> list[tuple[list[ApiViewSnapshotConfig], HeaderGraph]]:
     # Variants of a view differ only in preprocessor definitions, which the
     # textual include scan ignores, so classify each distinct input set once.
-    groups: dict[tuple, list[str]] = {}
+    groups: dict[tuple, list[ApiViewSnapshotConfig]] = {}
     for config in configs:
         codegen_dir = codegen_dirs.get(config.codegen_platform)
         key = (
             tuple(config.inputs + ([codegen_dir] if codegen_dir else [])),
             tuple(config.exclude_patterns),
         )
-        groups.setdefault(key, []).append(config.snapshot_name)
+        groups.setdefault(key, []).append(config)
 
     return [
         (
-            view_names,
+            view_configs,
             classify_headers(
                 list(inputs), _TEMPLATE_EXCLUDE_PATTERNS + list(exclude_patterns)
             ),
         )
-        for (inputs, exclude_patterns), view_names in groups.items()
+        for (inputs, exclude_patterns), view_configs in groups.items()
     ]
 
 
 def get_skipped_files_by_view(
-    view_graphs: list[tuple[list[str], HeaderGraph]],
+    view_graphs: list[tuple[list[ApiViewSnapshotConfig], HeaderGraph]],
     react_native_dir: str,
     verbose: bool,
 ) -> dict[str, set[str]]:
     skipped_by_view: dict[str, set[str]] = {}
-    for view_names, graph in view_graphs:
-        skipped = skipped_headers(graph)
-        if verbose:
-            kept = sorted(
-                path
-                for path, tier in graph.tiers.items()
-                if tier in (Tier.PRIVATE, Tier.FRAMEWORKS) and path not in skipped
+    for view_configs, graph in view_graphs:
+        names_by_visibility: dict[frozenset[Tier], list[str]] = {}
+        for config in view_configs:
+            names_by_visibility.setdefault(config.visibility, []).append(
+                config.snapshot_name
             )
-            print(
-                f"[{', '.join(view_names)}] {len(kept)} private or frameworks "
-                "header(s) kept because a public header reaches them"
-            )
-            for path in kept:
-                print(
-                    f"  {graph.tiers[path].name.lower()} "
-                    f"{_display_path(path, react_native_dir)}"
+
+        for visibility, view_names in names_by_visibility.items():
+            skipped = skipped_headers(graph, visibility)
+            if verbose:
+                _log_kept_headers(
+                    view_names, graph, visibility, skipped, react_native_dir
                 )
-        for view_name in view_names:
-            skipped_by_view[view_name] = skipped
+            for view_name in view_names:
+                skipped_by_view[view_name] = skipped
     return skipped_by_view
 
 
+def _log_kept_headers(
+    view_names: list[str],
+    graph: HeaderGraph,
+    included_tiers: frozenset[Tier],
+    skipped: set[str],
+    react_native_dir: str,
+) -> None:
+    kept = sorted(
+        path
+        for path, tier in graph.tiers.items()
+        if tier is not None and tier not in included_tiers and path not in skipped
+    )
+    included = ", ".join(tier.name.lower() for tier in sorted(included_tiers))
+    print(
+        f"[{', '.join(view_names)}] {len(kept)} header(s) outside the included "
+        f"tiers ({included}) kept because an included header reaches them"
+    )
+    for path in kept:
+        print(
+            f"  {graph.tiers[path].name.lower()} "
+            f"{_display_path(path, react_native_dir)}"
+        )
+
+
 def log_boundary_breaks(
-    view_graphs: list[tuple[list[str], HeaderGraph]],
+    view_graphs: list[tuple[list[ApiViewSnapshotConfig], HeaderGraph]],
     react_native_dir: str,
     enabled: bool,
 ) -> None:
     if not enabled:
         return
 
-    for view_names, graph in view_graphs:
-        label = ", ".join(view_names)
+    for view_configs, graph in view_graphs:
+        label = ", ".join(config.snapshot_name for config in view_configs)
         breaks = find_boundary_breaks(graph)
         print(f"[{label}] {len(breaks)} tier boundary break(s)")
         for boundary_break in breaks:

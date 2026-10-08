@@ -26,6 +26,8 @@ class Tier(enum.IntEnum):
     PUBLIC = 3
 
 
+DEFAULT_TIERS: frozenset[Tier] = frozenset({Tier.PUBLIC})
+
 _GUARD_TIERS = {
     "Private": Tier.PRIVATE,
     "Frameworks": Tier.FRAMEWORKS,
@@ -178,12 +180,23 @@ def find_boundary_breaks(graph: HeaderGraph) -> list[BoundaryBreak]:
     return breaks
 
 
-def skipped_headers(graph: HeaderGraph) -> set[str]:
+def parse_tier(name: str) -> Tier:
+    try:
+        return Tier[name.upper()]
+    except KeyError:
+        valid = ", ".join(tier.name.lower() for tier in Tier)
+        raise ValueError(f"Unknown tier '{name}', expected one of: {valid}") from None
+
+
+def skipped_headers(
+    graph: HeaderGraph, included_tiers: frozenset[Tier] = DEFAULT_TIERS
+) -> set[str]:
     """
-    Private and frameworks headers that no public header reaches. A header
-    reachable from a public one is public in practice, whatever its guard says.
+    Classified headers outside `included_tiers` that no header in an included
+    tier reaches. A header reachable from an included one is effectively part
+    of that tier, whatever its guard says.
     """
-    reachable = {path for path, tier in graph.tiers.items() if tier == Tier.PUBLIC}
+    reachable = {path for path, tier in graph.tiers.items() if tier in included_tiers}
     queue = deque(reachable)
     while queue:
         node = queue.popleft()
@@ -195,7 +208,7 @@ def skipped_headers(graph: HeaderGraph) -> set[str]:
     return {
         path
         for path, tier in graph.tiers.items()
-        if tier in (Tier.PRIVATE, Tier.FRAMEWORKS) and path not in reachable
+        if tier is not None and tier not in included_tiers and path not in reachable
     }
 
 
