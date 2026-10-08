@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- * @generated SignedSource<<a7ee8533698805217e86f58648598578>>
+ * @generated SignedSource<<72ad53973a7de132705b9ec1a72aac08>>
  */
 
 /**
@@ -371,6 +371,12 @@ public object ReactNativeFeatureFlags {
    */
   @JvmStatic
   public fun enableVirtualViewContainerStateExperimental(): Boolean = accessor.enableVirtualViewContainerStateExperimental()
+
+  /**
+   * Prevents a borderless ripple feedback underlay from projecting the entire view background on Android, which could hide the background and ripple.
+   */
+  @JvmStatic
+  public fun fixBorderlessRippleAndroid(): Boolean = accessor.fixBorderlessRippleAndroid()
 
   /**
    * Uses the default event priority instead of the discreet event priority by default when dispatching events from Fabric to React.

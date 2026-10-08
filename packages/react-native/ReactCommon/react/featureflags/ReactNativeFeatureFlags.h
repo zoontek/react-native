@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- * @generated SignedSource<<428041796e323eaad0a1c4f5eee2b356>>
+ * @generated SignedSource<<73ae8b45c0961bc60eeb804d4d40bd07>>
  */
 
 /**
@@ -325,6 +325,11 @@ class ReactNativeFeatureFlags {
    * Enables the experimental version of `VirtualViewContainerState`.
    */
   RN_EXPORT static bool enableVirtualViewContainerStateExperimental();
+
+  /**
+   * Prevents a borderless ripple feedback underlay from projecting the entire view background on Android, which could hide the background and ripple.
+   */
+  RN_EXPORT static bool fixBorderlessRippleAndroid();
 
   /**
    * Uses the default event priority instead of the discreet event priority by default when dispatching events from Fabric to React.

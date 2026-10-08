@@ -662,6 +662,17 @@ const definitions: FeatureFlagDefinitions = {
       },
       ossReleaseStage: 'none',
     },
+    fixBorderlessRippleAndroid: {
+      defaultValue: false,
+      metadata: {
+        dateAdded: '2026-10-06',
+        description:
+          'Prevents a borderless ripple feedback underlay from projecting the entire view background on Android, which could hide the background and ripple.',
+        expectedReleaseValue: true,
+        purpose: 'experimentation',
+      },
+      ossReleaseStage: 'canary',
+    },
     fixMappingOfEventPrioritiesBetweenFabricAndReact: {
       defaultValue: false,
       metadata: {

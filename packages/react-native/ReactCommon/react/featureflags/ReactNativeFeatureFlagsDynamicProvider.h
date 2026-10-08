@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- * @generated SignedSource<<0b0f6fb039d5d9ae4b34cbd9b31ad8a1>>
+ * @generated SignedSource<<419516aab11d7e44485bb29e696a75dd>>
  */
 
 /**
@@ -558,6 +558,15 @@ class ReactNativeFeatureFlagsDynamicProvider : public ReactNativeFeatureFlagsDef
     }
 
     return ReactNativeFeatureFlagsDefaults::enableVirtualViewContainerStateExperimental();
+  }
+
+  bool fixBorderlessRippleAndroid() override {
+    auto value = values_["fixBorderlessRippleAndroid"];
+    if (!value.isNull()) {
+      return value.getBool();
+    }
+
+    return ReactNativeFeatureFlagsDefaults::fixBorderlessRippleAndroid();
   }
 
   bool fixMappingOfEventPrioritiesBetweenFabricAndReact() override {
