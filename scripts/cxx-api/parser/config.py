@@ -24,6 +24,7 @@ class ApiViewVariant:
 
     name: str
     definitions: dict[str, str | int] = field(default_factory=dict)
+    visibility: frozenset[Tier] = DEFAULT_TIERS
 
 
 @dataclass
@@ -116,6 +117,9 @@ def parse_config(
             ApiViewVariant(
                 name=variant_name,
                 definitions=variant_config.get("definitions") or {},
+                visibility=_parse_visibility(
+                    variant_config.get("visibility"), visibility
+                ),
             )
             for variant_name, variant_config in raw_variants.items()
         ]
@@ -146,7 +150,7 @@ def parse_config(
                         codegen_platform=codegen_platform,
                         input_filter=input_filter,
                         exclude_symbols=exclude_symbols,
-                        visibility=visibility,
+                        visibility=variant.visibility,
                     )
                 )
 

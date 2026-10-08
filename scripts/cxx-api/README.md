@@ -16,8 +16,11 @@ The pipeline produces one `.api` snapshot file per configured **API view × vari
 | `ReactAndroidReleaseCxx.api` | Android-specific C++ API (release) |
 | `ReactAppleDebugCxx.api` | Apple-specific C++/Obj-C API (debug) |
 | `ReactAppleReleaseCxx.api` | Apple-specific C++/Obj-C API (release) |
+| `ReactCommonFrameworksCxx.api` | Platform-independent C++ API, including for-frameworks symbols |
+| `ReactAndroidFrameworksCxx.api` | Android-specific C++ API, including for-frameworks symbols |
+| `ReactAppleFrameworksCxx.api` | Apple-specific C++/Obj-C API, including for-frameworks symbols |
 
-For each view, debug and release variants are generated with different preprocessor definitions (e.g. `REACT_NATIVE_DEBUG` vs `NDEBUG`), since `#ifdef` guards in the source headers can produce a different public API surface per variant.
+For each view, debug and release variants are generated with different preprocessor definitions (e.g. `REACT_NATIVE_DEBUG` vs `NDEBUG`), since `#ifdef` guards in the source headers can produce a different public API surface per variant. The frameworks variant uses the view's base definitions and also includes symbols from "for frameworks" headers.
 
 Snapshot files are committed to the repo under `scripts/cxx-api/api-snapshots/`.
 
@@ -104,7 +107,7 @@ All API views and their variants are defined in `config.yml`. Each view specifie
 | `input_filter` | Whether to run Doxygen through the input filters in `parser/input_filters/` |
 | `visibility` | C++ stable API tiers to include (`public`, `frameworks`, `private`); defaults to `[public]`. See [Tier filtering](#tier-filtering) |
 
-`exclude_patterns` and `exclude_symbols` can also be set at the top level, in which case they apply to every view. A top-level `visibility` applies to every view that does not set its own.
+`exclude_patterns` and `exclude_symbols` can also be set at the top level, in which case they apply to every view. A top-level `visibility` applies to every view that does not set its own, and a variant can set `visibility` to override its view's.
 
 ## Snapshot format
 

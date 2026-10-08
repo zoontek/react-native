@@ -668,6 +668,28 @@ class TestParseConfig(unittest.TestCase):
         for r in result:
             self.assertEqual(r.visibility, frozenset({Tier.PUBLIC, Tier.PRIVATE}))
 
+    def test_variant_visibility_overrides_view(self):
+        """A variant's visibility replaces the view's for that variant only"""
+        config = {
+            "platforms": {
+                "TestView": {
+                    "variants": {
+                        "debug": {},
+                        "frameworks": {"visibility": ["public", "frameworks"]},
+                    },
+                }
+            }
+        }
+        result = parse_config(config, "/base/dir")
+
+        debug = next(r for r in result if r.snapshot_name == "TestViewDebug")
+        self.assertEqual(debug.visibility, frozenset({Tier.PUBLIC}))
+
+        frameworks = next(r for r in result if r.snapshot_name == "TestViewFrameworks")
+        self.assertEqual(
+            frameworks.visibility, frozenset({Tier.PUBLIC, Tier.FRAMEWORKS})
+        )
+
     def test_unknown_visibility_rejected(self):
         """An unknown tier name in visibility raises"""
         config = {"platforms": {"TestView": {"visibility": ["internal"]}}}
