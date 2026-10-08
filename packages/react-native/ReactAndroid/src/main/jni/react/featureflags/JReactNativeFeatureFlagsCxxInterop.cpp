@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- * @generated SignedSource<<667c7bb26992905d8a73351b6d5eeadd>>
+ * @generated SignedSource<<e3ea5970bf376b5989f8226bbf1573b7>>
  */
 
 /**
@@ -126,6 +126,12 @@ class ReactNativeFeatureFlagsJavaProvider
   bool enableAndroidTextMeasurementOptimizations() override {
     static const auto method =
         getReactNativeFeatureFlagsProviderJavaClass()->getMethod<jboolean()>("enableAndroidTextMeasurementOptimizations");
+    return method(javaProvider_);
+  }
+
+  bool enableAsyncDiskCacheCheckInMultiSourceImageAndroid() override {
+    static const auto method =
+        getReactNativeFeatureFlagsProviderJavaClass()->getMethod<jboolean()>("enableAsyncDiskCacheCheckInMultiSourceImageAndroid");
     return method(javaProvider_);
   }
 
@@ -652,6 +658,11 @@ bool JReactNativeFeatureFlagsCxxInterop::enableAndroidTextMeasurementOptimizatio
   return ReactNativeFeatureFlags::enableAndroidTextMeasurementOptimizations();
 }
 
+bool JReactNativeFeatureFlagsCxxInterop::enableAsyncDiskCacheCheckInMultiSourceImageAndroid(
+    facebook::jni::alias_ref<JReactNativeFeatureFlagsCxxInterop> /*unused*/) {
+  return ReactNativeFeatureFlags::enableAsyncDiskCacheCheckInMultiSourceImageAndroid();
+}
+
 bool JReactNativeFeatureFlagsCxxInterop::enableBridgelessArchitecture(
     facebook::jni::alias_ref<JReactNativeFeatureFlagsCxxInterop> /*unused*/) {
   return ReactNativeFeatureFlags::enableBridgelessArchitecture();
@@ -1098,6 +1109,9 @@ void JReactNativeFeatureFlagsCxxInterop::registerNatives() {
       makeNativeMethod(
         "enableAndroidTextMeasurementOptimizations",
         JReactNativeFeatureFlagsCxxInterop::enableAndroidTextMeasurementOptimizations),
+      makeNativeMethod(
+        "enableAsyncDiskCacheCheckInMultiSourceImageAndroid",
+        JReactNativeFeatureFlagsCxxInterop::enableAsyncDiskCacheCheckInMultiSourceImageAndroid),
       makeNativeMethod(
         "enableBridgelessArchitecture",
         JReactNativeFeatureFlagsCxxInterop::enableBridgelessArchitecture),

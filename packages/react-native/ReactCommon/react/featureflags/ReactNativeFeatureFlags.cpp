@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- * @generated SignedSource<<eba4d2684dff3009f3f5b9a106e96ba7>>
+ * @generated SignedSource<<cae25fe0fa074dbc0c33045296de0231>>
  */
 
 /**
@@ -84,6 +84,10 @@ bool ReactNativeFeatureFlags::enableAndroidAutoOffscreenCompositingForElevation(
 
 bool ReactNativeFeatureFlags::enableAndroidTextMeasurementOptimizations() {
   return getAccessor().enableAndroidTextMeasurementOptimizations();
+}
+
+bool ReactNativeFeatureFlags::enableAsyncDiskCacheCheckInMultiSourceImageAndroid() {
+  return getAccessor().enableAsyncDiskCacheCheckInMultiSourceImageAndroid();
 }
 
 bool ReactNativeFeatureFlags::enableBridgelessArchitecture() {

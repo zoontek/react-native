@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- * @generated SignedSource<<9f7f9f4861e223a9407648bd9b085236>>
+ * @generated SignedSource<<f06ad184a42a3353b304a62a3bf35b0c>>
  */
 
 /**
@@ -117,6 +117,11 @@ bool NativeReactNativeFeatureFlags::enableAndroidAutoOffscreenCompositingForElev
 bool NativeReactNativeFeatureFlags::enableAndroidTextMeasurementOptimizations(
     jsi::Runtime& /*runtime*/) {
   return ReactNativeFeatureFlags::enableAndroidTextMeasurementOptimizations();
+}
+
+bool NativeReactNativeFeatureFlags::enableAsyncDiskCacheCheckInMultiSourceImageAndroid(
+    jsi::Runtime& /*runtime*/) {
+  return ReactNativeFeatureFlags::enableAsyncDiskCacheCheckInMultiSourceImageAndroid();
 }
 
 bool NativeReactNativeFeatureFlags::enableBridgelessArchitecture(

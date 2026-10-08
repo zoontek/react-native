@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- * @generated SignedSource<<c4d29d63693b67752ef19a0c22e2e613>>
+ * @generated SignedSource<<428041796e323eaad0a1c4f5eee2b356>>
  */
 
 /**
@@ -115,6 +115,11 @@ class ReactNativeFeatureFlags {
    * Enables various optimizations throughout the path of measuring text on Android.
    */
   RN_EXPORT static bool enableAndroidTextMeasurementOptimizations();
+
+  /**
+   * Runs multi-source image disk-cache checks asynchronously on Android.
+   */
+  RN_EXPORT static bool enableAsyncDiskCacheCheckInMultiSourceImageAndroid();
 
   /**
    * Feature flag to enable the new bridgeless architecture.

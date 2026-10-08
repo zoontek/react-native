@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- * @generated SignedSource<<c2c4ed4f4bca0b82aefc82dfb43617b7>>
+ * @generated SignedSource<<62d4a09fa162c10b27df8143e905375b>>
  */
 
 /**
@@ -52,6 +52,8 @@ public interface ReactNativeFeatureFlagsProvider {
   @DoNotStrip public fun enableAndroidAutoOffscreenCompositingForElevation(): Boolean
 
   @DoNotStrip public fun enableAndroidTextMeasurementOptimizations(): Boolean
+
+  @DoNotStrip public fun enableAsyncDiskCacheCheckInMultiSourceImageAndroid(): Boolean
 
   @DoNotStrip public fun enableBridgelessArchitecture(): Boolean
 
