@@ -5973,10 +5973,6 @@ class facebook::react::SharedColor {
   public std::string toString() const noexcept;
 }
 
-class facebook::react::StackTraceParser {
-  public static std::vector<facebook::react::JsErrorHandler::ProcessedError::StackFrame> parse(bool isHermes, const std::string& stackString);
-}
-
 class facebook::react::State {
   protected State(facebook::react::StateData::Shared data, const facebook::react::State& previousState);
   protected State(facebook::react::StateData::Shared data, facebook::react::ShadowNodeFamily::Weak family);
