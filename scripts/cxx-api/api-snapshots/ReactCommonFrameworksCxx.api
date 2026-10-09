@@ -520,11 +520,8 @@ void facebook::react::parseUnprocessedFontVariant(const facebook::react::PropsPa
 void facebook::react::parseUnprocessedFontVariantString(const std::string& value, facebook::react::FontVariant& result);
 void facebook::react::parseUnprocessedTransformOriginString(const std::string& value, facebook::react::TransformOrigin& result);
 void facebook::react::registerCxxModuleToGlobalModuleMap(std::string name, std::function<std::shared_ptr<facebook::react::TurboModule>(std::shared_ptr<facebook::react::CallInvoker> jsInvoker)> moduleProviderFunc);
-void facebook::react::serializeTransformAxis(const facebook::react::TransformOperation& operation, const std::string& operationName, float defaultValue, folly::dynamic& resultTranslateArray);
-void facebook::react::serializeTransformOperationValue(const std::string& operationName, const facebook::react::ValueUnit& valueUnit, folly::dynamic& resultArray);
 void facebook::react::setDefaultColorSpace(facebook::react::ColorSpace newColorSpace);
 void facebook::react::setTouchPayloadOnObject(facebook::jsi::Object& object, facebook::jsi::Runtime& runtime, const facebook::react::BaseTouch& touch);
-void facebook::react::updateTransformProps(const facebook::react::Transform& transform, const facebook::react::TransformOperation& operation, folly::dynamic& resultTranslateArray);
 bool facebook::react::operator==(const facebook::react::AttributedStringBox& lhs, const facebook::react::AttributedStringBox& rhs);
 bool facebook::react::operator==(const facebook::react::LayoutConstraints& lhs, const facebook::react::LayoutConstraints& rhs);
 bool facebook::react::operator==(const facebook::react::LayoutContext& lhs, const facebook::react::LayoutContext& rhs);
