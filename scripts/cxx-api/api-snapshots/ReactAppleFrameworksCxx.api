@@ -3556,7 +3556,6 @@ float facebook::react::yogaFloatFromFloat(facebook::react::Float value);
 folly::dynamic facebook::react::convertIdToFollyDynamic(id json);
 folly::dynamic facebook::react::diffDynamicProps(const folly::dynamic& oldProps, const folly::dynamic& newProps);
 folly::dynamic facebook::react::mergeDynamicProps(const folly::dynamic& source, const folly::dynamic& patch, facebook::react::NullValueStrategy nullValueStrategy);
-folly::dynamic facebook::react::toDynamic(const facebook::react::SubmitBehavior& value);
 id facebook::react::convertFollyDynamicToId(const folly::dynamic& dyn);
 int facebook::react::toInt(const facebook::react::DisplayType& displayType);
 int facebook::react::toInt(const facebook::react::LayoutDirection& layoutDirection);
@@ -3692,7 +3691,6 @@ void facebook::react::fromRawValue(const facebook::react::PropsParserContext& co
 void facebook::react::fromRawValue(const facebook::react::PropsParserContext& context, const facebook::react::RawValue& value, facebook::react::ScrollViewKeyboardDismissMode& result);
 void facebook::react::fromRawValue(const facebook::react::PropsParserContext& context, const facebook::react::RawValue& value, facebook::react::ScrollViewMaintainVisibleContentPosition& result);
 void facebook::react::fromRawValue(const facebook::react::PropsParserContext& context, const facebook::react::RawValue& value, facebook::react::ScrollViewSnapToAlignment& result);
-void facebook::react::fromRawValue(const facebook::react::PropsParserContext& context, const facebook::react::RawValue& value, facebook::react::Selection& result);
 void facebook::react::fromRawValue(const facebook::react::PropsParserContext& context, const facebook::react::RawValue& value, facebook::react::SharedColor& result);
 void facebook::react::fromRawValue(const facebook::react::PropsParserContext& context, const facebook::react::RawValue& value, facebook::react::TextAlignment& result);
 void facebook::react::fromRawValue(const facebook::react::PropsParserContext& context, const facebook::react::RawValue& value, facebook::react::TextBreakStrategy& result);
@@ -3724,7 +3722,6 @@ void facebook::react::fromRawValue(const facebook::react::PropsParserContext&, c
 void facebook::react::fromRawValue(const facebook::react::PropsParserContext&, const facebook::react::RawValue& value, facebook::react::LineBreakMode& result);
 void facebook::react::fromRawValue(const facebook::react::PropsParserContext&, const facebook::react::RawValue& value, facebook::react::Point& result);
 void facebook::react::fromRawValue(const facebook::react::PropsParserContext&, const facebook::react::RawValue& value, facebook::react::Size& result);
-void facebook::react::fromRawValue(const facebook::react::PropsParserContext&, const facebook::react::RawValue& value, facebook::react::SubmitBehavior& result);
 void facebook::react::fromRawValue(const facebook::react::PropsParserContext&, const facebook::react::RawValue& value, facebook::react::TextAlignmentVertical& result);
 void facebook::react::fromRawValue(const facebook::react::PropsParserContext&, const facebook::react::RawValue& value, facebook::react::TextWidthMode& result);
 void facebook::react::fromRawValue(const facebook::react::PropsParserContext&, const facebook::react::RawValue& value, facebook::react::ValueUnit& result);
@@ -6137,11 +6134,6 @@ class facebook::react::TextAttributes : public facebook::react::DebugStringConve
   public std::string fontFamily;
   public std::vector<facebook::react::TextEffectInfo> textEffects;
   public void apply(facebook::react::TextAttributes textAttributes);
-}
-
-class facebook::react::TextInputComponentDescriptor : public facebook::react::ConcreteComponentDescriptor<facebook::react::TextInputShadowNode> {
-  protected virtual void adopt(facebook::react::ShadowNode& shadowNode) const override;
-  public TextInputComponentDescriptor(const facebook::react::ComponentDescriptorParameters& parameters);
 }
 
 class facebook::react::TextInputEventEmitter : public facebook::react::BaseViewEventEmitter {

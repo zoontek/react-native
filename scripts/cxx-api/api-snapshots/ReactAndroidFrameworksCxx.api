@@ -764,7 +764,6 @@ folly::dynamic facebook::react::toDynamic(const facebook::react::FilterFunction&
 folly::dynamic facebook::react::toDynamic(const facebook::react::ImageSource& imageSource);
 folly::dynamic facebook::react::toDynamic(const facebook::react::Point& point);
 folly::dynamic facebook::react::toDynamic(const facebook::react::SharedColor& sharedColor);
-folly::dynamic facebook::react::toDynamic(const facebook::react::SubmitBehavior& value);
 folly::dynamic facebook::react::toDynamic(const std::vector<bool>& arrayValue);
 folly::dynamic facebook::react::toDynamic(const std::vector<double>& arrayValue);
 folly::dynamic facebook::react::toDynamic(const std::vector<facebook::react::Float>& arrayValue);
@@ -936,7 +935,6 @@ void facebook::react::fromRawValue(const facebook::react::PropsParserContext&, c
 void facebook::react::fromRawValue(const facebook::react::PropsParserContext&, const facebook::react::RawValue& value, facebook::react::LineBreakMode& result);
 void facebook::react::fromRawValue(const facebook::react::PropsParserContext&, const facebook::react::RawValue& value, facebook::react::Point& result);
 void facebook::react::fromRawValue(const facebook::react::PropsParserContext&, const facebook::react::RawValue& value, facebook::react::Size& result);
-void facebook::react::fromRawValue(const facebook::react::PropsParserContext&, const facebook::react::RawValue& value, facebook::react::SubmitBehavior& result);
 void facebook::react::fromRawValue(const facebook::react::PropsParserContext&, const facebook::react::RawValue& value, facebook::react::TextAlignmentVertical& result);
 void facebook::react::fromRawValue(const facebook::react::PropsParserContext&, const facebook::react::RawValue& value, facebook::react::TextWidthMode& result);
 void facebook::react::fromRawValue(const facebook::react::PropsParserContext&, const facebook::react::RawValue& value, facebook::react::ValueUnit& result);
@@ -1153,12 +1151,6 @@ class facebook::react::AndroidSwitchProps : public facebook::react::HostPlatform
   public facebook::react::SharedColor trackTintColor;
   public virtual facebook::react::ComponentName getDiffPropsImplementationTarget() const override;
   public virtual folly::dynamic getDiffProps(const facebook::react::Props* prevProps) const override;
-}
-
-class facebook::react::AndroidTextInputComponentDescriptor : public facebook::react::ConcreteComponentDescriptor<facebook::react::AndroidTextInputShadowNode> {
-  protected virtual void adopt(facebook::react::ShadowNode& shadowNode) const override;
-  public AndroidTextInputComponentDescriptor(const facebook::react::ComponentDescriptorParameters& parameters);
-  public virtual facebook::react::State::Shared createInitialState(const facebook::react::Props::Shared& props, const facebook::react::ShadowNodeFamily::Shared& family) const override;
 }
 
 class facebook::react::AndroidTextInputEventEmitter : public facebook::react::BaseViewEventEmitter {
