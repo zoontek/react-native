@@ -1196,11 +1196,6 @@ interface RCTImageLoader : public NSObject <RCTBridgeModule, RCTImageLoaderProto
   public virtual instancetype initWithRedirectDelegate:loadersProvider:decodersProvider:(id<RCTImageRedirectProtocol> redirectDelegate, NSArray<id<RCTImageURLLoader>>*(^)(RCTModuleRegistry*) getLoaders, NSArray<id<RCTImageDataDecoder>>*(^)(RCTModuleRegistry*) getDecoders);
 }
 
-interface RCTImageManager : public NSObject <RCTImageManagerProtocol> {
-  public virtual facebook::react::ImageRequest requestImage:surfaceId:(facebook::react::ImageSource imageSource, facebook::react::SurfaceId surfaceId);
-  public virtual instancetype initWithImageLoader:(id<RCTImageLoaderWithAttributionProtocol> imageLoader);
-}
-
 interface RCTImageSource : public NSObject {
   public @property (assign, readonly) CGFloat scale;
   public @property (assign, readonly) CGSize size;
@@ -1938,11 +1933,6 @@ interface RCTSwiftUIContainerViewWrapper : public NSObject {
 }
 
 interface RCTSwitchComponentView : public RCTViewComponentView {
-}
-
-interface RCTSyncImageManager : public NSObject <RCTImageManagerProtocol> {
-  public virtual facebook::react::ImageRequest requestImage:surfaceId:(facebook::react::ImageSource imageSource, facebook::react::SurfaceId surfaceId);
-  public virtual instancetype initWithImageLoader:(id<RCTImageLoaderWithAttributionProtocol> imageLoader);
 }
 
 interface RCTTextInputComponentView : public RCTViewComponentView {
@@ -2833,10 +2823,6 @@ protocol RCTImageLoaderWithAttributionProtocol : public RCTImageLoaderProtocol, 
   public virtual void trackURLImageDidDestroy:(RCTImageURLLoaderRequest* loaderRequest);
   public virtual void trackURLImageRequestDidDestroy:(RCTImageURLLoaderRequest* loaderRequest);
   public virtual void trackURLImageVisibilityForRequest:imageView:(RCTImageURLLoaderRequest* loaderRequest, UIView* imageView);
-}
-
-protocol RCTImageManagerProtocol : public NSObject {
-  public virtual facebook::react::ImageRequest requestImage:surfaceId:(facebook::react::ImageSource imageSource, facebook::react::SurfaceId surfaceId);
 }
 
 protocol RCTImageRedirectProtocol {
