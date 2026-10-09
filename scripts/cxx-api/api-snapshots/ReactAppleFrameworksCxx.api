@@ -11374,7 +11374,6 @@ class facebook::react::jsinspector_modern::WeakList {
 }
 
 
-constexpr facebook::react::HighResTimeStamp facebook::react::jsinspector_modern::tracing::TRACING_TIME_ORIGIN;
 constexpr facebook::react::HighResTimeStamp facebook::react::jsinspector_modern::tracing::kCurrentBufferStartTimeUninitialized;
 using facebook::react::jsinspector_modern::tracing::Categories = folly::small_vector<facebook::react::jsinspector_modern::tracing::Category, 1>;
 using facebook::react::jsinspector_modern::tracing::ConsoleTimeStampEntry = std::variant<facebook::react::HighResTimeStamp, std::string>;
@@ -11383,7 +11382,6 @@ using facebook::react::jsinspector_modern::tracing::Headers = std::map<std::stri
 using facebook::react::jsinspector_modern::tracing::ProcessId = uint64_t;
 using facebook::react::jsinspector_modern::tracing::RuntimeProfileId = uint16_t;
 using facebook::react::jsinspector_modern::tracing::ThreadId = uint64_t;
-int64_t facebook::react::jsinspector_modern::tracing::highResDurationToTracingClockDuration(facebook::react::HighResDuration duration);
 std::optional<facebook::react::jsinspector_modern::tracing::Category> facebook::react::jsinspector_modern::tracing::getTracingCategoryFromString(const std::string& str);
 std::optional<facebook::react::jsinspector_modern::tracing::ConsoleTimeStampColor> facebook::react::jsinspector_modern::tracing::getConsoleTimeStampColorFromString(const std::string& str);
 std::optional<folly::dynamic> facebook::react::jsinspector_modern::tracing::getConsoleTimeStampDetailFromObject(facebook::jsi::Runtime& runtime, const facebook::jsi::Value& detailValue);
@@ -11392,7 +11390,6 @@ std::string facebook::react::jsinspector_modern::tracing::consoleTimeStampColorT
 std::string facebook::react::jsinspector_modern::tracing::serializeTracingCategories(const facebook::react::jsinspector_modern::tracing::Categories& categories);
 std::string facebook::react::jsinspector_modern::tracing::serializeTracingCategories(const std::set<facebook::react::jsinspector_modern::tracing::Category>& categories);
 std::string facebook::react::jsinspector_modern::tracing::tracingCategoryToString(const facebook::react::jsinspector_modern::tracing::Category& category);
-uint64_t facebook::react::jsinspector_modern::tracing::highResTimeStampToTracingClockTimeStamp(facebook::react::HighResTimeStamp timestamp);
 
 class facebook::react::jsinspector_modern::tracing::HostTracingProfileSerializer {
   public static void emitAsDataCollectedChunks(facebook::react::jsinspector_modern::tracing::HostTracingProfile&& hostTracingProfile, const std::function<void(folly::dynamic&& chunk)>& chunkCallback, size_t maxChunkBytes, uint16_t profileTraceEventsChunkSize);
@@ -11423,54 +11420,14 @@ class facebook::react::jsinspector_modern::tracing::PerformanceTracer {
   public void unsubscribeFromTracingStateChanges(uint32_t subscriptionId);
 }
 
-class facebook::react::jsinspector_modern::tracing::ProfileTreeNode {
-  public ProfileTreeNode(uint32_t id, facebook::react::jsinspector_modern::tracing::ProfileTreeNode::CodeType codeType, facebook::react::jsinspector_modern::tracing::RuntimeSamplingProfile::SampleCallStackFrame callFrame, uint32_t parentId = facebook::react::jsinspector_modern::tracing::ProfileTreeNode::NO_PARENT);
-  public bool hasParent() const;
-  public const facebook::react::jsinspector_modern::tracing::RuntimeSamplingProfile::SampleCallStackFrame& getCallFrame() const;
-  public facebook::react::jsinspector_modern::tracing::ProfileTreeNode* addChild(uint32_t childId, facebook::react::jsinspector_modern::tracing::ProfileTreeNode::CodeType childCodeType, facebook::react::jsinspector_modern::tracing::RuntimeSamplingProfile::SampleCallStackFrame childCallFrame);
-  public facebook::react::jsinspector_modern::tracing::ProfileTreeNode* getIfAlreadyExists(facebook::react::jsinspector_modern::tracing::ProfileTreeNode::CodeType childCodeType, const facebook::react::jsinspector_modern::tracing::RuntimeSamplingProfile::SampleCallStackFrame& childCallFrame);
-  public facebook::react::jsinspector_modern::tracing::ProfileTreeNode::CodeType getCodeType() const;
-  public static constexpr uint32_t NO_PARENT;
-  public uint32_t getId() const;
-  public uint32_t getParentId() const;
-}
-
-enum facebook::react::jsinspector_modern::tracing::ProfileTreeNode::CodeType {
-  JavaScript,
-  Other,
-}
-
 class facebook::react::jsinspector_modern::tracing::RawRuntimeProfile {
   public virtual ~RawRuntimeProfile() = default;
-}
-
-class facebook::react::jsinspector_modern::tracing::RuntimeSamplingProfileTraceEventSerializer {
-  public static void serializeAndDispatch(facebook::react::jsinspector_modern::tracing::RuntimeSamplingProfile&& profile, facebook::react::jsinspector_modern::tracing::IdGenerator& profileIdGenerator, facebook::react::HighResTimeStamp tracingStartTime, const std::function<void(folly::dynamic&& traceEventsChunk)>& dispatchCallback, uint16_t traceEventChunkSize, uint16_t profileChunkSize = PROFILE_CHUNK_SIZE, uint16_t maxUniqueNodesPerChunk = MAX_UNIQUE_NODES_PER_CHUNK);
-  public static void serializeAndDispatch(std::vector<facebook::react::jsinspector_modern::tracing::RuntimeSamplingProfile>&& profiles, facebook::react::jsinspector_modern::tracing::IdGenerator& profileIdGenerator, facebook::react::HighResTimeStamp tracingStartTime, const std::function<void(folly::dynamic&& traceEventsChunk)>& dispatchCallback, uint16_t traceEventChunkSize, uint16_t profileChunkSize = PROFILE_CHUNK_SIZE, uint16_t maxUniqueNodesPerChunk = MAX_UNIQUE_NODES_PER_CHUNK);
 }
 
 class facebook::react::jsinspector_modern::tracing::TargetTracingAgent {
   protected facebook::react::jsinspector_modern::tracing::TraceRecordingState& state_;
   public TargetTracingAgent(facebook::react::jsinspector_modern::tracing::TraceRecordingState& state);
   public bool isRunningInBackgroundMode();
-}
-
-class facebook::react::jsinspector_modern::tracing::TraceEventGenerator {
-  public static facebook::react::jsinspector_modern::tracing::TraceEvent createIdleBeginFrameEvent(facebook::react::jsinspector_modern::tracing::FrameSequenceId sequenceId, int layerTreeId, facebook::react::HighResTimeStamp timestamp, facebook::react::jsinspector_modern::tracing::ProcessId processId, facebook::react::jsinspector_modern::tracing::ThreadId threadId);
-  public static facebook::react::jsinspector_modern::tracing::TraceEvent createNeedsBeginFrameChangedEvent(int layerTreeId, facebook::react::HighResTimeStamp timestamp, facebook::react::jsinspector_modern::tracing::ProcessId processId, facebook::react::jsinspector_modern::tracing::ThreadId threadId);
-  public static facebook::react::jsinspector_modern::tracing::TraceEvent createScreenshotEvent(facebook::react::jsinspector_modern::tracing::FrameSequenceId frameSequenceId, int sourceId, std::vector<uint8_t>&& snapshot, facebook::react::HighResTimeStamp expectedDisplayTime, facebook::react::jsinspector_modern::tracing::ProcessId processId, facebook::react::jsinspector_modern::tracing::ThreadId threadId);
-  public static facebook::react::jsinspector_modern::tracing::TraceEvent createSetLayerTreeIdEvent(std::string frame, int layerTreeId, facebook::react::jsinspector_modern::tracing::ProcessId processId, facebook::react::jsinspector_modern::tracing::ThreadId threadId, facebook::react::HighResTimeStamp timestamp);
-  public static std::pair<facebook::react::jsinspector_modern::tracing::TraceEvent, facebook::react::jsinspector_modern::tracing::TraceEvent> createFrameTimingsEvents(facebook::react::jsinspector_modern::tracing::FrameSequenceId sequenceId, int layerTreeId, facebook::react::HighResTimeStamp beginTimestamp, facebook::react::HighResTimeStamp endTimestamp, facebook::react::jsinspector_modern::tracing::ProcessId processId, facebook::react::jsinspector_modern::tracing::ThreadId threadId);
-}
-
-class facebook::react::jsinspector_modern::tracing::TraceEventSerializer {
-  public static folly::dynamic serialize(facebook::react::jsinspector_modern::tracing::TraceEvent&& event);
-  public static folly::dynamic serializeProfileChunk(facebook::react::jsinspector_modern::tracing::TraceEventProfileChunk&& profileChunk);
-  public static folly::dynamic serializeProfileChunkCPUProfile(facebook::react::jsinspector_modern::tracing::TraceEventProfileChunk::CPUProfile&& cpuProfile);
-  public static folly::dynamic serializeProfileChunkCPUProfileNode(facebook::react::jsinspector_modern::tracing::TraceEventProfileChunk::CPUProfile::Node&& node);
-  public static folly::dynamic serializeProfileChunkCPUProfileNodeCallFrame(facebook::react::jsinspector_modern::tracing::TraceEventProfileChunk::CPUProfile::Node::CallFrame&& callFrame);
-  public static folly::dynamic serializeProfileChunkTimeDeltas(facebook::react::jsinspector_modern::tracing::TraceEventProfileChunk::TimeDeltas&& deltas);
-  public static size_t estimateJsonSize(const folly::dynamic& value);
 }
 
 enum facebook::react::jsinspector_modern::tracing::Category {
@@ -11497,23 +11454,9 @@ enum facebook::react::jsinspector_modern::tracing::ConsoleTimeStampColor {
   Warning,
 }
 
-enum facebook::react::jsinspector_modern::tracing::EventLoopPhase {
-  Microtasks,
-  Task,
-}
-
 enum facebook::react::jsinspector_modern::tracing::Mode {
   Background,
   CDP,
-}
-
-struct facebook::react::jsinspector_modern::tracing::EventLoopReporter {
-  public EventLoopReporter(const facebook::react::jsinspector_modern::tracing::EventLoopReporter&) = delete;
-  public EventLoopReporter(facebook::react::jsinspector_modern::tracing::EventLoopPhase phase);
-  public EventLoopReporter(facebook::react::jsinspector_modern::tracing::EventLoopReporter&&) = delete;
-  public facebook::react::jsinspector_modern::tracing::EventLoopReporter& operator=(const facebook::react::jsinspector_modern::tracing::EventLoopReporter&) = delete;
-  public facebook::react::jsinspector_modern::tracing::EventLoopReporter& operator=(facebook::react::jsinspector_modern::tracing::EventLoopReporter&&) = delete;
-  public ~EventLoopReporter();
 }
 
 struct facebook::react::jsinspector_modern::tracing::FrameTimingSequence {
@@ -11539,10 +11482,6 @@ struct facebook::react::jsinspector_modern::tracing::HostTracingProfile {
   public std::vector<facebook::react::jsinspector_modern::tracing::InstanceTracingProfile> instanceTracingProfiles;
   public std::vector<facebook::react::jsinspector_modern::tracing::RuntimeSamplingProfile> runtimeSamplingProfiles;
   public ~HostTracingProfile() = default;
-}
-
-struct facebook::react::jsinspector_modern::tracing::IdGenerator {
-  public uint32_t getNext();
 }
 
 struct facebook::react::jsinspector_modern::tracing::InstanceTracingProfile {
