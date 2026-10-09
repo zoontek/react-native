@@ -4443,16 +4443,6 @@ class facebook::react::EventTarget {
   public void setEnabled(bool enabled);
 }
 
-class facebook::react::FuseboxTracer {
-  public FuseboxTracer(const facebook::react::FuseboxTracer&) = delete;
-  public bool isTracing();
-  public bool startTracing();
-  public bool stopTracing(const std::function<void(const folly::dynamic& eventsChunk)>& resultCallback);
-  public bool stopTracingAndWriteToFile(const std::string& path);
-  public static facebook::react::FuseboxTracer& getFuseboxTracer();
-  public void addEvent(const std::string_view& name, uint64_t start, uint64_t end, const std::optional<std::string_view>& track);
-}
-
 class facebook::react::HermesInstance {
   public static std::unique_ptr<facebook::react::JSRuntime> createJSRuntime(std::shared_ptr<hermes::vm::CrashManager> crashManager, std::shared_ptr<facebook::react::MessageQueueThread> msgQueueThread, bool allocInOldGenBeforeTTI) noexcept;
 }
@@ -5611,12 +5601,6 @@ class facebook::react::ReactInstance {
 struct facebook::react::ReactInstance::JSRuntimeFlags {
   public bool isProfiling;
   public const std::string runtimeDiagnosticFlags;
-}
-
-class facebook::react::ReactPerfettoLogger {
-  public static bool isTracing();
-  public static void mark(const std::string_view& eventName, facebook::react::HighResTimeStamp startTime, const std::optional<std::string_view>& trackName = std::nullopt, const std::optional<std::string_view>& trackGroup = std::nullopt);
-  public static void measure(const std::string_view& eventName, facebook::react::HighResTimeStamp startTime, facebook::react::HighResTimeStamp endTime, const std::optional<std::string_view>& trackName = std::nullopt, const std::optional<std::string_view>& trackGroup = std::nullopt);
 }
 
 class facebook::react::RootProps : public facebook::react::HostPlatformViewProps {
@@ -7935,13 +7919,6 @@ struct facebook::react::Bridging<uint32_t> {
 
 struct facebook::react::Bridging<void> {
   public static void fromJs(facebook::jsi::Runtime&, const facebook::jsi::Value&);
-}
-
-struct facebook::react::BufferEvent {
-  public std::string name;
-  public std::string track;
-  public uint64_t end;
-  public uint64_t start;
 }
 
 struct facebook::react::BundleHeader {
@@ -11889,49 +11866,6 @@ struct facebook::react::ReactMarker::ReactMarkerEvent {
   public const facebook::react::ReactMarker::ReactMarkerId markerId;
   public double time;
 }
-
-
-void facebook::react::BridgeNativeModulePerfLogger::asyncMethodCallArgConversionEnd(const char* moduleName, const char* methodName);
-void facebook::react::BridgeNativeModulePerfLogger::asyncMethodCallArgConversionStart(const char* moduleName, const char* methodName);
-void facebook::react::BridgeNativeModulePerfLogger::asyncMethodCallBatchPreprocessEnd(int batchSize);
-void facebook::react::BridgeNativeModulePerfLogger::asyncMethodCallBatchPreprocessStart();
-void facebook::react::BridgeNativeModulePerfLogger::asyncMethodCallDispatch(const char* moduleName, const char* methodName);
-void facebook::react::BridgeNativeModulePerfLogger::asyncMethodCallEnd(const char* moduleName, const char* methodName);
-void facebook::react::BridgeNativeModulePerfLogger::asyncMethodCallExecutionArgConversionEnd(const char* moduleName, const char* methodName, int32_t id);
-void facebook::react::BridgeNativeModulePerfLogger::asyncMethodCallExecutionArgConversionStart(const char* moduleName, const char* methodName, int32_t id);
-void facebook::react::BridgeNativeModulePerfLogger::asyncMethodCallExecutionEnd(const char* moduleName, const char* methodName, int32_t id);
-void facebook::react::BridgeNativeModulePerfLogger::asyncMethodCallExecutionFail(const char* moduleName, const char* methodName, int32_t id);
-void facebook::react::BridgeNativeModulePerfLogger::asyncMethodCallExecutionStart(const char* moduleName, const char* methodName, int32_t id);
-void facebook::react::BridgeNativeModulePerfLogger::asyncMethodCallFail(const char* moduleName, const char* methodName);
-void facebook::react::BridgeNativeModulePerfLogger::asyncMethodCallStart(const char* moduleName, const char* methodName);
-void facebook::react::BridgeNativeModulePerfLogger::disableLogging();
-void facebook::react::BridgeNativeModulePerfLogger::enableLogging(std::unique_ptr<facebook::react::NativeModulePerfLogger>&& logger);
-void facebook::react::BridgeNativeModulePerfLogger::moduleCreateCacheHit(const char* moduleName, int32_t id);
-void facebook::react::BridgeNativeModulePerfLogger::moduleCreateConstructEnd(const char* moduleName, int32_t id);
-void facebook::react::BridgeNativeModulePerfLogger::moduleCreateConstructStart(const char* moduleName, int32_t id);
-void facebook::react::BridgeNativeModulePerfLogger::moduleCreateEnd(const char* moduleName, int32_t id);
-void facebook::react::BridgeNativeModulePerfLogger::moduleCreateFail(const char* moduleName, int32_t id);
-void facebook::react::BridgeNativeModulePerfLogger::moduleCreateSetUpEnd(const char* moduleName, int32_t id);
-void facebook::react::BridgeNativeModulePerfLogger::moduleCreateSetUpStart(const char* moduleName, int32_t id);
-void facebook::react::BridgeNativeModulePerfLogger::moduleCreateStart(const char* moduleName, int32_t id);
-void facebook::react::BridgeNativeModulePerfLogger::moduleDataCreateEnd(const char* moduleName, int32_t id);
-void facebook::react::BridgeNativeModulePerfLogger::moduleDataCreateStart(const char* moduleName, int32_t id);
-void facebook::react::BridgeNativeModulePerfLogger::moduleJSRequireBeginningCacheHit(const char* moduleName);
-void facebook::react::BridgeNativeModulePerfLogger::moduleJSRequireBeginningEnd(const char* moduleName);
-void facebook::react::BridgeNativeModulePerfLogger::moduleJSRequireBeginningFail(const char* moduleName);
-void facebook::react::BridgeNativeModulePerfLogger::moduleJSRequireBeginningStart(const char* moduleName);
-void facebook::react::BridgeNativeModulePerfLogger::moduleJSRequireEndingEnd(const char* moduleName);
-void facebook::react::BridgeNativeModulePerfLogger::moduleJSRequireEndingFail(const char* moduleName);
-void facebook::react::BridgeNativeModulePerfLogger::moduleJSRequireEndingStart(const char* moduleName);
-void facebook::react::BridgeNativeModulePerfLogger::syncMethodCallArgConversionEnd(const char* moduleName, const char* methodName);
-void facebook::react::BridgeNativeModulePerfLogger::syncMethodCallArgConversionStart(const char* moduleName, const char* methodName);
-void facebook::react::BridgeNativeModulePerfLogger::syncMethodCallEnd(const char* moduleName, const char* methodName);
-void facebook::react::BridgeNativeModulePerfLogger::syncMethodCallExecutionEnd(const char* moduleName, const char* methodName);
-void facebook::react::BridgeNativeModulePerfLogger::syncMethodCallExecutionStart(const char* moduleName, const char* methodName);
-void facebook::react::BridgeNativeModulePerfLogger::syncMethodCallFail(const char* moduleName, const char* methodName);
-void facebook::react::BridgeNativeModulePerfLogger::syncMethodCallReturnConversionEnd(const char* moduleName, const char* methodName);
-void facebook::react::BridgeNativeModulePerfLogger::syncMethodCallReturnConversionStart(const char* moduleName, const char* methodName);
-void facebook::react::BridgeNativeModulePerfLogger::syncMethodCallStart(const char* moduleName, const char* methodName);
 
 
 void facebook::react::LowPriorityExecutor::execute(std::function<void()>&& workItem);
