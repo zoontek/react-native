@@ -180,14 +180,11 @@ facebook::react::SharedColor facebook::react::colorFromComponents(facebook::reac
 facebook::react::SharedColor facebook::react::colorFromRGBA(uint8_t r, uint8_t g, uint8_t b, uint8_t a);
 facebook::react::SharedColor facebook::react::whiteColor();
 facebook::react::Size facebook::react::yogaMeassureToSize(int64_t value);
-facebook::react::SurfaceId facebook::react::getNextRootViewTag() noexcept;
 facebook::react::TurboModuleMethodValueKind facebook::react::getTurboModuleMethodValueKind(facebook::jsi::Runtime& rt, const facebook::jsi::Value* value);
 facebook::react::ValueUnit facebook::react::toValueUnit(const facebook::react::RawValue& value);
 facebook::yoga::FloatOptional facebook::react::convertAspectRatio(const facebook::react::PropsParserContext&, const facebook::react::RawValue& value);
 facebook::yoga::FloatOptional facebook::react::yogaOptionalFloatFromFloat(Float value);
 float facebook::react::yogaFloatFromFloat(Float value);
-folly::dynamic facebook::react::diffDynamicProps(const folly::dynamic& oldProps, const folly::dynamic& newProps);
-folly::dynamic facebook::react::mergeDynamicProps(const folly::dynamic& source, const folly::dynamic& patch, facebook::react::NullValueStrategy nullValueStrategy);
 int facebook::react::toInt(const facebook::react::DisplayType& displayType);
 int facebook::react::toInt(const facebook::react::LayoutDirection& layoutDirection);
 std::optional<Float> facebook::react::optionalFloatFromYogaValue(const facebook::yoga::Style::Length& length, std::optional<Float> base = {});
@@ -1519,11 +1516,6 @@ enum facebook::react::LayoutDirection {
   Undefined,
 }
 
-enum facebook::react::NullValueStrategy {
-  Ignore,
-  Override,
-}
-
 enum facebook::react::OutlineStyle : uint8_t {
   Dashed,
   Dotted,
@@ -1826,20 +1818,6 @@ struct facebook::react::DropShadowParams {
   public Float standardDeviation;
   public bool operator==(const facebook::react::DropShadowParams& other) const = default;
   public facebook::react::SharedColor color;
-}
-
-struct facebook::react::DynamicEventPayload : public facebook::react::EventPayload {
-  protected folly::dynamic payload_;
-  public DynamicEventPayload(folly::dynamic&& payload);
-  public static facebook::react::SharedEventPayload create(folly::dynamic&& payload);
-  public virtual facebook::jsi::Value asJSIValue(facebook::jsi::Runtime& runtime) const override;
-  public virtual facebook::react::EventPayloadType getType() const override;
-  public virtual std::optional<double> extractValue(const std::vector<std::string>&) const override;
-}
-
-struct facebook::react::DynamicPointerEvent : public facebook::react::DynamicEventPayload {
-  public DynamicPointerEvent(folly::dynamic&& payload);
-  public const std::optional<std::vector<facebook::react::Tag>>& getHitPathForEventListener() const;
 }
 
 struct facebook::react::EventPayload {

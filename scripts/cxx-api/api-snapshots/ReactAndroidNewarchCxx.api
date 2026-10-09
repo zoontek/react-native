@@ -520,7 +520,6 @@ facebook::react::SharedColor facebook::react::colorFromRGBA(uint8_t r, uint8_t g
 facebook::react::SharedColor facebook::react::parsePlatformColor(const facebook::react::ContextContainer& contextContainer, int32_t surfaceId, const facebook::react::RawValue& value);
 facebook::react::SharedColor facebook::react::whiteColor();
 facebook::react::Size facebook::react::yogaMeassureToSize(int64_t value);
-facebook::react::SurfaceId facebook::react::getNextRootViewTag() noexcept;
 facebook::react::TurboModuleMethodValueKind facebook::react::getTurboModuleMethodValueKind(facebook::jsi::Runtime& rt, const facebook::jsi::Value* value);
 facebook::react::ValueUnit facebook::react::toValueUnit(const facebook::react::RawValue& value);
 facebook::yoga::FloatOptional facebook::react::convertAspectRatio(const facebook::react::PropsParserContext&, const facebook::react::RawValue& value);
@@ -530,8 +529,6 @@ float facebook::react::blueFromHostPlatformColor(facebook::react::Color color);
 float facebook::react::greenFromHostPlatformColor(facebook::react::Color color);
 float facebook::react::redFromHostPlatformColor(facebook::react::Color color);
 float facebook::react::yogaFloatFromFloat(facebook::react::Float value);
-folly::dynamic facebook::react::diffDynamicProps(const folly::dynamic& oldProps, const folly::dynamic& newProps);
-folly::dynamic facebook::react::mergeDynamicProps(const folly::dynamic& source, const folly::dynamic& patch, facebook::react::NullValueStrategy nullValueStrategy);
 folly::dynamic facebook::react::toDynamic(const YGValue& dimension);
 folly::dynamic facebook::react::toDynamic(const facebook::react::BackgroundImage& backgroundImage);
 folly::dynamic facebook::react::toDynamic(const facebook::react::BoxShadow& boxShadow);
@@ -2920,11 +2917,6 @@ enum facebook::react::ModalHostViewSupportedOrientations : facebook::react::Moda
   PortraitUpsideDown,
 }
 
-enum facebook::react::NullValueStrategy {
-  Ignore,
-  Override,
-}
-
 enum facebook::react::OutlineStyle : uint8_t {
   Dashed,
   Dotted,
@@ -3280,20 +3272,6 @@ struct facebook::react::DropShadowParams {
   public facebook::react::Float standardDeviation;
   public facebook::react::SharedColor color;
   public folly::dynamic toDynamic() const;
-}
-
-struct facebook::react::DynamicEventPayload : public facebook::react::EventPayload {
-  protected folly::dynamic payload_;
-  public DynamicEventPayload(folly::dynamic&& payload);
-  public static facebook::react::SharedEventPayload create(folly::dynamic&& payload);
-  public virtual facebook::jsi::Value asJSIValue(facebook::jsi::Runtime& runtime) const override;
-  public virtual facebook::react::EventPayloadType getType() const override;
-  public virtual std::optional<double> extractValue(const std::vector<std::string>&) const override;
-}
-
-struct facebook::react::DynamicPointerEvent : public facebook::react::DynamicEventPayload {
-  public DynamicPointerEvent(folly::dynamic&& payload);
-  public const std::optional<std::vector<facebook::react::Tag>>& getHitPathForEventListener() const;
 }
 
 struct facebook::react::EventPayload {
