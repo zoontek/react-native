@@ -3361,7 +3361,6 @@ uint8_t facebook::react::blueFromColor(facebook::react::SharedColor color) noexc
 uint8_t facebook::react::greenFromColor(facebook::react::SharedColor color) noexcept;
 uint8_t facebook::react::redFromColor(facebook::react::SharedColor color) noexcept;
 void facebook::react::FBReactNativeSpec_registerComponentDescriptorsFromCodegen(std::shared_ptr<const facebook::react::ComponentDescriptorProviderRegistry> registry);
-void facebook::react::executeSynchronouslyOnSameThread_CAN_DEADLOCK(const facebook::react::RuntimeExecutor& runtimeExecutor, std::function<void(facebook::jsi::Runtime&)>&& runtimeWork);
 void facebook::react::fromRawValue(const facebook::react::ContextContainer& contextContainer, int32_t surfaceId, const facebook::react::RawValue& value, facebook::react::SharedColor& result);
 void facebook::react::fromRawValue(const facebook::react::PropsParserContext& context, const facebook::react::RawValue& value, YGValue& result);
 void facebook::react::fromRawValue(const facebook::react::PropsParserContext& context, const facebook::react::RawValue& value, facebook::react::AccessibilityAction& result);
@@ -3415,7 +3414,6 @@ void facebook::react::serializeTransformAxis(const facebook::react::TransformOpe
 void facebook::react::serializeTransformOperationValue(const std::string& operationName, const facebook::react::ValueUnit& valueUnit, folly::dynamic& resultArray);
 void facebook::react::setDefaultColorSpace(facebook::react::ColorSpace newColorSpace);
 void facebook::react::setTouchPayloadOnObject(facebook::jsi::Object& object, facebook::jsi::Runtime& runtime, const facebook::react::BaseTouch& touch);
-void facebook::react::unsafeExecuteOnMainThreadSync(std::function<void()> work);
 void facebook::react::updateTransformProps(const facebook::react::Transform& transform, const facebook::react::TransformOperation& operation, folly::dynamic& resultTranslateArray);
 bool facebook::react::operator==(const facebook::react::LayoutConstraints& lhs, const facebook::react::LayoutConstraints& rhs);
 bool facebook::react::operator==(const facebook::react::LayoutContext& lhs, const facebook::react::LayoutContext& rhs);
