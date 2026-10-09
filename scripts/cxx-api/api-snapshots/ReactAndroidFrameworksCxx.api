@@ -1325,13 +1325,6 @@ class facebook::react::AnimationChoreographer {
   public void setAnimationBackend(std::weak_ptr<facebook::react::UIManagerAnimationBackend> animationBackend);
 }
 
-class facebook::react::AppRegistryBinding {
-  public AppRegistryBinding() = delete;
-  public static void setSurfaceProps(facebook::jsi::Runtime& runtime, facebook::react::SurfaceId surfaceId, const std::string& moduleName, const folly::dynamic& initialProps, facebook::react::DisplayMode displayMode);
-  public static void startSurface(facebook::jsi::Runtime& runtime, facebook::react::SurfaceId surfaceId, const std::string& moduleName, const folly::dynamic& initialProps, facebook::react::DisplayMode displayMode);
-  public static void stopSurface(facebook::jsi::Runtime& runtime, facebook::react::SurfaceId surfaceId);
-}
-
 class facebook::react::AsyncArrayBuffer {
   public AsyncArrayBuffer(const facebook::react::AsyncArrayBuffer&) = delete;
   public AsyncArrayBuffer(facebook::react::AsyncArrayBuffer&&) noexcept = default;
@@ -2587,12 +2580,6 @@ class facebook::react::LayoutAnimationStatusDelegate {
 }
 
 class facebook::react::LayoutConformanceShadowNode : public facebook::react::ConcreteShadowNode<facebook::react::LayoutConformanceShadowNodeComponentName, facebook::react::YogaLayoutableShadowNode, facebook::react::LayoutConformanceProps> {
-}
-
-class facebook::react::LayoutEventEmitter : public facebook::react::UIManagerCommitHook {
-  public virtual void commitHookWasRegistered(const facebook::react::UIManager&) noexcept override;
-  public virtual void commitHookWasUnregistered(const facebook::react::UIManager&) noexcept override;
-  public virtual void shadowTreeDidCommit(const facebook::react::ShadowTree& shadowTree, const facebook::react::RootShadowNode::Shared& rootShadowNode, const std::vector<const facebook::react::LayoutableShadowNode*>& affectedLayoutableNodes) noexcept override;
 }
 
 class facebook::react::LayoutableShadowNode : public facebook::react::ShadowNode {
