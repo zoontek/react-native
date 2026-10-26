@@ -106,10 +106,8 @@ RCTSendScrollEventForNativeAnimations_DEPRECATED(UIScrollView *scrollView, NSInt
 
   CGPoint _contentOffsetWhenClipped;
 
-  // Set in `finalizeUpdates:`, when the content size and direction are known.
   std::optional<CGPoint> _pendingContentOffset;
-  // In RTL, a size change moves the offset from the left edge, so the state needs an update.
-  BOOL _contentOffsetNeedsStateUpdate;
+  BOOL _contentOffsetNeedsUpdate;
 
   __weak UIView *_contentView;
 
@@ -310,10 +308,13 @@ static inline UIViewAnimationOptions animationOptionsWithCurve(UIViewAnimationCu
 - (void)updateLayoutMetrics:(const LayoutMetrics &)layoutMetrics
            oldLayoutMetrics:(const LayoutMetrics &)oldLayoutMetrics
 {
+  if (layoutMetrics.layoutDirection != oldLayoutMetrics.layoutDirection && !_pendingContentOffset) {
+    _pendingContentOffset = [self _mirrorContentOffsetIfNeeded:_scrollView.contentOffset];
+  }
   [super updateLayoutMetrics:layoutMetrics oldLayoutMetrics:oldLayoutMetrics];
-  if (layoutMetrics.frame.size.width != oldLayoutMetrics.frame.size.width ||
-      layoutMetrics.layoutDirection != oldLayoutMetrics.layoutDirection) {
-    _contentOffsetNeedsStateUpdate = YES;
+  if (layoutMetrics.layoutDirection == LayoutDirection::RightToLeft &&
+      layoutMetrics.frame.size.width != oldLayoutMetrics.frame.size.width) {
+    _contentOffsetNeedsUpdate = YES;
   }
   if (layoutMetrics.layoutDirection != oldLayoutMetrics.layoutDirection) {
     CGAffineTransform transform = (layoutMetrics.layoutDirection == LayoutDirection::LeftToRight)
@@ -413,7 +414,7 @@ static inline UIViewAnimationOptions animationOptionsWithCurve(UIViewAnimationCu
   if (oldScrollViewProps.contentInset != newScrollViewProps.contentInset && !newScrollViewProps.centerContent) {
     _scrollView.contentInset = RCTUIEdgeInsetsFromEdgeInsets(newScrollViewProps.contentInset);
   }
-  // Skip a zero offset on mount, so RTL content starts on the right, like on Android.
+  // Skip a zero offset on mount, so RTL content starts on the right.
   if (oldProps ? oldScrollViewProps.contentOffset != newScrollViewProps.contentOffset
                : newScrollViewProps.contentOffset != facebook::react::Point{}) {
     _pendingContentOffset = RCTCGPointFromPoint(newScrollViewProps.contentOffset);
@@ -477,7 +478,7 @@ static inline UIViewAnimationOptions animationOptionsWithCurve(UIViewAnimationCu
   auto &data = _state->getData();
 
   auto contentOffset = RCTCGPointFromPoint(data.contentOffset);
-  if (!oldState && !CGPointEqualToPoint(contentOffset, CGPointZero)) {
+  if (!oldState) {
     /*
      * When <ScrollView /> is suspended, it is removed from view hierarchy and its offset is stored in
      * state. We want to restore this offset from the state but it must be snapped to be within UIScrollView's
@@ -507,8 +508,10 @@ static inline UIViewAnimationOptions animationOptionsWithCurve(UIViewAnimationCu
     return;
   }
 
+  if (_layoutMetrics.layoutDirection == LayoutDirection::RightToLeft && contentSize.width != _contentSize.width) {
+    _contentOffsetNeedsUpdate = YES;
+  }
   _contentSize = contentSize;
-  _contentOffsetNeedsStateUpdate = YES;
   _containerView.frame = CGRect{RCTCGPointFromPoint(data.contentBoundingRect.origin), contentSize};
 
   [self _preserveContentOffsetIfNeededWithBlock:^{
@@ -521,16 +524,17 @@ static inline UIViewAnimationOptions animationOptionsWithCurve(UIViewAnimationCu
   [super finalizeUpdates:updateMask];
 
   if (_pendingContentOffset) {
-    _scrollView.contentOffset = [self _mirrorContentOffsetIfNeeded:*_pendingContentOffset];
+    CGPoint contentOffset = [self _mirrorContentOffsetIfNeeded:*_pendingContentOffset];
     _pendingContentOffset.reset();
-    _contentOffsetNeedsStateUpdate = YES;
+    if (!CGPointEqualToPoint(_scrollView.contentOffset, contentOffset)) {
+      _scrollView.contentOffset = contentOffset;
+      _contentOffsetNeedsUpdate = NO;
+    }
   }
 
-  if (_contentOffsetNeedsStateUpdate) {
-    _contentOffsetNeedsStateUpdate = NO;
-    if (_layoutMetrics.layoutDirection == LayoutDirection::RightToLeft) {
-      [self _updateStateWithContentOffset];
-    }
+  if (_contentOffsetNeedsUpdate) {
+    _contentOffsetNeedsUpdate = NO;
+    [self scrollViewDidScroll:_scrollView];
   }
 }
 
@@ -620,15 +624,11 @@ static inline UIViewAnimationOptions animationOptionsWithCurve(UIViewAnimationCu
   return NO;
 }
 
-/*
- * In RTL, the scroll view is mirrored, so UIKit offsets start on the right.
- * JS and the state use offsets from the left, like on Android.
- * The same call converts both ways.
- */
+// In RTL, UIKit offsets start on the right, but JS and state offsets start on the left.
 - (CGPoint)_mirrorContentOffsetIfNeeded:(CGPoint)offset
 {
   if (_layoutMetrics.layoutDirection == LayoutDirection::RightToLeft) {
-    offset.x = _scrollView.contentSize.width - _scrollView.bounds.size.width - offset.x;
+    offset.x = MAX(_scrollView.contentSize.width - _scrollView.bounds.size.width, 0) - offset.x;
   }
   return offset;
 }
@@ -733,10 +733,9 @@ static inline UIViewAnimationOptions animationOptionsWithCurve(UIViewAnimationCu
   // in RTL the mirroring transform makes UIKit report zoomScale == -1, and changing
   // it to 1 makes UIKit move contentOffset.
   _scrollView.zoomScale = 1.0;
-  // The next mount sets a non-zero `contentOffset` again.
   _scrollView.contentOffset = CGPointZero;
   _pendingContentOffset.reset();
-  _contentOffsetNeedsStateUpdate = NO;
+  _contentOffsetNeedsUpdate = NO;
   // Invalidate cached content size so that updateState: recalculates the
   // container frame after zoomScale reset (which may have mutated it in RTL).
   _contentSize = CGSizeZero;
