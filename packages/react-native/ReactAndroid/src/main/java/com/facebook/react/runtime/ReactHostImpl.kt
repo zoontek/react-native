@@ -1109,7 +1109,7 @@ public class ReactHostImpl(
          * Native is reloading, it seems reasonable to assume that: (1) We must have navigated to a
          * React Native screen in the past, or (2) We must be on a React Native screen.
          */
-        if (isReloading && !isManagerResumed) {
+        if (isReloading && !isManagerResumed && currentActivity != null) {
           reactLifecycleStateManager.moveToOnHostResume(reactContext, currentActivity)
         } else {
           /**
