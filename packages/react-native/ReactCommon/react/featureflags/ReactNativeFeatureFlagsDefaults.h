@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- * @generated SignedSource<<4f15eee24d8380b5d0cc9f726ad3a371>>
+ * @generated SignedSource<<35e8175277baa31d135d802ef5a5e6f1>>
  */
 
 /**
@@ -147,10 +147,6 @@ class ReactNativeFeatureFlagsDefaults : public ReactNativeFeatureFlagsProvider {
 
   bool enableFollowUpMountItemDispatchAndroid() override {
     return false;
-  }
-
-  bool enableFontScaleChangesUpdatingLayout() override {
-    return true;
   }
 
   bool enableIOSCompressedTextFrameAdjustment() override {
