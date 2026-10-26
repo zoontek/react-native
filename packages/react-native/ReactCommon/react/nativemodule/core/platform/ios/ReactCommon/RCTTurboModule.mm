@@ -680,9 +680,8 @@ jsi::Value ObjCTurboModule::convertReturnIdToJSIValue(
  */
 NSString *ObjCTurboModule::getArgumentTypeName(jsi::Runtime &runtime, NSString *methodName, int argIndex)
 {
-  if (methodArgumentTypeNames_ == nullptr) {
-    NSMutableDictionary<NSString *, NSArray<NSString *> *> *methodArgumentTypeNames = [NSMutableDictionary new];
-
+  std::lock_guard<std::mutex> lock(methodInfosMutex_);
+  if (!argumentTypeNamesLoaded_) {
     unsigned int numberOfMethods;
     Class cls = [instance_ class];
     Method *methods = class_copyMethodList(object_getClass(cls), &numberOfMethods);
@@ -707,19 +706,21 @@ NSString *ObjCTurboModule::getArgumentTypeName(jsi::Runtime &runtime, NSString *
           [argumentTypes addObject:arguments[j].type];
         }
 
-        NSString *normalizedOtherMethodName = [otherMethodName componentsSeparatedByString:@":"][0];
-        methodArgumentTypeNames[normalizedOtherMethodName] = argumentTypes;
+        std::string_view otherMethodNameView = otherMethodName.UTF8String;
+        std::string_view normalizedOtherMethodName = otherMethodNameView.substr(0, otherMethodNameView.find(':'));
+        findOrCreateMethodInfo(normalizedOtherMethodName).argumentTypeNames = argumentTypes;
       }
 
       free(methods);
     }
 
-    methodArgumentTypeNames_ = methodArgumentTypeNames;
+    argumentTypeNamesLoaded_ = true;
   }
 
-  if (methodArgumentTypeNames_[methodName] != nullptr) {
-    assert([methodArgumentTypeNames_[methodName] count] > argIndex);
-    return methodArgumentTypeNames_[methodName][argIndex];
+  auto it = methodInfos_.find(std::string_view(methodName.UTF8String));
+  if (it != methodInfos_.end() && it->second.argumentTypeNames != nil) {
+    assert([it->second.argumentTypeNames count] > argIndex);
+    return it->second.argumentTypeNames[argIndex];
   }
 
   return nil;
@@ -818,18 +819,19 @@ void ObjCTurboModule::setInvocationArg(
     /**
      * Convert objects using RCTCxxConvert to structs.
      */
-    if ([objCArg isKindOfClass:[NSDictionary class]] && hasMethodArgConversionSelector(methodNameNSString, i)) {
+    if ([objCArg isKindOfClass:[NSDictionary class]]) {
       SEL methodArgConversionSelector = getMethodArgConversionSelector(methodNameNSString, i);
+      if (methodArgConversionSelector != nullptr) {
+        // Message dispatch logic from old infra (link:
+        // https://github.com/facebook/react-native/commit/6783694158057662fd7b11fc123c339b2b21bfe6#diff-263fc157dfce55895cdc16495b55d190R350)
+        RCTManagedPointer *(*convert)(id, SEL, id) = (__typeof__(convert))objc_msgSend;
+        RCTManagedPointer *box = convert([RCTCxxConvert class], methodArgConversionSelector, objCArg);
 
-      // Message dispatch logic from old infra (link:
-      // https://github.com/facebook/react-native/commit/6783694158057662fd7b11fc123c339b2b21bfe6#diff-263fc157dfce55895cdc16495b55d190R350)
-      RCTManagedPointer *(*convert)(id, SEL, id) = (__typeof__(convert))objc_msgSend;
-      RCTManagedPointer *box = convert([RCTCxxConvert class], methodArgConversionSelector, objCArg);
-
-      void *pointer = box.voidPointer;
-      [inv setArgument:&pointer atIndex:i + 2];
-      [retainedObjectsForInvocation addObject:box];
-      return;
+        void *pointer = box.voidPointer;
+        [inv setArgument:&pointer atIndex:i + 2];
+        [retainedObjectsForInvocation addObject:box];
+        return;
+      }
     }
   }
 
@@ -840,6 +842,26 @@ void ObjCTurboModule::setInvocationArg(
   if (objCArg != nullptr) {
     [retainedObjectsForInvocation addObject:objCArg];
   }
+}
+
+ObjCTurboModule::MethodInfo &ObjCTurboModule::findOrCreateMethodInfo(std::string_view methodName)
+{
+  auto it = methodInfos_.find(methodName);
+  if (it == methodInfos_.end()) {
+    it = methodInfos_.emplace(std::string(methodName), MethodInfo{}).first;
+  }
+  return it->second;
+}
+
+NSMethodSignature *ObjCTurboModule::getMethodSignature(const char *methodName, SEL selector)
+{
+  std::lock_guard<std::mutex> lock(methodInfosMutex_);
+  MethodInfo &methodInfo = findOrCreateMethodInfo(methodName);
+  if (methodInfo.signature == nil) {
+    const NSObject<RCTBridgeModule> *module = instance_;
+    methodInfo.signature = [module methodSignatureForSelector:selector];
+  }
+  return methodInfo.signature;
 }
 
 NSInvocation *ObjCTurboModule::createMethodInvocation(
@@ -859,8 +881,7 @@ NSInvocation *ObjCTurboModule::createMethodInvocation(
     TurboModulePerfLogger::asyncMethodCallArgConversionStart(moduleName, methodName);
   }
 
-  const NSObject<RCTBridgeModule> *module = instance_;
-  NSMethodSignature *methodSignature = [module methodSignatureForSelector:selector];
+  NSMethodSignature *methodSignature = getMethodSignature(methodName, selector);
   if (count > methodSignature.numberOfArguments - 2) {
     throw jsi::JSError(
         runtime,
@@ -986,36 +1007,28 @@ jsi::Value ObjCTurboModule::invokeObjCMethod(
 
 BOOL ObjCTurboModule::hasMethodArgConversionSelector(NSString *methodName, size_t argIndex)
 {
-  return (methodArgConversionSelectors_ != nullptr) && (methodArgConversionSelectors_[methodName] != nullptr) &&
-      ![methodArgConversionSelectors_[methodName][argIndex] isEqual:(id)kCFNull];
+  return getMethodArgConversionSelector(methodName, argIndex) != nullptr;
 }
 
 SEL ObjCTurboModule::getMethodArgConversionSelector(NSString *methodName, size_t argIndex)
 {
-  assert(hasMethodArgConversionSelector(methodName, argIndex));
-  return (SEL)((NSValue *)methodArgConversionSelectors_[methodName][argIndex]).pointerValue;
+  std::lock_guard<std::mutex> lock(methodInfosMutex_);
+  auto it = methodInfos_.find(std::string_view(methodName.UTF8String));
+  if (it == methodInfos_.end() || argIndex >= it->second.argConversionSelectors.size()) {
+    return nullptr;
+  }
+  return it->second.argConversionSelectors[argIndex];
 }
 
 void ObjCTurboModule::setMethodArgConversionSelector(NSString *methodName, size_t argIndex, NSString *fnName)
 {
-  if (methodArgConversionSelectors_ == nullptr) {
-    methodArgConversionSelectors_ = [NSMutableDictionary new];
+  const char *methodNameUTF8 = methodName.UTF8String;
+  std::lock_guard<std::mutex> lock(methodInfosMutex_);
+  std::vector<SEL> &selectors = findOrCreateMethodInfo(methodNameUTF8).argConversionSelectors;
+  if (selectors.empty()) {
+    selectors.resize(methodMap_.at(methodNameUTF8).argCount, nullptr);
   }
-
-  if (methodArgConversionSelectors_[methodName] == nullptr) {
-    auto metaData = methodMap_.at([methodName UTF8String]);
-    auto argCount = metaData.argCount;
-
-    methodArgConversionSelectors_[methodName] = [NSMutableArray arrayWithCapacity:argCount];
-    for (int i = 0; i < argCount; i += 1) {
-      [methodArgConversionSelectors_[methodName] addObject:(id)kCFNull];
-    }
-  }
-
-  SEL selector = NSSelectorFromString(fnName);
-  NSValue *selectorValue = [NSValue valueWithPointer:selector];
-
-  methodArgConversionSelectors_[methodName][argIndex] = selectorValue;
+  selectors.at(argIndex) = NSSelectorFromString(fnName);
 }
 
 void ObjCTurboModule::setEventEmitterCallback(EventEmitterCallback eventEmitterCallback)
