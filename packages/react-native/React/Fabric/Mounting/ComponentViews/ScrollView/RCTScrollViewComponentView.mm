@@ -108,6 +108,8 @@ RCTSendScrollEventForNativeAnimations_DEPRECATED(UIScrollView *scrollView, NSInt
 
   // Set in `finalizeUpdates:`, when the content size and direction are known.
   std::optional<CGPoint> _pendingContentOffset;
+  // In RTL, a size change moves the offset from the left edge, so the state needs an update.
+  BOOL _contentOffsetNeedsStateUpdate;
 
   __weak UIView *_contentView;
 
@@ -309,6 +311,10 @@ static inline UIViewAnimationOptions animationOptionsWithCurve(UIViewAnimationCu
            oldLayoutMetrics:(const LayoutMetrics &)oldLayoutMetrics
 {
   [super updateLayoutMetrics:layoutMetrics oldLayoutMetrics:oldLayoutMetrics];
+  if (layoutMetrics.frame.size.width != oldLayoutMetrics.frame.size.width ||
+      layoutMetrics.layoutDirection != oldLayoutMetrics.layoutDirection) {
+    _contentOffsetNeedsStateUpdate = YES;
+  }
   if (layoutMetrics.layoutDirection != oldLayoutMetrics.layoutDirection) {
     CGAffineTransform transform = (layoutMetrics.layoutDirection == LayoutDirection::LeftToRight)
         ? CGAffineTransformIdentity
@@ -502,6 +508,7 @@ static inline UIViewAnimationOptions animationOptionsWithCurve(UIViewAnimationCu
   }
 
   _contentSize = contentSize;
+  _contentOffsetNeedsStateUpdate = YES;
   _containerView.frame = CGRect{RCTCGPointFromPoint(data.contentBoundingRect.origin), contentSize};
 
   [self _preserveContentOffsetIfNeededWithBlock:^{
@@ -513,17 +520,17 @@ static inline UIViewAnimationOptions animationOptionsWithCurve(UIViewAnimationCu
 {
   [super finalizeUpdates:updateMask];
 
-  BOOL hasPendingContentOffset = _pendingContentOffset.has_value();
-  if (hasPendingContentOffset) {
+  if (_pendingContentOffset) {
     _scrollView.contentOffset = [self _mirrorContentOffsetIfNeeded:*_pendingContentOffset];
     _pendingContentOffset.reset();
+    _contentOffsetNeedsStateUpdate = YES;
   }
 
-  // In RTL, a size change moves the offset from the left edge, so update the state.
-  if (_layoutMetrics.layoutDirection == LayoutDirection::RightToLeft &&
-      (hasPendingContentOffset ||
-       (updateMask & (RNComponentViewUpdateMaskState | RNComponentViewUpdateMaskLayoutMetrics)))) {
-    [self _updateStateWithContentOffset];
+  if (_contentOffsetNeedsStateUpdate) {
+    _contentOffsetNeedsStateUpdate = NO;
+    if (_layoutMetrics.layoutDirection == LayoutDirection::RightToLeft) {
+      [self _updateStateWithContentOffset];
+    }
   }
 }
 
@@ -729,6 +736,7 @@ static inline UIViewAnimationOptions animationOptionsWithCurve(UIViewAnimationCu
   // The next mount sets a non-zero `contentOffset` again.
   _scrollView.contentOffset = CGPointZero;
   _pendingContentOffset.reset();
+  _contentOffsetNeedsStateUpdate = NO;
   // Invalidate cached content size so that updateState: recalculates the
   // container frame after zoomScale reset (which may have mutated it in RTL).
   _contentSize = CGSizeZero;
