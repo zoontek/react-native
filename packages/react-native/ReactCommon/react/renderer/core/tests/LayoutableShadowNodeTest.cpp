@@ -262,6 +262,60 @@ TEST(LayoutableShadowNodeTest, contentOriginOffset) {
   EXPECT_EQ(relativeLayoutMetrics.frame.origin.y, 20);
 }
 
+#ifndef ANDROID
+/*
+ * ┌─────────────────────────────┬──────────────┐
+ * │<View>                       │<ScrollView>  │
+ * │                             │ (RTL)        │
+ * │                             │              │
+ * └─────────────────────────────┴──────────────┘
+ */
+TEST(LayoutableShadowNodeTest, contentOriginOffsetInRTL) {
+  auto builder = simpleComponentBuilder();
+  auto childShadowNode = std::shared_ptr<ViewShadowNode>{};
+  auto contentOffsetX = Float{0};
+  // clang-format off
+  auto element =
+    Element<ScrollViewShadowNode>()
+      .finalize([](ScrollViewShadowNode &shadowNode){
+        auto layoutMetrics = EmptyLayoutMetrics;
+        layoutMetrics.frame.size = {.width=100, .height=200};
+        layoutMetrics.layoutDirection = LayoutDirection::RightToLeft;
+        shadowNode.setLayoutMetrics(layoutMetrics);
+      })
+      .stateData([&](ScrollViewState &data) {
+        data.contentOffset = {.x=contentOffsetX, .y=0};
+        data.contentBoundingRect.size = {.width=400, .height=200};
+      })
+      .children({
+        Element<ViewShadowNode>()
+        .finalize([](ViewShadowNode &shadowNode){
+          auto layoutMetrics = EmptyLayoutMetrics;
+          layoutMetrics.frame.size = {.width=400, .height=200};
+          shadowNode.setLayoutMetrics(layoutMetrics);
+        })
+        .reference(childShadowNode)
+    });
+  // clang-format on
+
+  auto parentShadowNode = builder.build(element);
+
+  auto relativeLayoutMetrics =
+      LayoutableShadowNode::computeRelativeLayoutMetrics(
+          childShadowNode->getFamily(), *parentShadowNode, {});
+
+  EXPECT_EQ(relativeLayoutMetrics.frame.origin.x, -300);
+
+  contentOffsetX = 300;
+  parentShadowNode = builder.build(element);
+
+  relativeLayoutMetrics = LayoutableShadowNode::computeRelativeLayoutMetrics(
+      childShadowNode->getFamily(), *parentShadowNode, {});
+
+  EXPECT_EQ(relativeLayoutMetrics.frame.origin.x, 0);
+}
+#endif
+
 /*
  * ┌────────────────────────┐
  * │<View>                  │

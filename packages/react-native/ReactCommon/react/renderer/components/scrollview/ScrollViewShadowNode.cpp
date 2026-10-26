@@ -68,6 +68,13 @@ Point ScrollViewShadowNode::getContentOriginOffset(
     bool includeTransform) const {
   auto stateData = getStateData();
   auto contentOffset = stateData.contentOffset;
+#ifndef ANDROID
+  if (getLayoutMetrics().layoutDirection == LayoutDirection::RightToLeft) {
+    // iOS mirrors the scroll view in RTL, so the offset starts from the right.
+    contentOffset.x = stateData.getContentSize().width -
+        getLayoutMetrics().frame.size.width - contentOffset.x;
+  }
+#endif
   auto transform = includeTransform ? getTransform() : Transform::Identity();
   auto result = transform *
       Vector{
