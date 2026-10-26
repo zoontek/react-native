@@ -46,6 +46,18 @@ CullingContext CullingContext::adjustCullingContextIfNeeded(
         }
 
         cullingContext.transform = Transform::Identity();
+
+#ifdef ANDROID
+        auto layoutMetrics = scrollViewShadowNode->getLayoutMetrics();
+        if (layoutMetrics.layoutDirection == LayoutDirection::RightToLeft) {
+          // In RTL, content offset is flipped horizontally.
+          // We need to flip the culling context frame to match.
+          auto stateData = scrollViewShadowNode->getStateData();
+          cullingContext.frame.origin.x =
+              stateData.contentBoundingRect.size.width -
+              layoutMetrics.frame.size.width - cullingContext.frame.origin.x;
+        }
+#endif
       } else {
         cullingContext = {};
       }

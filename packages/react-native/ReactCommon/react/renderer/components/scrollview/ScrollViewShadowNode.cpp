@@ -10,8 +10,6 @@
 #include <react/debug/react_native_assert.h>
 #include <react/renderer/core/LayoutMetrics.h>
 
-#include <algorithm>
-
 namespace facebook::react {
 
 // NOLINTNEXTLINE(facebook-hte-CArray)
@@ -29,14 +27,15 @@ void ScrollViewShadowNode::updateStateIfNeeded() {
 
   if (state.contentBoundingRect != contentBoundingRect) {
     state.contentBoundingRect = contentBoundingRect;
+#ifndef ANDROID
     // RTL scroll views start on the right until the native view reports.
     if (getState()->getRevision() == State::initialRevisionValue &&
         getLayoutMetrics().layoutDirection == LayoutDirection::RightToLeft &&
         state.contentOffset.x == 0) {
-      state.contentOffset.x = std::max<Float>(
-          0,
-          contentBoundingRect.size.width - getLayoutMetrics().frame.size.width);
+      state.contentOffset.x =
+          contentBoundingRect.size.width - getLayoutMetrics().frame.size.width;
     }
+#endif
     setStateData(std::move(state));
   }
 }
