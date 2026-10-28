@@ -100,7 +100,7 @@ class DeviceInfoModuleTest {
     deviceInfoModule.typedExportedConstants
     deviceInfoModule.emitUpdateDimensionsEvent()
     verify(reactContext, times(0))
-        ?.emitDeviceEvent(ArgumentMatchers.anyString(), ArgumentMatchers.any())
+        .emitDeviceEvent(ArgumentMatchers.anyString(), ArgumentMatchers.any())
   }
 
   @Test
