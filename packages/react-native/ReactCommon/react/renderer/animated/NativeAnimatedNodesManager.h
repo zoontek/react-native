@@ -133,8 +133,11 @@ class NativeAnimatedNodesManager : public std::enable_shared_from_this<NativeAni
       AnimationMutations &mutations,
       AnimatedPropsBuilder &propsBuilder,
       bool hasLayoutUpdates = false);
-  AnimationMutations onAnimationFrameForBackend(AnimatedPropsBuilder &propsBuilder, AnimationTimestamp timestamp);
-  AnimationMutations pullAnimationMutations(AnimationTimestamp timestamp);
+  AnimationMutations onAnimationFrameForBackend(
+      AnimatedPropsBuilder &propsBuilder,
+      AnimationTimestamp timestamp,
+      bool stepAnimations = true);
+  AnimationMutations pullAnimationMutations(AnimationTimestamp timestamp, bool stepAnimations = true);
 
 #pragma mark - Drivers
 

@@ -1703,8 +1703,8 @@ class facebook::react::NativeAnimatedNodesManager : public std::enable_shared_fr
   public bool hasManagedProps() const noexcept;
   public bool isOnRenderThread() const noexcept;
   public bool useSharedAnimatedBackend() const noexcept;
-  public facebook::react::AnimationMutations onAnimationFrameForBackend(facebook::react::AnimatedPropsBuilder& propsBuilder, facebook::react::AnimationTimestamp timestamp);
-  public facebook::react::AnimationMutations pullAnimationMutations(facebook::react::AnimationTimestamp timestamp);
+  public facebook::react::AnimationMutations onAnimationFrameForBackend(facebook::react::AnimatedPropsBuilder& propsBuilder, facebook::react::AnimationTimestamp timestamp, bool stepAnimations = true);
+  public facebook::react::AnimationMutations pullAnimationMutations(facebook::react::AnimationTimestamp timestamp, bool stepAnimations = true);
   public facebook::react::NativeAnimatedNodesManager& operator=(const facebook::react::NativeAnimatedNodesManager&) = delete;
   public facebook::react::NativeAnimatedNodesManager& operator=(facebook::react::NativeAnimatedNodesManager&&) = delete;
   public folly::dynamic getManagedProps(facebook::react::Tag tag) const noexcept;
