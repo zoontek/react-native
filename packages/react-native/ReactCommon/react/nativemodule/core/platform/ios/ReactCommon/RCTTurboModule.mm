@@ -31,6 +31,7 @@
 
 #import <sstream>
 #import <string>
+#import <type_traits>
 #import <vector>
 
 using namespace facebook;
@@ -49,20 +50,37 @@ namespace TurboModuleConvertUtils {
 /**
  * All static helper functions are ObjC++ specific.
  */
-static jsi::Value convertNSNumberToJSIBoolean(jsi::Runtime &runtime, NSNumber *value)
+static jsi::Value convertNSNumberToJSIBoolean(jsi::Runtime &runtime, __unsafe_unretained NSNumber *value)
 {
   return jsi::Value((bool)[value boolValue]);
 }
 
-static jsi::Value convertNSNumberToJSINumber(jsi::Runtime &runtime, NSNumber *value)
+static jsi::Value convertNSNumberToJSINumber(jsi::Runtime &runtime, __unsafe_unretained NSNumber *value)
 {
   return jsi::Value([value doubleValue]);
 }
 
-static jsi::String convertNSStringToJSIString(jsi::Runtime &runtime, NSString *value)
+// Creates a JS string or property name from the string's own ASCII or UTF-16 characters.
+template <typename T>
+static T convertNSStringToJSI(jsi::Runtime &runtime, __unsafe_unretained NSString *value)
 {
+  auto fromAscii = [&](const char *ascii, size_t length) {
+    if constexpr (std::is_same_v<T, jsi::PropNameID>) {
+      return jsi::PropNameID::forAscii(runtime, ascii, length);
+    } else {
+      return jsi::String::createFromAscii(runtime, ascii, length);
+    }
+  };
+  auto fromUtf16 = [&](const char16_t *utf16, size_t length) {
+    if constexpr (std::is_same_v<T, jsi::PropNameID>) {
+      return jsi::PropNameID::forUtf16(runtime, utf16, length);
+    } else {
+      return jsi::String::createFromUtf16(runtime, utf16, length);
+    }
+  };
+
   if (value == nil) {
-    return jsi::String::createFromAscii(runtime, "", 0);
+    return fromAscii("", 0);
   }
 
   // Hand the JS runtime the string's own ASCII or UTF-16 characters when
@@ -70,44 +88,70 @@ static jsi::String convertNSStringToJSIString(jsi::Runtime &runtime, NSString *v
   auto string = (__bridge CFStringRef)value;
   CFIndex length = CFStringGetLength(string);
   if (const char *ascii = CFStringGetCStringPtr(string, kCFStringEncodingASCII)) {
-    return jsi::String::createFromAscii(runtime, ascii, static_cast<size_t>(length));
+    return fromAscii(ascii, static_cast<size_t>(length));
   }
   if (const UniChar *characters = CFStringGetCharactersPtr(string)) {
-    return jsi::String::createFromUtf16(
-        runtime,
-        // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-        reinterpret_cast<const char16_t *>(characters),
-        static_cast<size_t>(length));
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+    return fromUtf16(reinterpret_cast<const char16_t *>(characters), static_cast<size_t>(length));
   }
   std::u16string utf16(length, u'\0');
   // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
   CFStringGetCharacters(string, CFRangeMake(0, length), reinterpret_cast<UniChar *>(utf16.data()));
-  return jsi::String::createFromUtf16(runtime, utf16);
+  return fromUtf16(utf16.data(), utf16.size());
 }
 
-static jsi::Object convertNSDictionaryToJSIObject(jsi::Runtime &runtime, NSDictionary *value)
+// Doesn't retain `value`: the caller holds it, and containers hold what they contain while it is converted.
+static jsi::Value convertUnretainedObjCObjectToJSIValue(jsi::Runtime &runtime, __unsafe_unretained id value);
+
+// Reads a container's objects at once. They aren't retained, as the container holds them.
+template <typename ReadObjects>
+static std::vector<__unsafe_unretained id> getObjects(NSUInteger count, ReadObjects readObjects)
 {
+  std::vector<__unsafe_unretained id> objects(count);
+  readObjects(objects.data());
+  return objects;
+}
+
+static jsi::Object convertNSDictionaryToJSIObject(jsi::Runtime &runtime, __unsafe_unretained NSDictionary *value)
+{
+  NSUInteger count = value.count;
+  std::vector<__unsafe_unretained id> keysAndObjects = getObjects(count * 2, [&](__unsafe_unretained id *objects) {
+    [value getObjects:objects + count andKeys:objects count:count];
+  });
   jsi::Object result = jsi::Object(runtime);
-  for (NSString *k in value) {
-    result.setProperty(runtime, convertNSStringToJSIString(runtime, k), convertObjCObjectToJSIValue(runtime, value[k]));
+  for (NSUInteger i = 0; i < count; i++) {
+    result.setProperty(
+        runtime,
+        convertNSStringToJSI<jsi::PropNameID>(runtime, keysAndObjects[i]),
+        convertUnretainedObjCObjectToJSIValue(runtime, keysAndObjects[count + i]));
   }
   return result;
 }
 
-static jsi::Array convertNSArrayToJSIArray(jsi::Runtime &runtime, NSArray *value)
+static std::vector<__unsafe_unretained id> getObjects(__unsafe_unretained NSArray *value)
 {
-  jsi::Array result = jsi::Array(runtime, value.count);
-  for (size_t i = 0; i < value.count; i++) {
-    result.setValueAtIndex(runtime, i, convertObjCObjectToJSIValue(runtime, value[i]));
+  NSUInteger count = value.count;
+  return getObjects(
+      count, [&](__unsafe_unretained id *objects) { [value getObjects:objects range:NSMakeRange(0, count)]; });
+}
+
+static jsi::Array convertNSArrayToJSIArray(jsi::Runtime &runtime, __unsafe_unretained NSArray *value)
+{
+  std::vector<__unsafe_unretained id> objects = getObjects(value);
+  jsi::Array result = jsi::Array(runtime, objects.size());
+  for (size_t i = 0; i < objects.size(); i++) {
+    result.setValueAtIndex(runtime, i, convertUnretainedObjCObjectToJSIValue(runtime, objects[i]));
   }
   return result;
 }
 
-static std::vector<jsi::Value> convertNSArrayToStdVector(jsi::Runtime &runtime, NSArray *value)
+static std::vector<jsi::Value> convertNSArrayToStdVector(jsi::Runtime &runtime, __unsafe_unretained NSArray *value)
 {
+  std::vector<__unsafe_unretained id> objects = getObjects(value);
   std::vector<jsi::Value> result;
-  for (size_t i = 0; i < value.count; i++) {
-    result.emplace_back(convertObjCObjectToJSIValue(runtime, value[i]));
+  result.reserve(objects.size());
+  for (__unsafe_unretained id object : objects) {
+    result.emplace_back(convertUnretainedObjCObjectToJSIValue(runtime, object));
   }
   return result;
 }
@@ -153,8 +197,13 @@ static jsi::ArrayBuffer convertRCTArrayBufferToJSIArrayBuffer(jsi::Runtime &runt
 
 jsi::Value convertObjCObjectToJSIValue(jsi::Runtime &runtime, id value)
 {
+  return convertUnretainedObjCObjectToJSIValue(runtime, value);
+}
+
+static jsi::Value convertUnretainedObjCObjectToJSIValue(jsi::Runtime &runtime, __unsafe_unretained id value)
+{
   if ([value isKindOfClass:[NSString class]]) {
-    return convertNSStringToJSIString(runtime, (NSString *)value);
+    return convertNSStringToJSI<jsi::String>(runtime, value);
   } else if ([value isKindOfClass:[NSNumber class]]) {
     if ([value isKindOfClass:[@YES class]]) {
       return convertNSNumberToJSIBoolean(runtime, (NSNumber *)value);
@@ -691,7 +740,7 @@ jsi::Value ObjCTurboModule::convertReturnIdToJSIValue(
       break;
     }
     case StringKind: {
-      returnValue = convertNSStringToJSIString(runtime, (NSString *)result);
+      returnValue = convertNSStringToJSI<jsi::String>(runtime, (NSString *)result);
       break;
     }
     case ObjectKind: {
