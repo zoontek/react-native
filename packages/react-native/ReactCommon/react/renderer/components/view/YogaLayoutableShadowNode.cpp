@@ -503,7 +503,8 @@ void YogaLayoutableShadowNode::configureYogaTree(
   // `pointScaleFactor` it is not part of the Yoga config, so a change does not
   // invalidate Yoga's layout cache. Dirty the node when it changes to force
   // re-measurement. We propagate up to the root so an unchanged, still-cached
-  // ancestor isn't skipped by `calculateLayoutInternal` before reaching us.
+  // ancestor isn't skipped by `calculateLayoutInternal` before reaching us. An
+  // owner that is already dirty stops it; the child loop below covers that.
   if (getTraits().check(ShadowNodeTraits::Trait::MeasurableYogaNode) &&
       !floatEquality(
           getLayoutMetrics().fontSizeMultiplier, fontSizeMultiplier)) {
@@ -545,6 +546,15 @@ void YogaLayoutableShadowNode::configureYogaTree(
     } else {
       cloneChildInPlace(i).configureYogaTree(
           pointScaleFactor, fontSizeMultiplier, errata, swapLeftAndRight);
+    }
+
+    // An in-place clone can come back dirty without dirtying this node, from
+    // `setSize()` in a descriptor's `adopt()` or from `completeClone()`.
+    // Apply the rule of `updateYogaChildren()` so Yoga doesn't skip it.
+    const auto& updatedYogaNode = yogaLayoutableChildren_[i]->yogaNode_;
+    if (updatedYogaNode.isDirty() && !yogaNode_.isDirty() &&
+        yogaNode_.style().display() != yoga::Display::None) {
+      yogaNode_.setDirty(true);
     }
   }
 }
@@ -768,9 +778,11 @@ void YogaLayoutableShadowNode::layout(LayoutContext layoutContext) {
       auto newLayoutMetrics = layoutMetricsFromYogaNode(*childYogaNode);
       newLayoutMetrics.pointScaleFactor = layoutContext.pointScaleFactor;
       newLayoutMetrics.fontSizeMultiplier = layoutContext.fontSizeMultiplier;
+      // Store the swap that `configureYogaTree` applied, which comes from the
+      // root, not this node's direction. Otherwise a `direction` override never
+      // matches the skip check there and is configured again on every pass.
       newLayoutMetrics.wasLeftAndRightSwapped =
-          layoutContext.swapLeftAndRightInRTL &&
-          newLayoutMetrics.layoutDirection == LayoutDirection::RightToLeft;
+          layoutMetrics_.wasLeftAndRightSwapped;
 
       // Child node's layout has changed. When a node is added to
       // `affectedNodes`, onLayout event is called on the component. Comparing
