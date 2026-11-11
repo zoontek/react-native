@@ -89,6 +89,8 @@ internal class FabricUIManagerBinding : HybridClassBase() {
 
   external fun mergeReactRevision(surfaceId: Int)
 
+  external fun appearanceDidChange()
+
   fun register(
       runtimeExecutor: RuntimeExecutor,
       runtimeScheduler: RuntimeScheduler,

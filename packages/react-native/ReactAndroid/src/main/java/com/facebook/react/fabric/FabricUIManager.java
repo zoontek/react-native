@@ -1114,6 +1114,18 @@ public class FabricUIManager
     }
   }
 
+  /**
+   * Parses DynamicColor and PlatformColor props again in every surface, so mounted views get the
+   * colors of the new appearance. Call it after the native color caches are cleared.
+   */
+  @AnyThread
+  @ThreadConfined(ANY)
+  public void onAppearanceChanged() {
+    if (mBinding != null) {
+      mBinding.appearanceDidChange();
+    }
+  }
+
   @SuppressWarnings("unused")
   @AnyThread
   @ThreadConfined(ANY)

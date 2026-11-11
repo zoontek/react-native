@@ -64,6 +64,14 @@ class Props : public virtual Sealable, public virtual DebugStringConvertible {
 #ifdef RN_SERIALIZABLE_STATE
   folly::dynamic rawProps = folly::dynamic::object();
 
+  /*
+   * Raw values of the props that hold a DynamicColor or a PlatformColor, kept
+   * across revisions (unlike `rawProps`, which may only hold the last update)
+   * so they can be parsed again when the appearance of the app changes.
+   * `nullptr` when no prop holds such a color.
+   */
+  folly::dynamic appearanceRawProps = nullptr;
+
   void initializeDynamicProps(
       const Props &sourceProps,
       const RawProps &rawProps,

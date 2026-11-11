@@ -22,6 +22,7 @@
 #include <react/renderer/uimanager/primitives.h>
 
 #include "AndroidAnimationChoreographer.h"
+#include "AppearanceCommitHook.h"
 #include "JFabricUIManager.h"
 #include "SurfaceHandlerBinding.h"
 
@@ -101,6 +102,8 @@ class FabricUIManagerBinding : public jni::HybridClass<FabricUIManagerBinding>,
 
   void mergeReactRevision(SurfaceId surfaceId);
 
+  void appearanceDidChange();
+
   void schedulerDidRequestPreliminaryViewAllocation(const ShadowNode &shadowNode) override;
 
   void schedulerDidDispatchCommand(
@@ -178,6 +181,8 @@ class FabricUIManagerBinding : public jni::HybridClass<FabricUIManagerBinding>,
   bool enableFabricLogs_{false};
 
   std::shared_ptr<AndroidAnimationChoreographer> animationChoreographer_;
+
+  std::shared_ptr<AppearanceCommitHook> appearanceCommitHook_;
 };
 
 } // namespace facebook::react

@@ -635,6 +635,8 @@ void FabricUIManagerBinding::installFabricUIManager(
       runtimeExecutor, contextContainer, this);
   scheduler_ =
       std::make_shared<Scheduler>(toolbox, animationDriver_.get(), this);
+  appearanceCommitHook_ =
+      std::make_shared<AppearanceCommitHook>(*scheduler_->getUIManager());
 }
 
 void FabricUIManagerBinding::uninstallFabricUIManager() {
@@ -645,6 +647,10 @@ void FabricUIManagerBinding::uninstallFabricUIManager() {
   }
 
   std::unique_lock lock(installMutex_);
+  if (scheduler_ && appearanceCommitHook_) {
+    scheduler_->getUIManager()->unregisterCommitHook(*appearanceCommitHook_);
+  }
+  appearanceCommitHook_ = nullptr;
   animationDriver_ = nullptr;
   scheduler_ = nullptr;
   animationChoreographer_ = nullptr;
@@ -786,6 +792,20 @@ void FabricUIManagerBinding::mergeReactRevision(SurfaceId surfaceId) {
   scheduler->getUIManager()->getShadowTreeRegistry().visit(
       surfaceId,
       [](const ShadowTree& shadowTree) { shadowTree.mergeReactRevision(); });
+}
+
+void FabricUIManagerBinding::appearanceDidChange() {
+  std::shared_ptr<Scheduler> scheduler;
+  std::shared_ptr<AppearanceCommitHook> appearanceCommitHook;
+  {
+    std::shared_lock lock(installMutex_);
+    scheduler = scheduler_;
+    appearanceCommitHook = appearanceCommitHook_;
+  }
+  if (!scheduler || !appearanceCommitHook) {
+    return;
+  }
+  appearanceCommitHook->appearanceDidChange(*scheduler->getUIManager());
 }
 
 void FabricUIManagerBinding::schedulerDidRequestPreliminaryViewAllocation(
@@ -957,6 +977,8 @@ void FabricUIManagerBinding::registerNatives() {
           FabricUIManagerBinding::getRelativeAncestorList),
       makeNativeMethod(
           "mergeReactRevision", FabricUIManagerBinding::mergeReactRevision),
+      makeNativeMethod(
+          "appearanceDidChange", FabricUIManagerBinding::appearanceDidChange),
   });
 }
 

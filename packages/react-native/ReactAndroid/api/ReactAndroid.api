@@ -2258,6 +2258,7 @@ public class com/facebook/react/fabric/FabricUIManager : com/facebook/react/brid
 	public fun dispatchCommand (IILjava/lang/String;Lcom/facebook/react/bridge/ReadableArray;)V
 	public fun dispatchCommand (ILjava/lang/String;Lcom/facebook/react/bridge/ReadableArray;)V
 	public fun findNextFocusableElement (III)Ljava/lang/Integer;
+	public fun getAppearance (I)I
 	public fun getColor (I[Ljava/lang/String;)Ljava/lang/Integer;
 	public fun getEventDispatcher ()Lcom/facebook/react/uimanager/events/EventDispatcher;
 	public fun getPerformanceCounters ()Ljava/util/Map;
@@ -2269,6 +2270,7 @@ public class com/facebook/react/fabric/FabricUIManager : com/facebook/react/brid
 	public fun measure (ILjava/lang/String;Lcom/facebook/react/bridge/ReadableMap;Lcom/facebook/react/bridge/ReadableMap;Lcom/facebook/react/bridge/ReadableMap;FFFF)J
 	public fun onAllAnimationsComplete ()V
 	public fun onAnimationStarted ()V
+	public fun onAppearanceChanged ()V
 	public fun onHostDestroy ()V
 	public fun onHostPause ()V
 	public fun onHostResume ()V

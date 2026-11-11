@@ -490,15 +490,9 @@ function VariantColorsExample() {
 
 function ReactsToAppearanceChangesExample() {
   const theme = useColorScheme();
-  const key = Platform.select({
-    android: theme ?? '',
-    default: undefined,
-  });
 
   return (
-    // using a key here forces the component to unmount and remount
-    // which is necessary to trigger the appearance change
-    <View style={styles.column} key={key}>
+    <View style={styles.column}>
       <View style={styles.row}>
         <RNTesterText style={styles.labelCell}>
           {"DynamicColor({light: 'red', dark: 'blue'})"}

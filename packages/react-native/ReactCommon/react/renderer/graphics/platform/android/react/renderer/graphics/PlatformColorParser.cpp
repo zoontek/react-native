@@ -100,8 +100,8 @@ jint getAppearance(
 }
 
 // Picks the variant of a DynamicColor that matches the current appearance of
-// the surface. The color is resolved once: views keep it until their props are
-// parsed again.
+// the surface. When the appearance changes, AppearanceCommitHook parses the
+// props again.
 SharedColor parseDynamicColor(
     const ContextContainer& contextContainer,
     int32_t surfaceId,

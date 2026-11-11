@@ -14,7 +14,10 @@ import com.facebook.jni.annotations.DoNotStrip
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.UiThreadUtil
 import com.facebook.react.bridge.buildReadableMap
+import com.facebook.react.fabric.FabricUIManager
 import com.facebook.react.module.annotations.ReactModule
+import com.facebook.react.uimanager.UIManagerHelper
+import com.facebook.react.uimanager.common.UIManagerType
 import com.facebook.react.views.common.UiModeUtils
 
 /** Module that exposes the user's preferred color scheme. */
@@ -114,13 +117,16 @@ constructor(
 
   /** Sends an event to the JS instance that the preferred color scheme has changed. */
   public fun emitAppearanceChanged(colorScheme: String) {
-    val appearancePreferences = buildReadableMap { put("colorScheme", colorScheme) }
-
-    val reactApplicationContext = getReactApplicationContextIfActiveOrWarn()
-    reactApplicationContext?.emitDeviceEvent(APPEARANCE_CHANGED_EVENT_NAME, appearancePreferences)
-
-    // Invalidate platform color cache on native side
+    // Clear the color caches before any color is parsed for the new appearance
     invalidatePlatformColorCache()
+
+    val reactApplicationContext = getReactApplicationContextIfActiveOrWarn() ?: return
+    (UIManagerHelper.getUIManager(reactApplicationContext, UIManagerType.FABRIC)
+            as? FabricUIManager)
+        ?.onAppearanceChanged()
+
+    val appearancePreferences = buildReadableMap { put("colorScheme", colorScheme) }
+    reactApplicationContext.emitDeviceEvent(APPEARANCE_CHANGED_EVENT_NAME, appearancePreferences)
   }
 
   public fun invalidatePlatformColorCache() {
