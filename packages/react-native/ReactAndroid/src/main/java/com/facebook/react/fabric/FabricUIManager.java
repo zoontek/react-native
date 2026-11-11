@@ -92,6 +92,7 @@ import com.facebook.react.uimanager.events.EventDispatcher;
 import com.facebook.react.uimanager.events.FabricEventDispatcher;
 import com.facebook.react.uimanager.events.RCTEventEmitter;
 import com.facebook.react.uimanager.events.SynchronousEventReceiver;
+import com.facebook.react.views.common.UiModeUtils;
 import com.facebook.react.views.text.PreparedLayout;
 import com.facebook.react.views.text.ReactTextViewManager;
 import com.facebook.react.views.text.ReactTextViewManagerCallback;
@@ -584,6 +585,28 @@ public class FabricUIManager
                 ? (ReactTextViewManagerCallback) textViewManager
                 : null,
             mTextEffectRegistry);
+  }
+
+  /**
+   * Returns the appearance of a surface, used by native code to resolve DynamicColor values. Bit 0
+   * is set in dark mode, bit 1 when the user increased the contrast.
+   */
+  public int getAppearance(int surfaceId) {
+    ThemedReactContext context =
+        mMountingManager.getSurfaceManagerEnforced(surfaceId, "getAppearance").getContext();
+    // Surface may have been stopped
+    if (context == null) {
+      return 0;
+    }
+
+    int appearance = 0;
+    if (UiModeUtils.isDarkMode(context)) {
+      appearance |= 1;
+    }
+    if (UiModeUtils.isHighContrast(context)) {
+      appearance |= 1 << 1;
+    }
+    return appearance;
   }
 
   public @Nullable Integer getColor(int surfaceId, String[] resourcePaths) {

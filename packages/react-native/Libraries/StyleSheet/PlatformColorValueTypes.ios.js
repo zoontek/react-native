@@ -37,16 +37,14 @@ export const PlatformColor = (
   return color as LocalNativeColorValue;
 };
 
-export type DynamicColorIOSTuplePrivate = {
+export type DynamicColorTuple = {
   light: ColorValue,
   dark: ColorValue,
   highContrastLight?: ColorValue,
   highContrastDark?: ColorValue,
 };
 
-export const DynamicColorIOSPrivate = (
-  tuple: DynamicColorIOSTuplePrivate,
-): ColorValue => {
+export const DynamicColor = (tuple: DynamicColorTuple): ColorValue => {
   return {
     dynamic: {
       light: tuple.light,

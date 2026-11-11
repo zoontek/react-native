@@ -88,11 +88,50 @@ describe('Android', () => {
     const PlatformColor =
       // $FlowFixMe[missing-platform-support]
       require('../PlatformColorValueTypes.android').PlatformColor;
+    const DynamicColor =
+      // $FlowFixMe[missing-platform-support]
+      require('../PlatformColorValueTypes.android').DynamicColor;
 
     it('should normalize Android PlatformColor colors', () => {
       const color = PlatformColor('?attr/colorPrimary');
       const normalizedColor = normalizeColor(color);
       const expectedColor = {resource_paths: ['?attr/colorPrimary']};
+      expect(normalizedColor).toEqual(expectedColor);
+    });
+
+    it('should normalize Android Dynamic colors with accessible colors', () => {
+      const color = DynamicColor({
+        light: 'black',
+        dark: 'white',
+        highContrastLight: 'red',
+        highContrastDark: 'blue',
+      });
+      const normalizedColor = normalizeColor(color);
+      const expectedColor = {
+        dynamic: {
+          light: normalizeColor('black'),
+          dark: normalizeColor('white'),
+          highContrastLight: normalizeColor('red'),
+          highContrastDark: normalizeColor('blue'),
+        },
+      };
+      expect(normalizedColor).toEqual(expectedColor);
+    });
+
+    it('should normalize Android Dynamic colors with PlatformColor colors', () => {
+      const color = DynamicColor({
+        light: PlatformColor('?attr/colorPrimary'),
+        dark: PlatformColor('?attr/colorAccent'),
+      });
+      const normalizedColor = normalizeColor(color);
+      const expectedColor = {
+        dynamic: {
+          light: {resource_paths: ['?attr/colorPrimary']},
+          dark: {resource_paths: ['?attr/colorAccent']},
+          highContrastLight: undefined,
+          highContrastDark: undefined,
+        },
+      };
       expect(normalizedColor).toEqual(expectedColor);
     });
   }

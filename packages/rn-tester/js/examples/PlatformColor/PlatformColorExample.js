@@ -16,6 +16,7 @@ import * as React from 'react';
 import {
   Appearance,
   Button,
+  DynamicColor,
   DynamicColorIOS,
   Platform,
   PlatformColor,
@@ -385,57 +386,79 @@ function LazyFallbackColorsExample() {
 }
 
 function DynamicColorsExample() {
-  return Platform.OS === 'ios' ? (
+  return (
     <View style={styles.column}>
       <View style={styles.row}>
         <RNTesterText style={styles.labelCell}>
-          DynamicColorIOS({'{\n'}
+          DynamicColor({'{\n'}
           {'  '}light: 'red', dark: 'blue'{'\n'}
           {'}'})
         </RNTesterText>
         <View
           style={{
             ...styles.colorCell,
-            backgroundColor: DynamicColorIOS({light: 'red', dark: 'blue'}),
+            backgroundColor: DynamicColor({light: 'red', dark: 'blue'}),
           }}
         />
       </View>
       <View style={styles.row}>
         <RNTesterText style={styles.labelCell}>
-          DynamicColorIOS({'{\n'}
+          DynamicColor({'{\n'}
           {'  '}light: 'red', dark: 'blue'{'\n'}
           {'}'})
         </RNTesterText>
         <View
           style={{
             ...styles.colorCell,
-            borderColor: DynamicColorIOS({light: 'red', dark: 'blue'}),
+            borderColor: DynamicColor({light: 'red', dark: 'blue'}),
             borderWidth: 1,
           }}
         />
       </View>
       <View style={styles.row}>
         <RNTesterText style={styles.labelCell}>
-          DynamicColorIOS({'{\n'}
-          {'  '}light: PlatformColor('systemBlueColor'),{'\n'}
-          {'  '}dark: PlatformColor('systemRedColor'),{'\n'}
+          DynamicColor({'{\n'}
+          {'  '}light: 'red', dark: 'blue',{'\n'}
+          {'  '}highContrastLight: 'orange',{'\n'}
+          {'  '}highContrastDark: 'cyan',{'\n'}
           {'}'})
         </RNTesterText>
         <View
           style={{
             ...styles.colorCell,
-            backgroundColor: DynamicColorIOS({
-              light: PlatformColor('systemBlueColor'),
-              dark: PlatformColor('systemRedColor'),
+            backgroundColor: DynamicColor({
+              light: 'red',
+              dark: 'blue',
+              highContrastLight: 'orange',
+              highContrastDark: 'cyan',
             }),
           }}
         />
       </View>
+      <View style={styles.row}>
+        <RNTesterText style={styles.labelCell}>
+          DynamicColor({'{\n'}
+          {'  '}light: PlatformColor(...),{'\n'}
+          {'  '}dark: PlatformColor(...),{'\n'}
+          {'}'})
+        </RNTesterText>
+        <View
+          style={{
+            ...styles.colorCell,
+            backgroundColor:
+              Platform.OS === 'ios'
+                ? DynamicColor({
+                    light: PlatformColor('systemBlueColor'),
+                    dark: PlatformColor('systemRedColor'),
+                  })
+                : DynamicColor({
+                    light: PlatformColor('@android:color/holo_blue_dark'),
+                    dark: PlatformColor('@android:color/holo_red_dark'),
+                  }),
+          }}
+        />
+      </View>
     </View>
-  ) : (
-    <RNTesterText style={styles.labelCell}>
-      Not applicable on this platform
-    </RNTesterText>
   );
 }
 
@@ -554,7 +577,7 @@ exports.examples = [
     },
   },
   {
-    title: 'iOS Dynamic Colors',
+    title: 'Dynamic Colors',
     render(): React.MixedElement {
       return <DynamicColorsExample />;
     },

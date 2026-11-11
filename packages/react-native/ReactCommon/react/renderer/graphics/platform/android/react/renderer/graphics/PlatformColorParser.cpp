@@ -46,6 +46,40 @@ size_t hashGetColourArguments(
   return seed;
 }
 
+// Must match the flags returned by FabricUIManager.getAppearance
+constexpr jint kAppearanceDark = 1 << 0;
+constexpr jint kAppearanceHighContrast = 1 << 1;
+
+// Picks the variant of a DynamicColor that matches the current appearance of
+// the surface. The color is resolved once: views keep it until their props are
+// parsed again.
+SharedColor parseDynamicColor(
+    const ContextContainer& contextContainer,
+    int32_t surfaceId,
+    const std::unordered_map<std::string, RawValue>& items) {
+  auto fabricUIManager =
+      contextContainer.at<jni::alias_ref<jobject>>("FabricUIManager");
+  static auto getAppearanceFromJava =
+      fabricUIManager->getClass()->getMethod<jint(jint)>("getAppearance");
+  auto appearance = getAppearanceFromJava(fabricUIManager, surfaceId);
+  bool isDark = (appearance & kAppearanceDark) != 0;
+  bool isHighContrast = (appearance & kAppearanceHighContrast) != 0;
+
+  auto variant = items.end();
+  if (isHighContrast) {
+    variant = items.find(isDark ? "highContrastDark" : "highContrastLight");
+  }
+  if (variant == items.end() || !variant->second.hasValue()) {
+    variant = items.find(isDark ? "dark" : "light");
+  }
+
+  SharedColor color{};
+  if (variant != items.end() && variant->second.hasValue()) {
+    fromRawValue(contextContainer, surfaceId, variant->second, color);
+  }
+  return color;
+}
+
 } // namespace
 
 SharedColor parsePlatformColor(
@@ -57,6 +91,16 @@ SharedColor parsePlatformColor(
     // Mixed array + string values, so read as a map of RawValue (a map of
     // vector<string> would assert on the fallback string).
     auto map = (std::unordered_map<std::string, RawValue>)value;
+
+    auto dynamicIt = map.find("dynamic");
+    if (dynamicIt != map.end() &&
+        dynamicIt->second
+            .hasType<std::unordered_map<std::string, RawValue>>()) {
+      return parseDynamicColor(
+          contextContainer,
+          surfaceId,
+          (std::unordered_map<std::string, RawValue>)dynamicIt->second);
+    }
 
     std::vector<std::string> resourcePaths;
     auto resourcePathsIt = map.find("resource_paths");

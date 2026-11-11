@@ -456,7 +456,7 @@ const publicAPIMapping = {
   },
   'Libraries/StyleSheet/PlatformColorValueTypes': {
     default: null,
-    types: ['PlatformColor'],
+    types: ['DynamicColor', 'DynamicColorTuple', 'PlatformColor'],
   },
   'Libraries/StyleSheet/PlatformColorValueTypesIOS': {
     default: null,

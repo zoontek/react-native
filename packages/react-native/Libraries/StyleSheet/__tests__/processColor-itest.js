@@ -11,6 +11,9 @@
 import '@react-native/fantom/src/setUpDefaultReactNativeEnvironment';
 
 const {OS} = require('../../Utilities/Platform').default;
+const DynamicColorAndroid =
+  // $FlowFixMe[missing-platform-support]
+  require('../PlatformColorValueTypes.android').DynamicColor;
 const PlatformColorAndroid =
   // $FlowFixMe[missing-platform-support]
   require('../PlatformColorValueTypes.android').PlatformColor;
@@ -144,6 +147,24 @@ describe('processColor', () => {
         const expectedColor = {
           resource_paths: ['?attr/colorPrimary'],
           fallback: '#000000',
+        };
+        expect(processedColor).toEqual(expectedColor);
+      });
+
+      it('should process Android Dynamic colors', () => {
+        const color = DynamicColorAndroid({
+          light: 'black',
+          dark: 'white',
+          highContrastDark: PlatformColorAndroid('?attr/colorPrimary'),
+        });
+        const processedColor = processColor(color);
+        const expectedColor = {
+          dynamic: {
+            light: platformSpecific(0xff000000),
+            dark: platformSpecific(0xffffffff),
+            highContrastLight: undefined,
+            highContrastDark: {resource_paths: ['?attr/colorPrimary']},
+          },
         };
         expect(processedColor).toEqual(expectedColor);
       });

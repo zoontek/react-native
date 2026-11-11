@@ -24,6 +24,8 @@ eslintTester.run('../platform-colors', rule, {
     "const color = DynamicColorIOS({light: 'black', dark: 'white'});",
     "const color = DynamicColorIOS({light: PlatformColor('black'), dark: PlatformColor('white')});",
     "const color = DynamicColorIOS({light: PlatformColor('black'), dark: PlatformColor('white'), highContrastLight: PlatformColor('black'), highContrastDark: PlatformColor('white')});",
+    "const color = DynamicColor({light: 'black', dark: 'white'});",
+    "const color = DynamicColor({light: PlatformColor('black'), dark: PlatformColor('white'), highContrastLight: PlatformColor('black'), highContrastDark: PlatformColor('white')});",
   ],
   invalid: [
     {
@@ -56,15 +58,27 @@ eslintTester.run('../platform-colors', rule, {
     },
     {
       code: "const tuple = {light: 'black', dark: 'white'}; const color = DynamicColorIOS(tuple);",
-      errors: [{message: rule.meta.messages.dynamicColorIOSArg}],
+      errors: [{messageId: 'dynamicColorArg', data: {name: 'DynamicColorIOS'}}],
     },
     {
       code: "const black = 'black'; const color = DynamicColorIOS({light: black, dark: 'white'});",
-      errors: [{message: rule.meta.messages.dynamicColorIOSValue}],
+      errors: [
+        {messageId: 'dynamicColorValue', data: {name: 'DynamicColorIOS'}},
+      ],
     },
     {
       code: "const white = 'white'; const color = DynamicColorIOS({light: 'black', dark: white});",
-      errors: [{message: rule.meta.messages.dynamicColorIOSValue}],
+      errors: [
+        {messageId: 'dynamicColorValue', data: {name: 'DynamicColorIOS'}},
+      ],
+    },
+    {
+      code: "const tuple = {light: 'black', dark: 'white'}; const color = DynamicColor(tuple);",
+      errors: [{messageId: 'dynamicColorArg', data: {name: 'DynamicColor'}}],
+    },
+    {
+      code: "const black = 'black'; const color = DynamicColor({light: black, dark: 'white'});",
+      errors: [{messageId: 'dynamicColorValue', data: {name: 'DynamicColor'}}],
     },
   ],
 });

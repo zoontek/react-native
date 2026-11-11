@@ -316,6 +316,8 @@ export type {
 } from './Libraries/Utilities/Dimensions';
 export {default as Dimensions} from './Libraries/Utilities/Dimensions';
 
+export type {DynamicColorTuple} from './Libraries/StyleSheet/PlatformColorValueTypes';
+export {DynamicColor} from './Libraries/StyleSheet/PlatformColorValueTypes';
 export type {DynamicColorIOSTuple} from './Libraries/StyleSheet/PlatformColorValueTypesIOS';
 export {DynamicColorIOS} from './Libraries/StyleSheet/PlatformColorValueTypesIOS';
 

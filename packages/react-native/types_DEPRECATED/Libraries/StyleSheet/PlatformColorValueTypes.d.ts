@@ -7,7 +7,7 @@
  * @format
  */
 
-import {OpaqueColorValue} from './StyleSheet';
+import {ColorValue, OpaqueColorValue} from './StyleSheet';
 
 /**
  * Select native platform color
@@ -18,3 +18,18 @@ import {OpaqueColorValue} from './StyleSheet';
 export function PlatformColor(
   ...colors: Array<string | {fallback: string}>
 ): OpaqueColorValue;
+
+export type DynamicColorTuple = {
+  light: ColorValue;
+  dark: ColorValue;
+  highContrastLight?: ColorValue | undefined;
+  highContrastDark?: ColorValue | undefined;
+};
+
+/**
+ * Specify color to display depending on the current system appearance settings
+ *
+ * @param tuple Colors you want to use for "light mode" and "dark mode", and
+ * optionally for high contrast
+ */
+export function DynamicColor(tuple: DynamicColorTuple): OpaqueColorValue;

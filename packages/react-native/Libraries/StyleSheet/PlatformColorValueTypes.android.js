@@ -9,7 +9,7 @@
  */
 
 import type {ProcessedColorValue} from './processColor';
-import type {NativeColorValue} from './StyleSheet';
+import type {ColorValue, NativeColorValue} from './StyleSheet';
 
 import parsePlatformColorArgs from './parsePlatformColorArgs';
 
@@ -17,6 +17,12 @@ import parsePlatformColorArgs from './parsePlatformColorArgs';
 type LocalNativeColorValue = {
   resource_paths?: Array<string>,
   fallback?: string,
+  dynamic?: {
+    light: ?(ColorValue | ProcessedColorValue),
+    dark: ?(ColorValue | ProcessedColorValue),
+    highContrastLight?: ?(ColorValue | ProcessedColorValue),
+    highContrastDark?: ?(ColorValue | ProcessedColorValue),
+  },
 };
 
 export const PlatformColor = (
@@ -34,19 +40,83 @@ export const PlatformColor = (
   return color as LocalNativeColorValue;
 };
 
-export const normalizeColorObject = (
-  color: NativeColorValue,
-): ?ProcessedColorValue => {
-  /* $FlowExpectedError[incompatible-type]
-   * LocalNativeColorValue is the actual type of the opaque NativeColorValue on Android platform */
-  if ('resource_paths' in (color as LocalNativeColorValue)) {
+export type DynamicColorTuple = {
+  light: ColorValue,
+  dark: ColorValue,
+  highContrastLight?: ColorValue,
+  highContrastDark?: ColorValue,
+};
+
+export const DynamicColor = (tuple: DynamicColorTuple): ColorValue => {
+  return {
+    dynamic: {
+      light: tuple.light,
+      dark: tuple.dark,
+      highContrastLight: tuple.highContrastLight,
+      highContrastDark: tuple.highContrastDark,
+    },
+    /* $FlowExpectedError[incompatible-type]
+     * LocalNativeColorValue is the actual type of the opaque NativeColorValue on Android platform */
+  } as LocalNativeColorValue;
+};
+
+const _normalizeColorObject = (
+  color: LocalNativeColorValue,
+): ?LocalNativeColorValue => {
+  if ('resource_paths' in color) {
     return color;
+  } else if ('dynamic' in color && color.dynamic !== undefined) {
+    const normalizeColor = require('./normalizeColor').default;
+
+    const dynamic = color.dynamic;
+    const dynamicColor: LocalNativeColorValue = {
+      dynamic: {
+        // $FlowFixMe[incompatible-use]
+        light: normalizeColor(dynamic.light),
+        // $FlowFixMe[incompatible-use]
+        dark: normalizeColor(dynamic.dark),
+        // $FlowFixMe[incompatible-use]
+        highContrastLight: normalizeColor(dynamic.highContrastLight),
+        // $FlowFixMe[incompatible-use]
+        highContrastDark: normalizeColor(dynamic.highContrastDark),
+      },
+    };
+    return dynamicColor;
   }
   return null;
 };
 
-export const processColorObject = (
+export const normalizeColorObject: (
   color: NativeColorValue,
-): ?NativeColorValue => {
+  /* $FlowExpectedError[incompatible-type]
+   * LocalNativeColorValue is the actual type of the opaque NativeColorValue on Android platform */
+) => ?ProcessedColorValue = _normalizeColorObject;
+
+const _processColorObject = (
+  color: LocalNativeColorValue,
+): ?LocalNativeColorValue => {
+  if ('dynamic' in color && color.dynamic != null) {
+    const processColor = require('./processColor').default;
+    const dynamic = color.dynamic;
+    const dynamicColor: LocalNativeColorValue = {
+      dynamic: {
+        // $FlowFixMe[incompatible-use]
+        light: processColor(dynamic.light),
+        // $FlowFixMe[incompatible-use]
+        dark: processColor(dynamic.dark),
+        // $FlowFixMe[incompatible-use]
+        highContrastLight: processColor(dynamic.highContrastLight),
+        // $FlowFixMe[incompatible-use]
+        highContrastDark: processColor(dynamic.highContrastDark),
+      },
+    };
+    return dynamicColor;
+  }
   return color;
 };
+
+export const processColorObject: (
+  color: NativeColorValue,
+  /* $FlowExpectedError[incompatible-type]
+   * LocalNativeColorValue is the actual type of the opaque NativeColorValue on Android platform */
+) => ?NativeColorValue = _processColorObject;

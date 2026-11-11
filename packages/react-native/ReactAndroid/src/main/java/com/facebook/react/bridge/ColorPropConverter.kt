@@ -17,12 +17,14 @@ import androidx.annotation.ColorLong
 import androidx.core.content.res.ResourcesCompat
 import com.facebook.common.logging.FLog
 import com.facebook.react.common.ReactConstants
+import com.facebook.react.views.common.UiModeUtils
 
 public object ColorPropConverter {
 
   private fun supportWideGamut(): Boolean = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
 
   private const val JSON_KEY = "resource_paths"
+  private const val DYNAMIC_KEY = "dynamic"
   private const val PREFIX_RESOURCE = "@"
   private const val PREFIX_ATTR = "?"
   private const val PACKAGE_DELIMITER = ":"
@@ -43,6 +45,10 @@ public object ColorPropConverter {
     checkNotNull(context)
 
     if (value is ReadableMap) {
+      if (value.hasKey(DYNAMIC_KEY)) {
+        return getColorInteger(getDynamicColorVariant(value, context), context)
+      }
+
       if (value.hasKey("space")) {
         val r = (value.getDouble("r").toFloat() * 255).toInt()
         val g = (value.getDouble("g").toFloat() * 255).toInt()
@@ -79,6 +85,36 @@ public object ColorPropConverter {
     throw JSApplicationCausedNativeException("ColorValue: the value must be a number or Object.")
   }
 
+  /**
+   * Picks the variant of a DynamicColor that matches the current appearance of the context. Returns
+   * a processed color: a Double, a ReadableMap, or null.
+   */
+  private fun getDynamicColorVariant(value: ReadableMap, context: Context): Any? {
+    val dynamic =
+        value.getMap(DYNAMIC_KEY)
+            ?: throw JSApplicationCausedNativeException(
+                "ColorValue: The `$DYNAMIC_KEY` must be an object of colors.",
+            )
+    val isDark = UiModeUtils.isDarkMode(context)
+    val highContrastKey = if (isDark) "highContrastDark" else "highContrastLight"
+    val key =
+        when {
+          UiModeUtils.isHighContrast(context) &&
+              dynamic.hasKey(highContrastKey) &&
+              !dynamic.isNull(highContrastKey) -> highContrastKey
+          isDark -> "dark"
+          else -> "light"
+        }
+    if (!dynamic.hasKey(key)) {
+      return null
+    }
+    return when (dynamic.getType(key)) {
+      ReadableType.Number -> dynamic.getDouble(key)
+      ReadableType.Map -> dynamic.getMap(key)
+      else -> null
+    }
+  }
+
   @JvmStatic
   @Throws(JSApplicationCausedNativeException::class)
   public fun getColorInstance(value: Any?, context: Context): Color? {
@@ -93,6 +129,10 @@ public object ColorPropConverter {
     checkNotNull(context)
 
     if (value is ReadableMap) {
+      if (value.hasKey(DYNAMIC_KEY)) {
+        return getColorInstance(getDynamicColorVariant(value, context), context)
+      }
+
       if (supportWideGamut() && value.hasKey("space")) {
         val rawColorSpace = value.getString("space")
         val isDisplayP3 = rawColorSpace == "display-p3"

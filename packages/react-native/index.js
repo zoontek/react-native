@@ -277,6 +277,10 @@ module.exports = {
   get Dimensions() {
     return require('./Libraries/Utilities/Dimensions').default;
   },
+  get DynamicColor() {
+    return require('./Libraries/StyleSheet/PlatformColorValueTypes')
+      .DynamicColor;
+  },
   get DynamicColorIOS() {
     return require('./Libraries/StyleSheet/PlatformColorValueTypesIOS')
       .DynamicColorIOS;

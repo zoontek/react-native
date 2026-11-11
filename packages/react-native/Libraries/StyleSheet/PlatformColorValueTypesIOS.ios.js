@@ -10,7 +10,7 @@
 
 import type {ColorValue} from './StyleSheet';
 
-import {DynamicColorIOSPrivate} from './PlatformColorValueTypes.ios';
+import {DynamicColor} from './PlatformColorValueTypes.ios';
 
 export type DynamicColorIOSTuple = {
   light: ColorValue,
@@ -19,11 +19,5 @@ export type DynamicColorIOSTuple = {
   highContrastDark?: ColorValue,
 };
 
-export const DynamicColorIOS = (tuple: DynamicColorIOSTuple): ColorValue => {
-  return DynamicColorIOSPrivate({
-    light: tuple.light,
-    dark: tuple.dark,
-    highContrastLight: tuple.highContrastLight,
-    highContrastDark: tuple.highContrastDark,
-  });
-};
+export const DynamicColorIOS: (tuple: DynamicColorIOSTuple) => ColorValue =
+  DynamicColor;
