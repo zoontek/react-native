@@ -20,10 +20,9 @@ module.exports = {
         'PlatformColor() must have at least one argument that is a literal.',
       platformColorArgTypes:
         'PlatformColor() every argument must be a literal.',
-      dynamicColorArg:
-        'DynamicColor() must take a single argument of type Object',
+      dynamicColorArg: '{{name}}() must take a single argument of type Object',
       dynamicColorValue:
-        'DynamicColor() value must be either a literal or a PlatformColor() call.',
+        '{{name}}() value must be either a literal or a PlatformColor() call.',
     },
     schema: [],
   },
@@ -68,12 +67,17 @@ module.exports = {
             });
             return;
           }
-        } else if (node.callee.name === 'DynamicColor') {
+        } else if (
+          node.callee.name === 'DynamicColor' ||
+          node.callee.name === 'DynamicColorIOS'
+        ) {
+          const name = node.callee.name;
           const args = node.arguments;
           if (!(args.length === 1 && args[0].type === 'ObjectExpression')) {
             context.report({
               node,
               messageId: 'dynamicColorArg',
+              data: {name},
             });
             return;
           }
@@ -88,6 +92,7 @@ module.exports = {
               context.report({
                 node,
                 messageId: 'dynamicColorValue',
+                data: {name},
               });
               return;
             }
