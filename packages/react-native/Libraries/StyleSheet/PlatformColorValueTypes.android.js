@@ -65,23 +65,21 @@ const _normalizeColorObject = (
 ): ?LocalNativeColorValue => {
   if ('resource_paths' in color) {
     return color;
-  } else if ('dynamic' in color && color.dynamic !== undefined) {
-    const normalizeColor = require('./normalizeColor').default;
-
+  } else {
     const dynamic = color.dynamic;
-    const dynamicColor: LocalNativeColorValue = {
-      dynamic: {
-        // $FlowFixMe[incompatible-use]
-        light: normalizeColor(dynamic.light),
-        // $FlowFixMe[incompatible-use]
-        dark: normalizeColor(dynamic.dark),
-        // $FlowFixMe[incompatible-use]
-        highContrastLight: normalizeColor(dynamic.highContrastLight),
-        // $FlowFixMe[incompatible-use]
-        highContrastDark: normalizeColor(dynamic.highContrastDark),
-      },
-    };
-    return dynamicColor;
+    if (dynamic !== undefined) {
+      const normalizeColor = require('./normalizeColor').default;
+
+      const dynamicColor: LocalNativeColorValue = {
+        dynamic: {
+          light: normalizeColor(dynamic.light),
+          dark: normalizeColor(dynamic.dark),
+          highContrastLight: normalizeColor(dynamic.highContrastLight),
+          highContrastDark: normalizeColor(dynamic.highContrastDark),
+        },
+      };
+      return dynamicColor;
+    }
   }
   return null;
 };
@@ -95,18 +93,15 @@ export const normalizeColorObject: (
 const _processColorObject = (
   color: LocalNativeColorValue,
 ): ?LocalNativeColorValue => {
-  if ('dynamic' in color && color.dynamic != null) {
+  const dynamic = color.dynamic;
+
+  if (dynamic != null) {
     const processColor = require('./processColor').default;
-    const dynamic = color.dynamic;
     const dynamicColor: LocalNativeColorValue = {
       dynamic: {
-        // $FlowFixMe[incompatible-use]
         light: processColor(dynamic.light),
-        // $FlowFixMe[incompatible-use]
         dark: processColor(dynamic.dark),
-        // $FlowFixMe[incompatible-use]
         highContrastLight: processColor(dynamic.highContrastLight),
-        // $FlowFixMe[incompatible-use]
         highContrastDark: processColor(dynamic.highContrastDark),
       },
     };
