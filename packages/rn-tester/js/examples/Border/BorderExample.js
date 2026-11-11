@@ -215,10 +215,7 @@ const styles = StyleSheet.create({
   },
   border16: {
     borderWidth: 10,
-    borderColor:
-      Platform.OS === 'ios'
-        ? DynamicColor({light: 'magenta', dark: 'cyan'})
-        : 'black',
+    borderColor: DynamicColor({light: 'magenta', dark: 'cyan'}),
   },
   borderWithoutClipping: {
     borderWidth: 10,

@@ -501,21 +501,12 @@ function ReactsToAppearanceChangesExample() {
     <View style={styles.column} key={key}>
       <View style={styles.row}>
         <RNTesterText style={styles.labelCell}>
-          {Platform.select({
-            ios: "DynamicColor({light: 'red', dark: 'blue'})",
-            android: "PlatformColor('?attr/colorAccent')",
-            default: 'Unexpected Platform.OS: ' + Platform.OS,
-          })}
+          {"DynamicColor({light: 'red', dark: 'blue'})"}
         </RNTesterText>
         <View
           style={{
             ...styles.colorCell,
-            backgroundColor:
-              Platform.OS === 'ios'
-                ? DynamicColor({light: 'red', dark: 'blue'})
-                : Platform.OS === 'android'
-                  ? PlatformColor('?attr/colorAccent')
-                  : 'red',
+            backgroundColor: DynamicColor({light: 'red', dark: 'blue'}),
           }}
         />
       </View>
