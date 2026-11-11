@@ -505,13 +505,12 @@ export default {
     },
     {
       title: 'Dynamic color',
-      name: 'dynamic-color-ios',
+      name: 'dynamic-color',
       description: 'Using a custom dynamic color',
-      platform: 'ios',
       render: function (): React.Node {
         return (
           <View
-            testID="border-test-dynamic-color-ios"
+            testID="border-test-dynamic-color"
             style={[styles.box, styles.border16]}
           />
         );
