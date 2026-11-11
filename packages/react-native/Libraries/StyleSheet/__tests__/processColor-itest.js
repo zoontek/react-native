@@ -11,12 +11,7 @@
 import '@react-native/fantom/src/setUpDefaultReactNativeEnvironment';
 
 const {OS} = require('../../Utilities/Platform').default;
-const PlatformColorAndroid =
-  // $FlowFixMe[missing-platform-support]
-  require('../PlatformColorValueTypes.android').PlatformColor;
-const PlatformColorIOS =
-  // $FlowFixMe[missing-platform-support]
-  require('../PlatformColorValueTypes.ios').PlatformColor;
+const {DynamicColor, PlatformColor} = require('../PlatformColorValueTypes');
 const processColor = require('../processColor').default;
 
 const platformSpecific =
@@ -93,12 +88,8 @@ describe('processColor', () => {
 
   describe('iOS', () => {
     if (OS === 'ios') {
-      const DynamicColor =
-        // $FlowFixMe[missing-platform-support]
-        require('../PlatformColorValueTypes.ios').DynamicColor;
-
       it('should process iOS PlatformColor colors', () => {
-        const color = PlatformColorIOS('systemRedColor');
+        const color = PlatformColor('systemRedColor');
         const processedColor = processColor(color);
         const expectedColor = {semantic: ['systemRedColor']};
         expect(processedColor).toEqual(expectedColor);
@@ -117,7 +108,7 @@ describe('processColor', () => {
       // shared behavior is exercised by the iOS and Android cases here rather
       // than duplicated for platforms the harness cannot run.
       it('should carry an unprocessed fallback on iOS PlatformColor colors', () => {
-        const color = PlatformColorIOS('systemRedColor', {fallback: '#ff0000'});
+        const color = PlatformColor('systemRedColor', {fallback: '#ff0000'});
         const processedColor = processColor(color);
         const expectedColor = {
           semantic: ['systemRedColor'],
@@ -130,19 +121,15 @@ describe('processColor', () => {
 
   describe('Android', () => {
     if (OS === 'android') {
-      const {DynamicColor, PlatformColor} =
-        // $FlowFixMe[missing-platform-support]
-        require('../PlatformColorValueTypes.android');
-
       it('should process Android PlatformColor colors', () => {
-        const color = PlatformColorAndroid('?attr/colorPrimary');
+        const color = PlatformColor('?attr/colorPrimary');
         const processedColor = processColor(color);
         const expectedColor = {resource_paths: ['?attr/colorPrimary']};
         expect(processedColor).toEqual(expectedColor);
       });
 
       it('should carry an unprocessed fallback on Android PlatformColor colors', () => {
-        const color = PlatformColorAndroid('?attr/colorPrimary', {
+        const color = PlatformColor('?attr/colorPrimary', {
           fallback: '#000000',
         });
         const processedColor = processColor(color);

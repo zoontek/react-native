@@ -11,15 +11,7 @@
 import '@react-native/fantom/src/setUpDefaultReactNativeEnvironment';
 
 const {OS} = require('../../Utilities/Platform').default;
-const PlatformColorAndroid =
-  // $FlowFixMe[missing-platform-support]
-  require('../PlatformColorValueTypes.android').PlatformColor;
-const DynamicColor =
-  // $FlowFixMe[missing-platform-support]
-  require('../PlatformColorValueTypes.ios').DynamicColor;
-const PlatformColorIOS =
-  // $FlowFixMe[missing-platform-support]
-  require('../PlatformColorValueTypes.ios').PlatformColor;
+const {DynamicColor, PlatformColor} = require('../PlatformColorValueTypes');
 const processColorArray = require('../processColorArray').default;
 
 const platformSpecific =
@@ -99,8 +91,8 @@ describe('processColorArray', () => {
     if (OS === 'ios') {
       it('should convert array of iOS PlatformColor colors', () => {
         const colorFromArray = processColorArray([
-          PlatformColorIOS('systemColorWhite'),
-          PlatformColorIOS('systemColorBlack'),
+          PlatformColor('systemColorWhite'),
+          PlatformColor('systemColorBlack'),
         ]);
         const expectedColorValueArray = [
           {semantic: ['systemColorWhite']},
@@ -127,8 +119,8 @@ describe('processColorArray', () => {
     if (OS === 'android') {
       it('should convert array of Android PlatformColor colors', () => {
         const colorFromArray = processColorArray([
-          PlatformColorAndroid('?attr/colorPrimary'),
-          PlatformColorAndroid('?colorPrimaryDark'),
+          PlatformColor('?attr/colorPrimary'),
+          PlatformColor('?colorPrimaryDark'),
         ]);
         const expectedColorValueArray = [
           {resource_paths: ['?attr/colorPrimary']},

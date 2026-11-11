@@ -15,15 +15,7 @@ import type {BackgroundImageValue} from '../StyleSheetTypes';
 import processBackgroundImage from '../processBackgroundImage';
 
 const {OS} = require('../../Utilities/Platform').default;
-const PlatformColorAndroid =
-  // $FlowFixMe[missing-platform-support]
-  require('../PlatformColorValueTypes.android').PlatformColor;
-const DynamicColor =
-  // $FlowFixMe[missing-platform-support]
-  require('../PlatformColorValueTypes.ios').DynamicColor;
-const PlatformColorIOS =
-  // $FlowFixMe[missing-platform-support]
-  require('../PlatformColorValueTypes.ios').PlatformColor;
+const {DynamicColor, PlatformColor} = require('../PlatformColorValueTypes');
 const processColor = require('../processColor').default;
 
 describe('processBackgroundImage', () => {
@@ -682,7 +674,7 @@ describe('processBackgroundImage', () => {
           {
             type: 'linear-gradient' as const,
             colorStops: [
-              {color: PlatformColorIOS('systemRedColor'), positions: ['0%']},
+              {color: PlatformColor('systemRedColor'), positions: ['0%']},
               {color: 'red', positions: ['100%']},
             ],
           },
@@ -719,7 +711,7 @@ describe('processBackgroundImage', () => {
             type: 'linear-gradient' as const,
             colorStops: [
               {
-                color: PlatformColorAndroid('?attr/colorPrimary'),
+                color: PlatformColor('?attr/colorPrimary'),
                 positions: ['0%'],
               },
               {color: 'red', positions: ['100%']},

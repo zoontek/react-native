@@ -12,6 +12,7 @@ import '@react-native/fantom/src/setUpDefaultReactNativeEnvironment';
 
 const {OS} = require('../../Utilities/Platform').default;
 const normalizeColor = require('../normalizeColor').default;
+const {DynamicColor, PlatformColor} = require('../PlatformColorValueTypes');
 
 it('forwards calls to @react-native/normalize-colors', () => {
   // normalizeColor delegates string and number inputs to
@@ -21,13 +22,6 @@ it('forwards calls to @react-native/normalize-colors', () => {
 
 describe('iOS', () => {
   if (OS === 'ios') {
-    const PlatformColor =
-      // $FlowFixMe[missing-platform-support]
-      require('../PlatformColorValueTypes.ios').PlatformColor;
-    const DynamicColor =
-      // $FlowFixMe[missing-platform-support]
-      require('../PlatformColorValueTypes.ios').DynamicColor;
-
     it('should normalize iOS PlatformColor colors', () => {
       const color = PlatformColor('systemRedColor');
       const normalizedColor = normalizeColor(color);
@@ -85,13 +79,6 @@ describe('iOS', () => {
 
 describe('Android', () => {
   if (OS === 'android') {
-    const PlatformColor =
-      // $FlowFixMe[missing-platform-support]
-      require('../PlatformColorValueTypes.android').PlatformColor;
-    const DynamicColor =
-      // $FlowFixMe[missing-platform-support]
-      require('../PlatformColorValueTypes.android').DynamicColor;
-
     it('should normalize Android PlatformColor colors', () => {
       const color = PlatformColor('?attr/colorPrimary');
       const normalizedColor = normalizeColor(color);
