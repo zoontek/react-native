@@ -12,7 +12,9 @@ import type {ProcessedColorValue} from './processColor';
 import type {ColorValue, NativeColorValue} from './StyleSheet';
 
 import Platform from '../Utilities/Platform';
+import normalizeColor from './normalizeColor';
 import parsePlatformColorArgs from './parsePlatformColorArgs';
+import processColor from './processColor';
 
 type DynamicColorVariant = ?(ColorValue | ProcessedColorValue);
 
@@ -93,9 +95,6 @@ const _normalizeColorObject = (
 
   const dynamic = color.dynamic;
   if (dynamic != null) {
-    // Required lazily, as normalizeColor requires this module
-    const normalizeColor = require('./normalizeColor').default;
-
     return {
       dynamic: {
         light: normalizeColor(dynamic.light),
@@ -119,9 +118,6 @@ const _processColorObject = (
 ): ?LocalNativeColorValue => {
   const dynamic = color.dynamic;
   if (dynamic != null) {
-    // Required lazily, as processColor requires this module
-    const processColor = require('./processColor').default;
-
     return {
       dynamic: {
         light: processColor(dynamic.light),
