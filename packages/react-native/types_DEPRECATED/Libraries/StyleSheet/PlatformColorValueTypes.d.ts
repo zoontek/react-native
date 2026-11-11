@@ -33,3 +33,15 @@ export type DynamicColorTuple = {
  * optionally for high contrast
  */
 export function DynamicColor(tuple: DynamicColorTuple): OpaqueColorValue;
+
+/**
+ * @deprecated DynamicColorIOSTuple is deprecated and will be removed in a future release.
+ * Use DynamicColorTuple instead.
+ */
+export type DynamicColorIOSTuple = DynamicColorTuple;
+
+/**
+ * @deprecated DynamicColorIOS is deprecated and will be removed in a future release.
+ * Use DynamicColor instead, which also works on Android.
+ */
+export function DynamicColorIOS(tuple: DynamicColorTuple): OpaqueColorValue;

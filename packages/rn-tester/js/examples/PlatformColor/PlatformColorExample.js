@@ -17,7 +17,6 @@ import {
   Appearance,
   Button,
   DynamicColor,
-  DynamicColorIOS,
   Platform,
   PlatformColor,
   StyleSheet,
@@ -468,7 +467,7 @@ function VariantColorsExample() {
       <View style={styles.row}>
         <RNTesterText style={styles.labelCell}>
           {Platform.select({
-            ios: "DynamicColorIOS({light: 'red', dark: 'blue'})",
+            ios: "DynamicColor({light: 'red', dark: 'blue'})",
             android: "PlatformColor('?attr/colorAccent')",
             default: 'Unexpected Platform.OS: ' + Platform.OS,
           })}
@@ -478,7 +477,7 @@ function VariantColorsExample() {
             ...styles.colorCell,
             backgroundColor:
               Platform.OS === 'ios'
-                ? DynamicColorIOS({light: 'red', dark: 'blue'})
+                ? DynamicColor({light: 'red', dark: 'blue'})
                 : Platform.OS === 'android'
                   ? PlatformColor('?attr/colorAccent')
                   : 'red',
@@ -503,7 +502,7 @@ function ReactsToAppearanceChangesExample() {
       <View style={styles.row}>
         <RNTesterText style={styles.labelCell}>
           {Platform.select({
-            ios: "DynamicColorIOS({light: 'red', dark: 'blue'})",
+            ios: "DynamicColor({light: 'red', dark: 'blue'})",
             android: "PlatformColor('?attr/colorAccent')",
             default: 'Unexpected Platform.OS: ' + Platform.OS,
           })}
@@ -513,7 +512,7 @@ function ReactsToAppearanceChangesExample() {
             ...styles.colorCell,
             backgroundColor:
               Platform.OS === 'ios'
-                ? DynamicColorIOS({light: 'red', dark: 'blue'})
+                ? DynamicColor({light: 'red', dark: 'blue'})
                 : Platform.OS === 'android'
                   ? PlatformColor('?attr/colorAccent')
                   : 'red',

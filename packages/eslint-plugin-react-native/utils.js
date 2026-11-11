@@ -458,10 +458,6 @@ const publicAPIMapping = {
     default: null,
     types: ['DynamicColor', 'DynamicColorTuple', 'PlatformColor'],
   },
-  'Libraries/StyleSheet/PlatformColorValueTypesIOS': {
-    default: null,
-    types: ['DynamicColorIOS', 'DynamicColorIOSTuple'],
-  },
   'Libraries/StyleSheet/Rect': {
     default: null,
     types: ['Insets'],

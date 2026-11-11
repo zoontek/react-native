@@ -20,6 +20,10 @@
 
 /// <reference path="../src/types/globals.d.ts" />
 
+import type {DynamicColorTuple} from './Libraries/StyleSheet/PlatformColorValueTypes';
+
+import {DynamicColor} from './Libraries/StyleSheet/PlatformColorValueTypes';
+
 // #region Components
 
 export type {
@@ -318,8 +322,16 @@ export {default as Dimensions} from './Libraries/Utilities/Dimensions';
 
 export type {DynamicColorTuple} from './Libraries/StyleSheet/PlatformColorValueTypes';
 export {DynamicColor} from './Libraries/StyleSheet/PlatformColorValueTypes';
-export type {DynamicColorIOSTuple} from './Libraries/StyleSheet/PlatformColorValueTypesIOS';
-export {DynamicColorIOS} from './Libraries/StyleSheet/PlatformColorValueTypesIOS';
+/**
+ * @deprecated DynamicColorIOSTuple is deprecated and will be removed in a future release.
+ * Use DynamicColorTuple instead.
+ */
+export type DynamicColorIOSTuple = DynamicColorTuple;
+/**
+ * @deprecated DynamicColorIOS is deprecated and will be removed in a future release.
+ * Use DynamicColor instead, which also works on Android.
+ */
+export const DynamicColorIOS: typeof DynamicColor = DynamicColor;
 
 export type {EasingFunction} from './Libraries/Animated/Easing';
 export {default as Easing} from './Libraries/Animated/Easing';

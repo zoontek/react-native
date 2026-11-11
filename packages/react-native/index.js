@@ -281,9 +281,13 @@ module.exports = {
     return require('./Libraries/StyleSheet/PlatformColorValueTypes')
       .DynamicColor;
   },
+  /**
+   * @deprecated DynamicColorIOS is deprecated and will be removed in a future release.
+   * Use DynamicColor instead, which also works on Android.
+   */
   get DynamicColorIOS() {
-    return require('./Libraries/StyleSheet/PlatformColorValueTypesIOS')
-      .DynamicColorIOS;
+    return require('./Libraries/StyleSheet/PlatformColorValueTypes')
+      .DynamicColor;
   },
   get Easing() {
     return require('./Libraries/Animated/Easing').default;

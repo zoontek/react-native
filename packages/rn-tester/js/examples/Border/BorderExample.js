@@ -15,7 +15,7 @@ import type {RNTesterModule} from '../../types/RNTesterTypes';
 import hotdog from '../../assets/hotdog.jpg';
 import * as React from 'react';
 import {
-  DynamicColorIOS,
+  DynamicColor,
   Image,
   Platform,
   PlatformColor,
@@ -217,7 +217,7 @@ const styles = StyleSheet.create({
     borderWidth: 10,
     borderColor:
       Platform.OS === 'ios'
-        ? DynamicColorIOS({light: 'magenta', dark: 'cyan'})
+        ? DynamicColor({light: 'magenta', dark: 'cyan'})
         : 'black',
   },
   borderWithoutClipping: {

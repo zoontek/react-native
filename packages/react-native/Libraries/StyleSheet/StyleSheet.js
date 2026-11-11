@@ -35,7 +35,7 @@ export type {
 
 /**
  * This type should be used as the type for anything that is a color. It is
- * most useful when using DynamicColorIOS which can be a string or a dynamic
+ * most useful when using DynamicColor which can be a string or a dynamic
  * color object.
  *
  * `type Props = {backgroundColor: ColorValue};`

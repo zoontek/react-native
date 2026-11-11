@@ -24,9 +24,9 @@ describe('iOS', () => {
     const PlatformColor =
       // $FlowFixMe[missing-platform-support]
       require('../PlatformColorValueTypes.ios').PlatformColor;
-    const DynamicColorIOS =
+    const DynamicColor =
       // $FlowFixMe[missing-platform-support]
-      require('../PlatformColorValueTypesIOS.ios').DynamicColorIOS;
+      require('../PlatformColorValueTypes.ios').DynamicColor;
 
     it('should normalize iOS PlatformColor colors', () => {
       const color = PlatformColor('systemRedColor');
@@ -36,7 +36,7 @@ describe('iOS', () => {
     });
 
     it('should normalize iOS Dynamic colors with named colors', () => {
-      const color = DynamicColorIOS({light: 'black', dark: 'white'});
+      const color = DynamicColor({light: 'black', dark: 'white'});
       const normalizedColor = normalizeColor(color);
       const expectedColor = {
         dynamic: {
@@ -48,7 +48,7 @@ describe('iOS', () => {
     });
 
     it('should normalize iOS Dynamic colors with accessible colors', () => {
-      const color = DynamicColorIOS({
+      const color = DynamicColor({
         light: 'black',
         dark: 'white',
         highContrastLight: 'red',
@@ -67,7 +67,7 @@ describe('iOS', () => {
     });
 
     it('should normalize iOS Dynamic colors with PlatformColor colors', () => {
-      const color = DynamicColorIOS({
+      const color = DynamicColor({
         light: PlatformColor('systemBlackColor'),
         dark: PlatformColor('systemWhiteColor'),
       });

@@ -11,18 +11,12 @@
 import '@react-native/fantom/src/setUpDefaultReactNativeEnvironment';
 
 const {OS} = require('../../Utilities/Platform').default;
-const DynamicColorAndroid =
-  // $FlowFixMe[missing-platform-support]
-  require('../PlatformColorValueTypes.android').DynamicColor;
 const PlatformColorAndroid =
   // $FlowFixMe[missing-platform-support]
   require('../PlatformColorValueTypes.android').PlatformColor;
 const PlatformColorIOS =
   // $FlowFixMe[missing-platform-support]
   require('../PlatformColorValueTypes.ios').PlatformColor;
-const DynamicColorIOS =
-  // $FlowFixMe[missing-platform-support]
-  require('../PlatformColorValueTypesIOS.ios').DynamicColorIOS;
 const processColor = require('../processColor').default;
 
 const platformSpecific =
@@ -99,6 +93,10 @@ describe('processColor', () => {
 
   describe('iOS', () => {
     if (OS === 'ios') {
+      const DynamicColor =
+        // $FlowFixMe[missing-platform-support]
+        require('../PlatformColorValueTypes.ios').DynamicColor;
+
       it('should process iOS PlatformColor colors', () => {
         const color = PlatformColorIOS('systemRedColor');
         const processedColor = processColor(color);
@@ -107,7 +105,7 @@ describe('processColor', () => {
       });
 
       it('should process iOS Dynamic colors', () => {
-        const color = DynamicColorIOS({light: 'black', dark: 'white'});
+        const color = DynamicColor({light: 'black', dark: 'white'});
         const processedColor = processColor(color);
         const expectedColor = {dynamic: {light: 0xff000000, dark: 0xffffffff}};
         expect(processedColor).toEqual(expectedColor);
@@ -132,6 +130,10 @@ describe('processColor', () => {
 
   describe('Android', () => {
     if (OS === 'android') {
+      const {DynamicColor, PlatformColor} =
+        // $FlowFixMe[missing-platform-support]
+        require('../PlatformColorValueTypes.android');
+
       it('should process Android PlatformColor colors', () => {
         const color = PlatformColorAndroid('?attr/colorPrimary');
         const processedColor = processColor(color);
@@ -152,10 +154,10 @@ describe('processColor', () => {
       });
 
       it('should process Android Dynamic colors', () => {
-        const color = DynamicColorAndroid({
+        const color = DynamicColor({
           light: 'black',
           dark: 'white',
-          highContrastDark: PlatformColorAndroid('?attr/colorPrimary'),
+          highContrastDark: PlatformColor('?attr/colorPrimary'),
         });
         const processedColor = processColor(color);
         const expectedColor = {

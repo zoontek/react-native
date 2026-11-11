@@ -11,4 +11,4 @@ ESLint rules for [`@react-native/eslint-config`](https://github.com/react/react-
 
 ### `platform-colors`
 
-Enforces that calls to `PlatformColor` and `DynamicColorIOS` are statically analyzable to enable performance optimizations.
+Enforces that calls to `PlatformColor` and `DynamicColor` are statically analyzable to enable performance optimizations.

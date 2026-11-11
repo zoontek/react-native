@@ -38,7 +38,7 @@ import {
   Dimensions,
   DrawerLayoutAndroid,
   DrawerSlideEvent,
-  DynamicColorIOS,
+  DynamicColor,
   EmitterSubscription,
   EventSubscription,
   FlatList,
@@ -1883,12 +1883,12 @@ Platform.select({android: 1, ios: 2, macos: 3, web: 4, windows: 5, default: 0});
 PlatformColor('?attr/colorControlNormal');
 PlatformColor('?attr/colorControlNormal', '?attr/colorAccent', 'another');
 
-DynamicColorIOS({
+DynamicColor({
   dark: 'lightskyblue',
   light: 'midnightblue',
 });
 
-DynamicColorIOS({
+DynamicColor({
   dark: 'lightskyblue',
   light: PlatformColor('labelColor'),
 });
@@ -1933,7 +1933,7 @@ StyleSheet.create({
     alignItems: 'stretch',
     ...Platform.select({
       ios: {
-        color: DynamicColorIOS({
+        color: DynamicColor({
           dark: 'lightskyblue',
           light: PlatformColor('labelColor'),
         }),

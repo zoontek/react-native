@@ -18,12 +18,12 @@ const {OS} = require('../../Utilities/Platform').default;
 const PlatformColorAndroid =
   // $FlowFixMe[missing-platform-support]
   require('../PlatformColorValueTypes.android').PlatformColor;
+const DynamicColor =
+  // $FlowFixMe[missing-platform-support]
+  require('../PlatformColorValueTypes.ios').DynamicColor;
 const PlatformColorIOS =
   // $FlowFixMe[missing-platform-support]
   require('../PlatformColorValueTypes.ios').PlatformColor;
-const DynamicColorIOS =
-  // $FlowFixMe[missing-platform-support]
-  require('../PlatformColorValueTypesIOS.ios').DynamicColorIOS;
 const processColor = require('../processColor').default;
 
 describe('processBackgroundImage', () => {
@@ -697,7 +697,7 @@ describe('processBackgroundImage', () => {
             type: 'linear-gradient' as const,
             colorStops: [
               {
-                color: DynamicColorIOS({light: 'black', dark: 'white'}),
+                color: DynamicColor({light: 'black', dark: 'white'}),
                 positions: ['0%'],
               },
               {color: 'red', positions: ['100%']},

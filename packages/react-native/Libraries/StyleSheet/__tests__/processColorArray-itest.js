@@ -14,12 +14,12 @@ const {OS} = require('../../Utilities/Platform').default;
 const PlatformColorAndroid =
   // $FlowFixMe[missing-platform-support]
   require('../PlatformColorValueTypes.android').PlatformColor;
+const DynamicColor =
+  // $FlowFixMe[missing-platform-support]
+  require('../PlatformColorValueTypes.ios').DynamicColor;
 const PlatformColorIOS =
   // $FlowFixMe[missing-platform-support]
   require('../PlatformColorValueTypes.ios').PlatformColor;
-const DynamicColorIOS =
-  // $FlowFixMe[missing-platform-support]
-  require('../PlatformColorValueTypesIOS.ios').DynamicColorIOS;
 const processColorArray = require('../processColorArray').default;
 
 const platformSpecific =
@@ -111,8 +111,8 @@ describe('processColorArray', () => {
 
       it('should process iOS Dynamic colors', () => {
         const colorFromArray = processColorArray([
-          DynamicColorIOS({light: 'black', dark: 'white'}),
-          DynamicColorIOS({light: 'white', dark: 'black'}),
+          DynamicColor({light: 'black', dark: 'white'}),
+          DynamicColor({light: 'white', dark: 'black'}),
         ]);
         const expectedColorValueArray = [
           {dynamic: {light: 0xff000000, dark: 0xffffffff}},

@@ -13,16 +13,17 @@ module.exports = {
     type: 'problem',
     docs: {
       description:
-        'Ensure that PlatformColor(), DynamicColor() and DynamicColorIOS() are passed literals of the expected shape.',
+        'Ensure that PlatformColor() and DynamicColor() are passed literals of the expected shape.',
     },
     messages: {
       platformColorArgsLength:
         'PlatformColor() must have at least one argument that is a literal.',
       platformColorArgTypes:
         'PlatformColor() every argument must be a literal.',
-      dynamicColorArg: '{{name}}() must take a single argument of type Object',
+      dynamicColorArg:
+        'DynamicColor() must take a single argument of type Object',
       dynamicColorValue:
-        '{{name}}() value must be either a literal or a PlatformColor() call.',
+        'DynamicColor() value must be either a literal or a PlatformColor() call.',
     },
     schema: [],
   },
@@ -67,16 +68,12 @@ module.exports = {
             });
             return;
           }
-        } else if (
-          node.callee.name === 'DynamicColor' ||
-          node.callee.name === 'DynamicColorIOS'
-        ) {
+        } else if (node.callee.name === 'DynamicColor') {
           const args = node.arguments;
           if (!(args.length === 1 && args[0].type === 'ObjectExpression')) {
             context.report({
               node,
               messageId: 'dynamicColorArg',
-              data: {name: node.callee.name},
             });
             return;
           }
@@ -91,7 +88,6 @@ module.exports = {
               context.report({
                 node,
                 messageId: 'dynamicColorValue',
-                data: {name: node.callee.name},
               });
               return;
             }
