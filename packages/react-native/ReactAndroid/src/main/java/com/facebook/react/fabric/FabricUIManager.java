@@ -589,7 +589,8 @@ public class FabricUIManager
 
   /**
    * Returns the appearance of a surface, used by native code to resolve DynamicColor values. Bit 0
-   * is set in dark mode, bit 1 when the user increased the contrast.
+   * is set in dark mode, bit 1 when the user increased the contrast. Native code caches the result
+   * per surface until the color scheme changes.
    */
   public int getAppearance(int surfaceId) {
     ThemedReactContext context =

@@ -46,9 +46,58 @@ size_t hashGetColourArguments(
   return seed;
 }
 
+// Caches of the (costly) JNI results. A cached nullopt is an explicit miss,
+// distinct from a path that resolves to transparent (ARGB 0).
+constinit std::mutex getColorCacheMutex;
+folly::EvictingCacheMap<size_t, std::optional<Color>>& getColorCache() {
+  static folly::EvictingCacheMap<size_t, std::optional<Color>> cache(64);
+  return cache;
+}
+
+// Appearance flags per surface, so a DynamicColor does not make a JNI call
+constinit std::mutex appearanceCacheMutex;
+folly::EvictingCacheMap<int32_t, jint>& appearanceCache() {
+  static folly::EvictingCacheMap<int32_t, jint> cache(16);
+  return cache;
+}
+
+// Clears both caches when the color scheme changes
+void setUpCacheInvalidation() {
+  static constinit std::once_flag setupCacheInvalidation;
+  std::call_once(
+      setupCacheInvalidation, configurePlatformColorCacheInvalidationHook, [] {
+        {
+          std::scoped_lock lock(getColorCacheMutex);
+          getColorCache().clear();
+        }
+        std::scoped_lock lock(appearanceCacheMutex);
+        appearanceCache().clear();
+      });
+}
+
 // Must match the flags returned by FabricUIManager.getAppearance
 constexpr jint kAppearanceDark = 1 << 0;
 constexpr jint kAppearanceHighContrast = 1 << 1;
+
+jint getAppearance(
+    const ContextContainer& contextContainer,
+    int32_t surfaceId) {
+  setUpCacheInvalidation();
+
+  std::scoped_lock lock(appearanceCacheMutex);
+  auto iterator = appearanceCache().find(surfaceId);
+  if (iterator != appearanceCache().end()) {
+    return iterator->second;
+  }
+
+  auto fabricUIManager =
+      contextContainer.at<jni::alias_ref<jobject>>("FabricUIManager");
+  static auto getAppearanceFromJava =
+      fabricUIManager->getClass()->getMethod<jint(jint)>("getAppearance");
+  auto appearance = getAppearanceFromJava(fabricUIManager, surfaceId);
+  appearanceCache().set(surfaceId, appearance);
+  return appearance;
+}
 
 // Picks the variant of a DynamicColor that matches the current appearance of
 // the surface. The color is resolved once: views keep it until their props are
@@ -57,11 +106,7 @@ SharedColor parseDynamicColor(
     const ContextContainer& contextContainer,
     int32_t surfaceId,
     const std::unordered_map<std::string, RawValue>& items) {
-  auto fabricUIManager =
-      contextContainer.at<jni::alias_ref<jobject>>("FabricUIManager");
-  static auto getAppearanceFromJava =
-      fabricUIManager->getClass()->getMethod<jint(jint)>("getAppearance");
-  auto appearance = getAppearanceFromJava(fabricUIManager, surfaceId);
+  auto appearance = getAppearance(contextContainer, surfaceId);
   bool isDark = (appearance & kAppearanceDark) != 0;
   bool isHighContrast = (appearance & kAppearanceHighContrast) != 0;
 
@@ -111,28 +156,14 @@ SharedColor parsePlatformColor(
 
     bool resolved = false;
     if (!resourcePaths.empty()) {
-      // Cache the (costly) JNI results. A cached nullopt is an explicit miss,
-      // distinct from a path that resolves to transparent (ARGB 0).
-      static constinit std::mutex getColorCacheMutex;
-      static folly::EvictingCacheMap<size_t, std::optional<Color>>
-          getColorCache(64);
-
-      // Listen for appearance changes, which should invalidate the cache
-      static constinit std::once_flag setupCacheInvalidation;
-      std::call_once(
-          setupCacheInvalidation,
-          configurePlatformColorCacheInvalidationHook,
-          [&] {
-            std::scoped_lock lock(getColorCacheMutex);
-            getColorCache.clear();
-          });
+      setUpCacheInvalidation();
 
       auto hash = hashGetColourArguments(surfaceId, resourcePaths);
       std::optional<Color> resolvedColor;
       {
         std::scoped_lock lock(getColorCacheMutex);
-        auto iterator = getColorCache.find(hash);
-        if (iterator != getColorCache.end()) {
+        auto iterator = getColorCache().find(hash);
+        if (iterator != getColorCache().end()) {
           resolvedColor = iterator->second;
         } else {
           auto fabricUIManager =
@@ -155,7 +186,7 @@ SharedColor parsePlatformColor(
           if (boxedColor) {
             resolvedColor = static_cast<Color>(boxedColor->value());
           }
-          getColorCache.set(hash, resolvedColor);
+          getColorCache().set(hash, resolvedColor);
         }
       }
       if (resolvedColor.has_value()) {
