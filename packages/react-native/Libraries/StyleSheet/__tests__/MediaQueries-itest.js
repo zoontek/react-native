@@ -21,6 +21,7 @@ const DARK = '@media (prefers-color-scheme: dark)';
 const MORE_CONTRAST = '@media (prefers-contrast: more)';
 const DARK_AND_MORE_CONTRAST =
   '@media (prefers-color-scheme: dark) and (prefers-contrast: more)';
+const LANDSCAPE = '@media (orientation: landscape)';
 
 const styles = StyleSheet.create({
   box: {
@@ -48,6 +49,10 @@ const styles = StyleSheet.create({
   width: {
     width: {default: 10, [DARK]: 20},
     height: 10,
+  },
+  orientation: {
+    flexDirection: {default: 'column', [LANDSCAPE]: 'row'},
+    backgroundColor: {default: 'white', [LANDSCAPE]: 'black'},
   },
   text: {
     color: {default: 'black', [DARK]: 'white'},
@@ -182,6 +187,31 @@ describe('media queries in styles', () => {
     setMediaFeatures({colorScheme: 'dark', contrast: 'no-preference'});
     expect(renderedBackgroundColor(root)).toEqual(
       <rn-view backgroundColor="rgba(0, 0, 0, 1)" />,
+    );
+  });
+
+  it('matches orientation', () => {
+    const root = Fantom.createRoot();
+    Fantom.runTask(() => {
+      root.render(<View style={styles.orientation} />);
+    });
+
+    expect(renderedBackgroundColor(root)).toEqual(
+      <rn-view backgroundColor="rgba(255, 255, 255, 1)" />,
+    );
+
+    setMediaFeatures({orientation: 'landscape'});
+    expect(
+      root
+        .getRenderedOutput({props: ['backgroundColor', 'flexDirection']})
+        .toJSX(),
+    ).toEqual(
+      <rn-view backgroundColor="rgba(0, 0, 0, 1)" flexDirection="row" />,
+    );
+
+    setMediaFeatures({orientation: 'portrait'});
+    expect(renderedBackgroundColor(root)).toEqual(
+      <rn-view backgroundColor="rgba(255, 255, 255, 1)" />,
     );
   });
 

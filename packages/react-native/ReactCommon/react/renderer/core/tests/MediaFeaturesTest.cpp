@@ -45,6 +45,15 @@ TEST(MediaFeaturesTest, matchesPrefersContrast) {
       matchMediaQuery("@media (prefers-contrast: less)", kDarkMoreContrast));
 }
 
+TEST(MediaFeaturesTest, matchesOrientation) {
+  const MediaFeatures landscape{.orientation = MediaOrientation::Landscape};
+  EXPECT_TRUE(matchMediaQuery("@media (orientation: portrait)", kLight));
+  EXPECT_FALSE(matchMediaQuery("@media (orientation: landscape)", kLight));
+  EXPECT_TRUE(matchMediaQuery("@media (orientation: landscape)", landscape));
+  EXPECT_FALSE(matchMediaQuery("@media (orientation: portrait)", landscape));
+  EXPECT_FALSE(matchMediaQuery("@media (orientation: square)", landscape));
+}
+
 TEST(MediaFeaturesTest, ignoresWhitespaceAndCase) {
   EXPECT_TRUE(matchMediaQuery(
       "  @MEDIA(  Prefers-Color-Scheme :DARK )  ", kDarkMoreContrast));

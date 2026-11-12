@@ -738,11 +738,13 @@ export function setMediaFeatures(
   mediaFeatures: Readonly<{
     colorScheme?: 'light' | 'dark',
     contrast?: 'no-preference' | 'less' | 'more',
+    orientation?: 'portrait' | 'landscape',
   }>,
 ) {
   NativeFantom.setMediaFeatures(
     mediaFeatures.colorScheme ?? 'light',
     mediaFeatures.contrast ?? 'no-preference',
+    mediaFeatures.orientation ?? 'portrait',
   );
 }
 

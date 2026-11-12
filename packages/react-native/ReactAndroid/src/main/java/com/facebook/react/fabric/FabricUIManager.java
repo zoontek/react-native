@@ -480,10 +480,10 @@ public class FabricUIManager
     mMediaFeaturesObserver =
         new MediaFeaturesObserver(
             mReactApplicationContext,
-            (colorScheme, contrast) -> {
+            (colorScheme, contrast, orientation) -> {
               FabricUIManagerBinding binding = mBinding;
               if (binding != null) {
-                binding.updateMediaFeatures(colorScheme, contrast);
+                binding.updateMediaFeatures(colorScheme, contrast, orientation);
               }
             });
     mMediaFeaturesObserver.start();

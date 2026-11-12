@@ -152,7 +152,11 @@ class NativeFantom : public NativeFantomCxxSpec<NativeFantom> {
   void clearImage(jsi::Runtime &rt, const std::string &uri);
   void clearAllImages(jsi::Runtime &rt);
 
-  void setMediaFeatures(jsi::Runtime &runtime, const std::string &colorScheme, const std::string &contrast);
+  void setMediaFeatures(
+      jsi::Runtime &runtime,
+      const std::string &colorScheme,
+      const std::string &contrast,
+      const std::string &orientation);
 
  private:
   TesterAppDelegate &appDelegate_;

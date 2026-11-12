@@ -14,6 +14,7 @@ namespace facebook::react {
 namespace {
 
 std::atomic<MediaFeatures> currentMediaFeatures{MediaFeatures{}};
+static_assert(std::atomic<MediaFeatures>::is_always_lock_free);
 
 char toLowerAscii(char c) noexcept {
   return (c >= 'A' && c <= 'Z') ? static_cast<char>(c - 'A' + 'a') : c;
@@ -76,6 +77,16 @@ bool matchMediaFeature(
     }
     if (equalsIgnoringAsciiCase(value, "more")) {
       return features.contrast == MediaContrast::More;
+    }
+    return false;
+  }
+
+  if (equalsIgnoringAsciiCase(name, "orientation")) {
+    if (equalsIgnoringAsciiCase(value, "portrait")) {
+      return features.orientation == MediaOrientation::Portrait;
+    }
+    if (equalsIgnoringAsciiCase(value, "landscape")) {
+      return features.orientation == MediaOrientation::Landscape;
     }
     return false;
   }

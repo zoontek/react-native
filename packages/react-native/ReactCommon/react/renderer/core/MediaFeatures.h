@@ -18,13 +18,18 @@ enum class MediaColorScheme : uint8_t { Light, Dark };
 
 enum class MediaContrast : uint8_t { NoPreference, Less, More };
 
+enum class MediaOrientation : uint8_t { Portrait, Landscape };
+
 /*
  * The values that media queries in props are matched against, for example
  * `@media (prefers-color-scheme: dark)`.
+ *
+ * Aligned on 4 bytes, so that `std::atomic<MediaFeatures>` is lock-free.
  */
-struct MediaFeatures {
+struct alignas(4) MediaFeatures {
   MediaColorScheme colorScheme{MediaColorScheme::Light};
   MediaContrast contrast{MediaContrast::NoPreference};
+  MediaOrientation orientation{MediaOrientation::Portrait};
 
   bool operator==(const MediaFeatures &other) const = default;
 };
@@ -50,6 +55,7 @@ bool setMediaFeatures(const MediaFeatures &features) noexcept;
  * Supported media features:
  * - `(prefers-color-scheme: light | dark)`
  * - `(prefers-contrast: no-preference | less | more)`
+ * - `(orientation: portrait | landscape)`
  *
  * Features can be combined with `and`, for example
  * `@media (prefers-color-scheme: dark) and (prefers-contrast: more)`.

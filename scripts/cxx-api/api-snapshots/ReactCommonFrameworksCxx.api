@@ -3568,6 +3568,11 @@ enum facebook::react::MediaContrast : uint8_t {
   NoPreference,
 }
 
+enum facebook::react::MediaOrientation : uint8_t {
+  Landscape,
+  Portrait,
+}
+
 enum facebook::react::NullValueStrategy {
   Ignore,
   Override,
@@ -4547,6 +4552,7 @@ struct facebook::react::MediaFeatures {
   public bool operator==(const facebook::react::MediaFeatures& other) const = default;
   public facebook::react::MediaColorScheme colorScheme;
   public facebook::react::MediaContrast contrast;
+  public facebook::react::MediaOrientation orientation;
 }
 
 struct facebook::react::Point {

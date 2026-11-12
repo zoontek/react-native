@@ -239,13 +239,16 @@ void NativeFantom::enqueueScrollEvent(
 void NativeFantom::setMediaFeatures(
     jsi::Runtime& runtime,
     const std::string& colorScheme,
-    const std::string& contrast) {
+    const std::string& contrast,
+    const std::string& orientation) {
   facebook::react::setMediaFeatures({
       .colorScheme = colorScheme == "dark" ? MediaColorScheme::Dark
                                            : MediaColorScheme::Light,
       .contrast = contrast == "more" ? MediaContrast::More
           : contrast == "less"       ? MediaContrast::Less
                                      : MediaContrast::NoPreference,
+      .orientation = orientation == "landscape" ? MediaOrientation::Landscape
+                                                : MediaOrientation::Portrait,
   });
   UIManagerBinding::getBinding(runtime)
       ->getUIManager()

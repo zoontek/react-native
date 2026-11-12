@@ -1515,6 +1515,11 @@ enum facebook::react::MediaContrast : uint8_t {
   NoPreference,
 }
 
+enum facebook::react::MediaOrientation : uint8_t {
+  Landscape,
+  Portrait,
+}
+
 enum facebook::react::OutlineStyle : uint8_t {
   Dashed,
   Dotted,
@@ -1874,6 +1879,7 @@ struct facebook::react::MediaFeatures {
   public bool operator==(const facebook::react::MediaFeatures& other) const = default;
   public facebook::react::MediaColorScheme colorScheme;
   public facebook::react::MediaContrast contrast;
+  public facebook::react::MediaOrientation orientation;
 }
 
 struct facebook::react::Point {

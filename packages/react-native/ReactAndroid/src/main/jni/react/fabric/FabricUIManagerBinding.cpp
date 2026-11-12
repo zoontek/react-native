@@ -122,7 +122,8 @@ void FabricUIManagerBinding::reportMount(SurfaceId surfaceId) {
 
 void FabricUIManagerBinding::updateMediaFeatures(
     jint colorScheme,
-    jint contrast) {
+    jint contrast,
+    jint orientation) {
   auto scheduler = getScheduler();
   if (!scheduler) {
     LOG(ERROR)
@@ -136,6 +137,8 @@ void FabricUIManagerBinding::updateMediaFeatures(
       .contrast = contrast == 2 ? MediaContrast::More
           : contrast == 1       ? MediaContrast::Less
                                 : MediaContrast::NoPreference,
+      .orientation = orientation == 1 ? MediaOrientation::Landscape
+                                      : MediaOrientation::Portrait,
   });
 }
 

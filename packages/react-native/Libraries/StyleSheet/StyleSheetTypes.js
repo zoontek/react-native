@@ -47,6 +47,7 @@ export type CursorValue = 'auto' | 'pointer';
  * query is used, or the `default` value. Supported media features:
  * - `(prefers-color-scheme: light | dark)`
  * - `(prefers-contrast: no-preference | less | more)`
+ * - `(orientation: portrait | landscape)`
  *
  * Features can be combined with `and`, for example
  * `'@media (prefers-color-scheme: dark) and (prefers-contrast: more)'`.

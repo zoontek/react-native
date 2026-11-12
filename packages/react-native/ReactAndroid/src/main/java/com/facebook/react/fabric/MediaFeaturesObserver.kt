@@ -33,12 +33,14 @@ internal class MediaFeaturesObserver(
     /**
      * @param colorScheme one of [COLOR_SCHEME_LIGHT] or [COLOR_SCHEME_DARK]
      * @param contrast one of [CONTRAST_NO_PREFERENCE], [CONTRAST_LESS] or [CONTRAST_MORE]
+     * @param orientation one of [ORIENTATION_PORTRAIT] or [ORIENTATION_LANDSCAPE]
      */
-    fun onMediaFeaturesChanged(colorScheme: Int, contrast: Int)
+    fun onMediaFeaturesChanged(colorScheme: Int, contrast: Int, orientation: Int)
   }
 
   private var lastColorScheme: Int? = null
   private var lastContrast: Int? = null
+  private var lastOrientation: Int? = null
 
   private val componentCallbacks =
       object : ComponentCallbacks {
@@ -91,11 +93,21 @@ internal class MediaFeaturesObserver(
     val colorScheme =
         if (UiModeUtils.isDarkMode(currentContext)) COLOR_SCHEME_DARK else COLOR_SCHEME_LIGHT
     val contrast = readContrast()
+    val orientation =
+        if (
+            currentContext.resources.configuration.orientation ==
+                Configuration.ORIENTATION_LANDSCAPE
+        )
+            ORIENTATION_LANDSCAPE
+        else ORIENTATION_PORTRAIT
 
-    if (colorScheme != lastColorScheme || contrast != lastContrast) {
+    if (
+        colorScheme != lastColorScheme || contrast != lastContrast || orientation != lastOrientation
+    ) {
       lastColorScheme = colorScheme
       lastContrast = contrast
-      listener.onMediaFeaturesChanged(colorScheme, contrast)
+      lastOrientation = orientation
+      listener.onMediaFeaturesChanged(colorScheme, contrast, orientation)
     }
   }
 
@@ -140,6 +152,8 @@ internal class MediaFeaturesObserver(
     const val CONTRAST_NO_PREFERENCE: Int = 0
     const val CONTRAST_LESS: Int = 1
     const val CONTRAST_MORE: Int = 2
+    const val ORIENTATION_PORTRAIT: Int = 0
+    const val ORIENTATION_LANDSCAPE: Int = 1
 
     private const val HIGH_TEXT_CONTRAST_ENABLED = "high_text_contrast_enabled"
   }
