@@ -121,19 +121,22 @@ function moveConditionalProps(
   if (payload == null) {
     return payload;
   }
+  const plainProps: {[key: string]: unknown} = {};
   let conditionalProps: ?{[key: string]: unknown} = null;
   for (const key in payload) {
     const value = payload[key];
     if (value instanceof ConditionalProp) {
       conditionalProps = conditionalProps ?? ({} as {[key: string]: unknown});
       conditionalProps[key] = value.definition;
-      delete payload[key];
+    } else {
+      plainProps[key] = value;
     }
   }
-  if (conditionalProps != null) {
-    payload[CONDITIONAL_PROPS_KEY] = conditionalProps;
+  if (conditionalProps == null) {
+    return payload;
   }
-  return payload;
+  plainProps[CONDITIONAL_PROPS_KEY] = conditionalProps;
+  return plainProps;
 }
 
 /**
