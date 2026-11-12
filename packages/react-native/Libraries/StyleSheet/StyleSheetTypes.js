@@ -43,6 +43,44 @@ export type DimensionValue = number | string | 'auto' | null;
 export type CursorValue = 'auto' | 'pointer';
 
 /**
+ * A style value that depends on media queries. The value of the last matching
+ * query is used, or the `default` value. Supported media features:
+ * - `(prefers-color-scheme: light | dark)`
+ * - `(prefers-contrast: no-preference | less | more)`
+ * - `(orientation: portrait | landscape)`
+ *
+ * Features can be combined with `and`, for example
+ * `'@media (prefers-color-scheme: dark) and (prefers-contrast: more)'`.
+ *
+ * ```
+ * backgroundColor: {
+ *   default: 'white',
+ *   '@media (prefers-color-scheme: dark)': 'black',
+ * }
+ * ```
+ */
+export type ConditionalStyleValue<out T> = Readonly<{
+  default: ConditionalStyleValueBranch<T>,
+  [mediaQuery: string]: ConditionalStyleValueBranch<T>,
+}>;
+
+// One level of nested conditions is typed. A recursive type makes Flow
+// overflow its stack.
+type ConditionalStyleValueBranch<out T> =
+  | T
+  | Readonly<{
+      default: T,
+      [mediaQuery: string]: T,
+    }>;
+
+/**
+ * A style object where each value can be a `ConditionalStyleValue`.
+ */
+export type WithConditionalStyleValues<out T> = T extends {...}
+  ? {readonly [K in keyof T]: T[K] | ConditionalStyleValue<T[K]>}
+  : T;
+
+/**
  * React Native's layout system is based on Flexbox and is powered both
  * on iOS and Android by an open source project called `Yoga`:
  * https://github.com/facebook/yoga
@@ -1096,7 +1134,13 @@ export type ____DangerouslyImpreciseStyle_Internal = Readonly<{
 }>;
 
 export type StyleProp<out T> =
-  null | void | T | false | '' | ReadonlyArray<StyleProp<T>>;
+  | null
+  | void
+  | T
+  | WithConditionalStyleValues<T>
+  | false
+  | ''
+  | ReadonlyArray<StyleProp<T>>;
 
 export type ____DangerouslyImpreciseStyleProp_Internal = StyleProp<
   Partial<____DangerouslyImpreciseStyle_Internal>,
@@ -1118,7 +1162,9 @@ export type ____ImageStyleProp_Internal = StyleProp<
 export type ____Styles_Internal = {
   // $FlowFixMe[incompatible-exact]
   // $FlowFixMe[incompatible-type]
-  readonly [key: string]: Partial<____DangerouslyImpreciseStyle_Internal>,
+  readonly [key: string]: Partial<
+    WithConditionalStyleValues<____DangerouslyImpreciseStyle_Internal>,
+  >,
   ...
 };
 

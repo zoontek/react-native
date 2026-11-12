@@ -10,6 +10,8 @@
 #include <react/cxxstableapi/UmbrellaGuard.h>
 
 #include <React/RendererDebug.h>
+#include <folly/dynamic.h>
+#include <react/renderer/core/MediaFeatures.h>
 #include <react/renderer/core/PropsMacros.h>
 #include <react/renderer/core/PropsParserContext.h>
 #include <react/renderer/core/RawProps.h>
@@ -18,7 +20,6 @@
 
 #ifdef ANDROID
 #include <React/MapBuffer.h>
-#include <folly/dynamic.h>
 #endif
 
 namespace facebook::react {
@@ -60,6 +61,18 @@ class Props : public virtual Sealable, public virtual DebugStringConvertible {
   setProp(const PropsParserContext &context, RawPropsPropNameHash hash, const char *propName, const RawValue &value);
 
   std::string nativeId;
+
+  /*
+   * The conditional values of these props (for example, values that depend on
+   * `@media (prefers-color-scheme: dark)`), by prop name, in the format of
+   * `ConditionalProps.h`. `nullptr` when there are none.
+   */
+  std::shared_ptr<const folly::dynamic> conditionalProps;
+
+  /*
+   * The media features that `conditionalProps` were resolved with.
+   */
+  MediaFeatures conditionalPropsMediaFeatures{};
 
 #ifdef RN_SERIALIZABLE_STATE
   folly::dynamic rawProps = folly::dynamic::object();

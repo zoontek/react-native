@@ -300,9 +300,15 @@ let BaseImage: AbstractImageAndroid = ({
   }
 
   const flattenedStyle_ = flattenStyle<ImageStyleProp>(style);
-  const objectFit_ = convertObjectFitToResizeMode(flattenedStyle_?.objectFit);
+  const styleObjectFit_ = flattenedStyle_?.objectFit;
+  // A conditional value (with media queries) is not converted.
+  const objectFit_ =
+    typeof styleObjectFit_ === 'string'
+      ? convertObjectFitToResizeMode(styleObjectFit_)
+      : undefined;
   const resizeMode_ =
     objectFit_ || resizeMode || flattenedStyle_?.resizeMode || 'cover';
+  // $FlowFixMe[incompatible-type] A conditional value is resolved natively.
   nativeProps.resizeMode = resizeMode_;
 
   const actualRef = useWrapRefWithImageAttachedCallbacks(forwardedRef);

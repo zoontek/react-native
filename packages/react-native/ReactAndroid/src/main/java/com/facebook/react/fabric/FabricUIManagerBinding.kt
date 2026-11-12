@@ -85,6 +85,8 @@ internal class FabricUIManagerBinding : HybridClassBase() {
 
   external fun reportMount(surfaceId: Int)
 
+  external fun updateMediaFeatures(colorScheme: Int, contrast: Int, orientation: Int)
+
   external fun pullAndExecuteTransaction(surfaceId: Int)
 
   external fun mergeReactRevision(surfaceId: Int)

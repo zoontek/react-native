@@ -195,13 +195,14 @@ const TextImpl: component(
         String(processedStyle.fontWeight) as TextStyle['fontWeight'];
     }
 
-    if (processedStyle.userSelect != null) {
+    // A conditional value (with media queries) is not converted.
+    if (typeof processedStyle.userSelect === 'string') {
       _selectable = userSelectToSelectableMap[processedStyle.userSelect];
       overrides = overrides || ({} as {...TextStyle});
       overrides.userSelect = undefined;
     }
 
-    if (processedStyle.verticalAlign != null) {
+    if (typeof processedStyle.verticalAlign === 'string') {
       overrides = overrides || ({} as {...TextStyle});
       overrides.textAlignVertical =
         verticalAlignToTextAlignVerticalMap[processedStyle.verticalAlign];

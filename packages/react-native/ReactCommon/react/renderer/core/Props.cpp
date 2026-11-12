@@ -26,7 +26,10 @@ Props::Props(
           rawProps,
           "nativeID",
           sourceProps.nativeId,
-          {})) {}
+          {})),
+      conditionalProps(sourceProps.conditionalProps),
+      conditionalPropsMediaFeatures(sourceProps.conditionalPropsMediaFeatures) {
+}
 
 void Props::setProp(
     const PropsParserContext& context,

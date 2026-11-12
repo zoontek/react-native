@@ -178,6 +178,7 @@ public class FabricUIManager
   }
 
   @Nullable private FabricUIManagerBinding mBinding;
+  @Nullable private MediaFeaturesObserver mMediaFeaturesObserver;
   private final ReactApplicationContext mReactApplicationContext;
   private final MountingManager mMountingManager;
   private final FabricEventDispatcher mEventDispatcher;
@@ -460,9 +461,32 @@ public class FabricUIManager
     mBinding.stopSurface(surfaceID);
   }
 
+  /**
+   * Call this when the configuration of an activity changes: changes made with {@code
+   * AppCompatDelegate.setDefaultNightMode()} only reach the activity.
+   */
+  @UiThread
+  @UnstableReactNativeAPI
+  public void onConfigurationChanged(Context context) {
+    MediaFeaturesObserver mediaFeaturesObserver = mMediaFeaturesObserver;
+    if (mediaFeaturesObserver != null) {
+      mediaFeaturesObserver.update(context);
+    }
+  }
+
   @Override
   public void initialize() {
     mEventDispatcher.addBatchEventDispatchedListener(mBatchEventDispatchedListener);
+    mMediaFeaturesObserver =
+        new MediaFeaturesObserver(
+            mReactApplicationContext,
+            (colorScheme, contrast, orientation) -> {
+              FabricUIManagerBinding binding = mBinding;
+              if (binding != null) {
+                binding.updateMediaFeatures(colorScheme, contrast, orientation);
+              }
+            });
+    mMediaFeaturesObserver.start();
     if (ReactNativeFeatureFlags.enableFabricLogs()) {
       mDevToolsReactPerfLogger = new DevToolsReactPerfLogger();
       mDevToolsReactPerfLogger.addDevToolsReactPerfLoggerListener(FABRIC_PERF_LOGGER);
@@ -501,6 +525,11 @@ public class FabricUIManager
 
     mReactApplicationContext.unregisterComponentCallbacks(mViewManagerRegistry);
     mViewManagerRegistry.invalidate();
+
+    if (mMediaFeaturesObserver != null) {
+      mMediaFeaturesObserver.stop();
+      mMediaFeaturesObserver = null;
+    }
 
     // Remove lifecycle listeners (onHostResume, onHostPause) since the FabricUIManager is going
     // away. Then stop the mDispatchUIFrameCallback false will cause the choreographer

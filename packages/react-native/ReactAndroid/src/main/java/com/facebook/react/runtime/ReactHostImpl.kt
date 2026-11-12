@@ -745,6 +745,8 @@ public class ReactHostImpl(
 
       val appearanceModule = currentReactContext.getNativeModule(AppearanceModule::class.java)
       appearanceModule?.onConfigurationChanged(context)
+
+      uiManager?.onConfigurationChanged(context)
     }
   }
 

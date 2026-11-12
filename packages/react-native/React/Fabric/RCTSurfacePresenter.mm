@@ -115,6 +115,23 @@ class ReactRevisionMergeRunLoopObserverDelegate final : public RunLoopObserver::
                                              selector:@selector(_applicationWillTerminate)
                                                  name:UIApplicationWillTerminateNotification
                                                object:nil];
+
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(_updateMediaFeatures:)
+                                                 name:RCTUserInterfaceStyleDidChangeNotification
+                                               object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(_updateMediaFeatures:)
+                                                 name:UIAccessibilityDarkerSystemColorsStatusDidChangeNotification
+                                               object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(_updateMediaFeatures:)
+                                                 name:RCTWindowFrameDidChangeNotification
+                                               object:nil];
+    __weak RCTSurfacePresenter *weakSelf = self;
+    RCTExecuteOnMainQueue(^{
+      [weakSelf _updateMediaFeatures:nil];
+    });
   }
 
   return self;
@@ -263,6 +280,24 @@ class ReactRevisionMergeRunLoopObserverDelegate final : public RunLoopObserver::
 }
 
 #pragma mark - Private
+
+- (void)_updateMediaFeatures:(NSNotification *_Nullable)notification
+{
+  RCTAssertMainQueue();
+
+  UIWindow *window = RCTKeyWindow();
+  UITraitCollection *traitCollection = notification.userInfo[RCTUserInterfaceStyleDidChangeNotificationTraitCollectionKey]
+      ?: window.traitCollection ?: UITraitCollection.currentTraitCollection;
+  CGSize windowSize = window != nil ? window.bounds.size : UIScreen.screens.firstObject.bounds.size;
+
+  MediaFeatures mediaFeatures{
+      .colorScheme = traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark ? MediaColorScheme::Dark
+                                                                                    : MediaColorScheme::Light,
+      .contrast = UIAccessibilityDarkerSystemColorsEnabled() ? MediaContrast::More : MediaContrast::NoPreference,
+      .orientation = windowSize.width > windowSize.height ? MediaOrientation::Landscape : MediaOrientation::Portrait,
+  };
+  [self.scheduler updateMediaFeatures:mediaFeatures];
+}
 
 - (RCTScheduler *)_createScheduler
 {

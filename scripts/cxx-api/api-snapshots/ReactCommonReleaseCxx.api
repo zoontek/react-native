@@ -73,6 +73,7 @@ struct facebook::hermes::ISetEventLoopControl : public facebook::jsi::ICast {
 
 const char facebook::react::ViewComponentName[];
 const facebook::react::EventTag facebook::react::EMPTY_EVENT_TAG;
+constexpr char* facebook::react::kConditionalPropsName;
 constexpr facebook::react::ReactNativeVersionType facebook::react::ReactNativeVersion;
 constexpr facebook::react::Tag facebook::react::kNoTag;
 constexpr uint32_t facebook::react::INITIAL_BUCKETS_SIZE;
@@ -159,6 +160,8 @@ YGDirection facebook::react::yogaDirectionFromLayoutDirection(facebook::react::L
 bool facebook::react::areBorderRadiiCircular(const facebook::react::BorderRadii& borderRadii);
 bool facebook::react::isColorMeaningful(const facebook::react::SharedColor& color) noexcept;
 bool facebook::react::isZero(Float n);
+bool facebook::react::matchMediaQuery(std::string_view query, const facebook::react::MediaFeatures& features) noexcept;
+bool facebook::react::setMediaFeatures(const facebook::react::MediaFeatures& features) noexcept;
 constexpr auto facebook::react::to_underlying(auto e) noexcept;
 constexpr char facebook::react::toLower(char c);
 constexpr uint32_t facebook::react::fnv1aLowercase(std::string_view string);
@@ -167,6 +170,7 @@ facebook::react::ColorComponents facebook::react::colorComponentsFromColor(faceb
 facebook::react::ColorSpace facebook::react::getDefaultColorSpace();
 facebook::react::DisplayType facebook::react::displayTypeFromYGDisplay(YGDisplay display);
 facebook::react::LayoutMetrics facebook::react::layoutMetricsFromYogaNode(facebook::yoga::Node& yogaNode);
+facebook::react::MediaFeatures facebook::react::getMediaFeatures() noexcept;
 facebook::react::Rect facebook::react::insetBy(const facebook::react::Rect& rect, const facebook::react::EdgeInsets& insets) noexcept;
 facebook::react::Rect facebook::react::outsetBy(const facebook::react::Rect& rect, const facebook::react::EdgeInsets& outsets) noexcept;
 facebook::react::SharedColor facebook::react::blackColor();
@@ -180,10 +184,12 @@ facebook::react::ValueUnit facebook::react::toValueUnit(const facebook::react::R
 facebook::yoga::FloatOptional facebook::react::convertAspectRatio(const facebook::react::PropsParserContext&, const facebook::react::RawValue& value);
 facebook::yoga::FloatOptional facebook::react::yogaOptionalFloatFromFloat(Float value);
 float facebook::react::yogaFloatFromFloat(Float value);
+folly::dynamic facebook::react::resolveConditionalValue(const folly::dynamic& conditionalValue, const facebook::react::MediaFeatures& features);
 int facebook::react::toInt(const facebook::react::DisplayType& displayType);
 int facebook::react::toInt(const facebook::react::LayoutDirection& layoutDirection);
 std::optional<Float> facebook::react::optionalFloatFromYogaValue(const facebook::yoga::Style::Length& length, std::optional<Float> base = {});
 std::optional<facebook::react::BlendMode> facebook::react::blendModeFromString(std::string_view blendModeName);
+std::optional<facebook::react::ConditionalPropsResolution> facebook::react::resolveConditionalProps(const facebook::react::Props* sourceProps, const facebook::react::RawProps& rawProps);
 std::optional<facebook::react::FilterType> facebook::react::filterTypeFromString(std::string_view filterName);
 std::optional<facebook::react::Isolation> facebook::react::isolationFromString(std::string_view isolationSetting);
 std::string facebook::react::toString(const double& value);
@@ -947,7 +953,9 @@ class facebook::react::Props : public virtual facebook::react::Sealable, public 
   public Props() = default;
   public Props(const facebook::react::Props& other) = default;
   public Props(const facebook::react::PropsParserContext& context, const facebook::react::Props& sourceProps, const facebook::react::RawProps& rawProps, const std::function<bool(const std::string&)>& filterObjectKeys = nullptr);
+  public facebook::react::MediaFeatures conditionalPropsMediaFeatures;
   public facebook::react::Props& operator=(const facebook::react::Props& other) = delete;
+  public std::shared_ptr<const folly::dynamic> conditionalProps;
   public std::string nativeId;
   public using Shared = std::shared_ptr<const facebook::react::Props>;
   public virtual ~Props() = default;
@@ -960,6 +968,7 @@ class facebook::react::RawProps {
   public RawProps(facebook::jsi::Runtime& runtime, const facebook::jsi::Value& value) noexcept;
   public RawProps(facebook::react::RawProps&& other) noexcept = default;
   public RawProps(folly::dynamic dynamic) noexcept;
+  public bool hasProperty(const char* name) const;
   public bool isEmpty() const noexcept;
   public const facebook::react::RawValue* at(const char* name) const noexcept;
   public const facebook::react::RawValue* at(const char* name, const char* prefix, const char* suffix) const noexcept;
@@ -1495,6 +1504,22 @@ enum facebook::react::LayoutDirection {
   Undefined,
 }
 
+enum facebook::react::MediaColorScheme : uint8_t {
+  Dark,
+  Light,
+}
+
+enum facebook::react::MediaContrast : uint8_t {
+  Less,
+  More,
+  NoPreference,
+}
+
+enum facebook::react::MediaOrientation : uint8_t {
+  Landscape,
+  Portrait,
+}
+
 enum facebook::react::OutlineStyle : uint8_t {
   Dashed,
   Dotted,
@@ -1770,6 +1795,12 @@ struct facebook::react::ColorStop {
   public facebook::react::ValueUnit position;
 }
 
+struct facebook::react::ConditionalPropsResolution {
+  public facebook::react::MediaFeatures mediaFeatures;
+  public facebook::react::RawProps rawProps;
+  public std::shared_ptr<const folly::dynamic> conditionalProps;
+}
+
 struct facebook::react::CornerRadii {
   public bool operator==(const facebook::react::CornerRadii& other) const = default;
   public float horizontal;
@@ -1842,6 +1873,13 @@ struct facebook::react::LinearGradient {
   public bool operator==(const facebook::react::LinearGradient& other) const = default;
   public facebook::react::GradientDirection direction;
   public std::vector<facebook::react::ColorStop> colorStops;
+}
+
+struct facebook::react::MediaFeatures {
+  public bool operator==(const facebook::react::MediaFeatures& other) const = default;
+  public facebook::react::MediaColorScheme colorScheme;
+  public facebook::react::MediaContrast contrast;
+  public facebook::react::MediaOrientation orientation;
 }
 
 struct facebook::react::Point {

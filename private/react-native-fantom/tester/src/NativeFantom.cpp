@@ -13,6 +13,7 @@
 #include <react/debug/flags.h>
 #include <react/renderer/components/modal/ModalHostViewShadowNode.h>
 #include <react/renderer/components/scrollview/ScrollViewShadowNode.h>
+#include <react/renderer/core/MediaFeatures.h>
 #include <react/renderer/uimanager/UIManagerBinding.h>
 #include <algorithm>
 #include <fstream>
@@ -233,6 +234,25 @@ void NativeFantom::enqueueScrollEvent(
         return std::make_shared<
             const ScrollViewShadowNode::ConcreteState::Data>(newData);
       });
+}
+
+void NativeFantom::setMediaFeatures(
+    jsi::Runtime& runtime,
+    const std::string& colorScheme,
+    const std::string& contrast,
+    const std::string& orientation) {
+  facebook::react::setMediaFeatures({
+      .colorScheme = colorScheme == "dark" ? MediaColorScheme::Dark
+                                           : MediaColorScheme::Light,
+      .contrast = contrast == "more" ? MediaContrast::More
+          : contrast == "less"       ? MediaContrast::Less
+                                     : MediaContrast::NoPreference,
+      .orientation = orientation == "landscape" ? MediaOrientation::Landscape
+                                                : MediaOrientation::Portrait,
+  });
+  UIManagerBinding::getBinding(runtime)
+      ->getUIManager()
+      .updateConditionalProps();
 }
 
 void NativeFantom::enqueueModalSizeUpdate(

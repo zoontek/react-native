@@ -96,6 +96,12 @@ class RawProps final {
   bool isEmpty() const noexcept;
 
   /*
+   * Returns `true` if the source object has a prop with the given name.
+   * Does not require a prior `parse(parser)` call.
+   */
+  bool hasProperty(const char *name) const;
+
+  /*
    * Returns a const unowning pointer to `RawValue` of a prop with a given name.
    * Returns `nullptr` if a prop with the given name does not exist.
    */

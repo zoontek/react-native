@@ -138,6 +138,11 @@ interface Spec extends TurboModule {
   setImageResponse(uri: string, imageResponse: ImageResponse): void;
   clearImage(uri: string): void;
   clearAllImages(): void;
+  setMediaFeatures: (
+    colorScheme: string,
+    contrast: string,
+    orientation: string,
+  ) => void;
 }
 
 export default TurboModuleRegistry.getEnforcing<Spec>(

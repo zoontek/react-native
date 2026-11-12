@@ -459,6 +459,23 @@ void Scheduler::reportMount(SurfaceId surfaceId) const {
   uiManager_->reportMount(surfaceId);
 }
 
+void Scheduler::updateMediaFeatures(const MediaFeatures& mediaFeatures) {
+  // The media features are global to the process: another scheduler may
+  // already have set them. `mediaFeatures_` tells whether the shadow trees of
+  // this scheduler still need an update.
+  setMediaFeatures(mediaFeatures);
+  if (mediaFeatures_.exchange(mediaFeatures) == mediaFeatures) {
+    return;
+  }
+
+  runtimeExecutor_([weakUIManager = std::weak_ptr<const UIManager>(uiManager_)](
+                       jsi::Runtime& /*runtime*/) {
+    if (auto uiManager = weakUIManager.lock()) {
+      uiManager->updateConditionalProps();
+    }
+  });
+}
+
 std::shared_ptr<const ContextContainer> Scheduler::getContextContainer() const {
   return contextContainer_;
 }
