@@ -158,7 +158,7 @@ class ConcreteComponentDescriptor : public ComponentDescriptor {
 
     if (conditionalPropsResolution) {
       shadowNodeProps->conditionalProps = std::move(conditionalPropsResolution->conditionalProps);
-      shadowNodeProps->conditionalPropsGeneration = conditionalPropsResolution->generation;
+      shadowNodeProps->conditionalPropsMediaFeatures = conditionalPropsResolution->mediaFeatures;
     }
 
 #ifdef RN_SERIALIZABLE_STATE

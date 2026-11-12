@@ -108,7 +108,6 @@ using facebook::react::GradientDirection = std::variant<Float, facebook::react::
 using facebook::react::HostPlatformTouch = facebook::react::BaseTouch;
 using facebook::react::HostPlatformViewEventEmitter = facebook::react::BaseViewEventEmitter;
 using facebook::react::ImageSources = std::vector<facebook::react::ImageSource>;
-using facebook::react::MediaFeaturesGeneration = uint32_t;
 using facebook::react::NativeMethodCallFunc = std::function<void()>;
 using facebook::react::PromiseSetupFunctionType = std::function<void(facebook::jsi::Runtime& rt, std::shared_ptr<facebook::react::Promise>)>;
 using facebook::react::RawPropsPropNameHash = uint32_t;
@@ -171,7 +170,7 @@ facebook::react::ColorComponents facebook::react::colorComponentsFromColor(faceb
 facebook::react::ColorSpace facebook::react::getDefaultColorSpace();
 facebook::react::DisplayType facebook::react::displayTypeFromYGDisplay(YGDisplay display);
 facebook::react::LayoutMetrics facebook::react::layoutMetricsFromYogaNode(facebook::yoga::Node& yogaNode);
-facebook::react::MediaFeaturesSnapshot facebook::react::getMediaFeaturesSnapshot() noexcept;
+facebook::react::MediaFeatures facebook::react::getMediaFeatures() noexcept;
 facebook::react::Rect facebook::react::insetBy(const facebook::react::Rect& rect, const facebook::react::EdgeInsets& insets) noexcept;
 facebook::react::Rect facebook::react::outsetBy(const facebook::react::Rect& rect, const facebook::react::EdgeInsets& outsets) noexcept;
 facebook::react::SharedColor facebook::react::blackColor();
@@ -954,7 +953,7 @@ class facebook::react::Props : public virtual facebook::react::Sealable, public 
   public Props() = default;
   public Props(const facebook::react::Props& other) = default;
   public Props(const facebook::react::PropsParserContext& context, const facebook::react::Props& sourceProps, const facebook::react::RawProps& rawProps, const std::function<bool(const std::string&)>& filterObjectKeys = nullptr);
-  public facebook::react::MediaFeaturesGeneration conditionalPropsGeneration;
+  public facebook::react::MediaFeatures conditionalPropsMediaFeatures;
   public facebook::react::Props& operator=(const facebook::react::Props& other) = delete;
   public std::shared_ptr<const folly::dynamic> conditionalProps;
   public std::string nativeId;
@@ -1792,7 +1791,7 @@ struct facebook::react::ColorStop {
 }
 
 struct facebook::react::ConditionalPropsResolution {
-  public facebook::react::MediaFeaturesGeneration generation;
+  public facebook::react::MediaFeatures mediaFeatures;
   public facebook::react::RawProps rawProps;
   public std::shared_ptr<const folly::dynamic> conditionalProps;
 }
@@ -1875,11 +1874,6 @@ struct facebook::react::MediaFeatures {
   public bool operator==(const facebook::react::MediaFeatures& other) const = default;
   public facebook::react::MediaColorScheme colorScheme;
   public facebook::react::MediaContrast contrast;
-}
-
-struct facebook::react::MediaFeaturesSnapshot {
-  public facebook::react::MediaFeatures features;
-  public facebook::react::MediaFeaturesGeneration generation;
 }
 
 struct facebook::react::Point {

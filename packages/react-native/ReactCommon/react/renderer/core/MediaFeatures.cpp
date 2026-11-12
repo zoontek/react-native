@@ -13,29 +13,7 @@ namespace facebook::react {
 
 namespace {
 
-// The generation and the media features are packed in one value, so that a
-// single atomic read gives a consistent snapshot.
-std::atomic<uint64_t> packedMediaFeatures{0};
-
-uint64_t pack(
-    const MediaFeatures& features,
-    MediaFeaturesGeneration generation) noexcept {
-  return (static_cast<uint64_t>(generation) << 16) |
-      (static_cast<uint64_t>(features.colorScheme) << 8) |
-      static_cast<uint64_t>(features.contrast);
-}
-
-MediaFeaturesSnapshot unpack(uint64_t packed) noexcept {
-  return {
-      .features =
-          {
-              .colorScheme =
-                  static_cast<MediaColorScheme>((packed >> 8) & 0xff),
-              .contrast = static_cast<MediaContrast>(packed & 0xff),
-          },
-      .generation = static_cast<MediaFeaturesGeneration>(packed >> 16),
-  };
-}
+std::atomic<MediaFeatures> currentMediaFeatures{MediaFeatures{}};
 
 char toLowerAscii(char c) noexcept {
   return (c >= 'A' && c <= 'Z') ? static_cast<char>(c - 'A' + 'a') : c;
@@ -107,25 +85,13 @@ bool matchMediaFeature(
 
 } // namespace
 
-MediaFeaturesSnapshot getMediaFeaturesSnapshot() noexcept {
-  return unpack(packedMediaFeatures.load(std::memory_order_acquire));
+MediaFeatures getMediaFeatures() noexcept {
+  return currentMediaFeatures.load(std::memory_order_acquire);
 }
 
 bool setMediaFeatures(const MediaFeatures& features) noexcept {
-  auto packed = packedMediaFeatures.load(std::memory_order_acquire);
-  while (true) {
-    auto snapshot = unpack(packed);
-    if (snapshot.features == features) {
-      return false;
-    }
-    if (packedMediaFeatures.compare_exchange_weak(
-            packed,
-            pack(features, snapshot.generation + 1),
-            std::memory_order_acq_rel,
-            std::memory_order_acquire)) {
-      return true;
-    }
-  }
+  return currentMediaFeatures.exchange(features, std::memory_order_acq_rel) !=
+      features;
 }
 
 bool matchMediaQuery(

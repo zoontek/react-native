@@ -30,22 +30,9 @@ struct MediaFeatures {
 };
 
 /*
- * Each change of the media features increments the generation. Props keep the
- * generation of the media features that their conditional values were resolved
- * with, so that the renderer can find the props to resolve again.
+ * Returns the current media features of the process. Thread-safe.
  */
-using MediaFeaturesGeneration = uint32_t;
-
-struct MediaFeaturesSnapshot {
-  MediaFeatures features;
-  MediaFeaturesGeneration generation;
-};
-
-/*
- * Returns the current media features of the process, and their generation.
- * Thread-safe.
- */
-MediaFeaturesSnapshot getMediaFeaturesSnapshot() noexcept;
+MediaFeatures getMediaFeatures() noexcept;
 
 /*
  * Sets the current media features of the process. Returns `true` if they

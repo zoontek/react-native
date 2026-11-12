@@ -461,6 +461,19 @@ public class FabricUIManager
     mBinding.stopSurface(surfaceID);
   }
 
+  /**
+   * Call this when the configuration of an activity changes: changes made with {@code
+   * AppCompatDelegate.setDefaultNightMode()} only reach the activity.
+   */
+  @UiThread
+  @UnstableReactNativeAPI
+  public void onConfigurationChanged(Context context) {
+    MediaFeaturesObserver mediaFeaturesObserver = mMediaFeaturesObserver;
+    if (mediaFeaturesObserver != null) {
+      mediaFeaturesObserver.update(context);
+    }
+  }
+
   @Override
   public void initialize() {
     mEventDispatcher.addBatchEventDispatchedListener(mBatchEventDispatchedListener);

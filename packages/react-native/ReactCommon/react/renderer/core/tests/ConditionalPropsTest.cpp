@@ -107,15 +107,14 @@ TEST_F(ConditionalPropsTest, resolvesNewConditionalValues) {
   EXPECT_EQ(
       *resolution->conditionalProps,
       folly::dynamic(folly::dynamic::object("opacity", opacityValue())));
-  EXPECT_EQ(resolution->generation, getMediaFeaturesSnapshot().generation);
+  EXPECT_EQ(resolution->mediaFeatures, kDark);
 }
 
 TEST_F(ConditionalPropsTest, keepsUpToDateConditionalValuesOfTheSource) {
   Props sourceProps;
   sourceProps.conditionalProps = std::make_shared<const folly::dynamic>(
       folly::dynamic::object("opacity", opacityValue()));
-  sourceProps.conditionalPropsGeneration =
-      getMediaFeaturesSnapshot().generation;
+  sourceProps.conditionalPropsMediaFeatures = kLight;
 
   auto rawProps = RawProps(folly::dynamic::object("nativeID", "box"));
   EXPECT_FALSE(resolveConditionalProps(&sourceProps, rawProps).has_value());
@@ -125,8 +124,7 @@ TEST_F(ConditionalPropsTest, dropsConditionalValuesReplacedByPlainValues) {
   Props sourceProps;
   sourceProps.conditionalProps = std::make_shared<const folly::dynamic>(
       folly::dynamic::object("opacity", opacityValue()));
-  sourceProps.conditionalPropsGeneration =
-      getMediaFeaturesSnapshot().generation;
+  sourceProps.conditionalPropsMediaFeatures = kLight;
 
   auto rawProps = RawProps(folly::dynamic::object("opacity", 0.5));
   auto resolution = resolveConditionalProps(&sourceProps, rawProps);
@@ -141,8 +139,7 @@ TEST_F(ConditionalPropsTest, resolvesOutdatedConditionalValuesOfTheSource) {
   Props sourceProps;
   sourceProps.conditionalProps = std::make_shared<const folly::dynamic>(
       folly::dynamic::object("opacity", opacityValue()));
-  sourceProps.conditionalPropsGeneration =
-      getMediaFeaturesSnapshot().generation;
+  sourceProps.conditionalPropsMediaFeatures = kLight;
 
   setMediaFeatures(kDarkMoreContrast);
 
@@ -154,5 +151,5 @@ TEST_F(ConditionalPropsTest, resolvesOutdatedConditionalValuesOfTheSource) {
       folly::dynamic(folly::dynamic::object("opacity", 3)));
   ASSERT_NE(resolution->conditionalProps, nullptr);
   EXPECT_EQ(*resolution->conditionalProps, *sourceProps.conditionalProps);
-  EXPECT_EQ(resolution->generation, getMediaFeaturesSnapshot().generation);
+  EXPECT_EQ(resolution->mediaFeatures, kDarkMoreContrast);
 }

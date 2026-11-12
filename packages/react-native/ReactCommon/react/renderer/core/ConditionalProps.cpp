@@ -65,9 +65,9 @@ std::optional<ConditionalPropsResolution> resolveConditionalProps(
     return std::nullopt;
   }
 
-  auto snapshot = getMediaFeaturesSnapshot();
+  auto mediaFeatures = getMediaFeatures();
   auto isStale = sourceConditionalProps != nullptr &&
-      sourceProps->conditionalPropsGeneration != snapshot.generation;
+      sourceProps->conditionalPropsMediaFeatures != mediaFeatures;
 
   if (!hasNewConditionalProps && !isStale) {
     // The source conditional values are up to date. They only change if
@@ -105,8 +105,7 @@ std::optional<ConditionalPropsResolution> resolveConditionalProps(
   }
 
   for (const auto& item : newConditionalProps.items()) {
-    values[item.first] =
-        resolveConditionalValue(item.second, snapshot.features);
+    values[item.first] = resolveConditionalValue(item.second, mediaFeatures);
     conditionalProps[item.first] = item.second;
   }
 
@@ -114,7 +113,7 @@ std::optional<ConditionalPropsResolution> resolveConditionalProps(
     for (const auto& item : conditionalProps.items()) {
       if (newConditionalProps.count(item.first) == 0) {
         values[item.first] =
-            resolveConditionalValue(item.second, snapshot.features);
+            resolveConditionalValue(item.second, mediaFeatures);
       }
     }
   }
@@ -124,7 +123,7 @@ std::optional<ConditionalPropsResolution> resolveConditionalProps(
       .conditionalProps = conditionalProps.empty()
           ? nullptr
           : std::make_shared<const folly::dynamic>(std::move(conditionalProps)),
-      .generation = snapshot.generation,
+      .mediaFeatures = mediaFeatures,
   };
 }
 

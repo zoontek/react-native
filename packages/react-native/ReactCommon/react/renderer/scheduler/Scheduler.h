@@ -139,9 +139,8 @@ class Scheduler final : public UIManagerDelegate {
   RuntimeExecutor runtimeExecutor_;
   std::shared_ptr<UIManager> uiManager_;
 
-  // The generation of the media features that this scheduler last updated its
-  // shadow trees for.
-  std::atomic<MediaFeaturesGeneration> mediaFeaturesGeneration_{0};
+  // The media features that this scheduler last updated its shadow trees for.
+  std::atomic<MediaFeatures> mediaFeatures_{MediaFeatures{}};
 
   std::vector<std::shared_ptr<UIManagerCommitHook>> commitHooks_;
 

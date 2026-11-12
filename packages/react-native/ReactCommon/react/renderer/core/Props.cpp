@@ -28,7 +28,7 @@ Props::Props(
           sourceProps.nativeId,
           {})),
       conditionalProps(sourceProps.conditionalProps),
-      conditionalPropsGeneration(sourceProps.conditionalPropsGeneration) {}
+      conditionalPropsMediaFeatures(sourceProps.conditionalPropsMediaFeatures) {}
 
 void Props::setProp(
     const PropsParserContext& context,

@@ -56,14 +56,14 @@ struct ConditionalPropsResolution {
   std::shared_ptr<const folly::dynamic> conditionalProps;
 
   /*
-   * The generation of the media features that the values were resolved with.
+   * The media features that the values were resolved with.
    */
-  MediaFeaturesGeneration generation;
+  MediaFeatures mediaFeatures;
 };
 
 /*
  * Merges the conditional values of `sourceProps` and `rawProps`, and resolves
- * the ones that are new or that were resolved with older media features.
+ * the ones that are new or that were resolved with other media features.
  *
  * Returns `std::nullopt` when the new props can use `rawProps` as they are,
  * and keep the conditional values of `sourceProps` (the common case).

@@ -19,8 +19,6 @@ import androidx.annotation.RequiresApi
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.UiThreadUtil
 import com.facebook.react.views.common.UiModeUtils
-import java.util.Collections
-import java.util.WeakHashMap
 
 /**
  * Reads the media features that conditional props are matched against (for example with `@media
@@ -65,7 +63,6 @@ internal class MediaFeaturesObserver(
   private var contrastChangeListener: Any? = null
 
   fun start() {
-    activeObservers.add(this)
     reactContext.registerComponentCallbacks(componentCallbacks)
     reactContext.contentResolver.registerContentObserver(
         Settings.Secure.getUriFor(HIGH_TEXT_CONTRAST_ENABLED),
@@ -79,7 +76,6 @@ internal class MediaFeaturesObserver(
   }
 
   fun stop() {
-    activeObservers.remove(this)
     reactContext.unregisterComponentCallbacks(componentCallbacks)
     reactContext.contentResolver.unregisterContentObserver(highTextContrastObserver)
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
@@ -146,16 +142,5 @@ internal class MediaFeaturesObserver(
     const val CONTRAST_MORE: Int = 2
 
     private const val HIGH_TEXT_CONTRAST_ENABLED = "high_text_contrast_enabled"
-
-    private val activeObservers: MutableSet<MediaFeaturesObserver> =
-        Collections.synchronizedSet(Collections.newSetFromMap(WeakHashMap()))
-
-    /**
-     * Call this when the configuration of an activity changes: changes made with
-     * `AppCompatDelegate.setDefaultNightMode()` only reach the activity.
-     */
-    fun onConfigurationChanged(context: Context) {
-      synchronized(activeObservers) { activeObservers.toList() }.forEach { it.update(context) }
-    }
   }
 }

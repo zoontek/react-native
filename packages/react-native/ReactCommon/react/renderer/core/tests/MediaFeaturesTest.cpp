@@ -100,17 +100,14 @@ TEST(MediaFeaturesTest, neverMatchesUnsupportedQueries) {
   EXPECT_FALSE(matchMediaQuery("", kLight));
 }
 
-TEST(MediaFeaturesTest, incrementsTheGenerationOnlyOnChange) {
+TEST(MediaFeaturesTest, reportsOnlyChanges) {
   setMediaFeatures(kLight);
-  auto generation = getMediaFeaturesSnapshot().generation;
 
   EXPECT_FALSE(setMediaFeatures(kLight));
-  EXPECT_EQ(getMediaFeaturesSnapshot().generation, generation);
+  EXPECT_EQ(getMediaFeatures(), kLight);
 
   EXPECT_TRUE(setMediaFeatures(kDarkMoreContrast));
-  auto snapshot = getMediaFeaturesSnapshot();
-  EXPECT_EQ(snapshot.generation, generation + 1);
-  EXPECT_EQ(snapshot.features, kDarkMoreContrast);
+  EXPECT_EQ(getMediaFeatures(), kDarkMoreContrast);
 
   setMediaFeatures(kLight);
 }

@@ -129,7 +129,7 @@ void FabricUIManagerBinding::updateMediaFeatures(
         << "FabricUIManagerBinding::updateMediaFeatures: scheduler disappeared";
     return;
   }
-  // The values match `FabricUIManager.MEDIA_*` constants.
+  // The values match the `MediaFeaturesObserver` constants.
   scheduler->updateMediaFeatures({
       .colorScheme =
           colorScheme == 1 ? MediaColorScheme::Dark : MediaColorScheme::Light,

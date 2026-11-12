@@ -461,11 +461,10 @@ void Scheduler::reportMount(SurfaceId surfaceId) const {
 
 void Scheduler::updateMediaFeatures(const MediaFeatures& mediaFeatures) {
   // The media features are global to the process: another scheduler may
-  // already have set them. Comparing generations tells whether the shadow
-  // trees of this scheduler still need an update.
+  // already have set them. `mediaFeatures_` tells whether the shadow trees of
+  // this scheduler still need an update.
   setMediaFeatures(mediaFeatures);
-  auto generation = getMediaFeaturesSnapshot().generation;
-  if (mediaFeaturesGeneration_.exchange(generation) == generation) {
+  if (mediaFeatures_.exchange(mediaFeatures) == mediaFeatures) {
     return;
   }
 

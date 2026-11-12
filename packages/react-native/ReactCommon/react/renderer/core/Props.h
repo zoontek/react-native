@@ -70,10 +70,9 @@ class Props : public virtual Sealable, public virtual DebugStringConvertible {
   std::shared_ptr<const folly::dynamic> conditionalProps;
 
   /*
-   * The generation of the media features that `conditionalProps` were resolved
-   * with.
+   * The media features that `conditionalProps` were resolved with.
    */
-  MediaFeaturesGeneration conditionalPropsGeneration{0};
+  MediaFeatures conditionalPropsMediaFeatures{};
 
 #ifdef RN_SERIALIZABLE_STATE
   folly::dynamic rawProps = folly::dynamic::object();
