@@ -55,6 +55,7 @@ import com.facebook.react.devsupport.interfaces.DevSupportManager
 import com.facebook.react.devsupport.interfaces.DevSupportManager.PausedInDebuggerOverlayCommandListener
 import com.facebook.react.fabric.ComponentFactory
 import com.facebook.react.fabric.FabricUIManager
+import com.facebook.react.fabric.MediaFeaturesObserver
 import com.facebook.react.interfaces.TaskInterface
 import com.facebook.react.interfaces.fabric.ReactSurface
 import com.facebook.react.internal.featureflags.ReactNativeFeatureFlags
@@ -745,6 +746,8 @@ public class ReactHostImpl(
 
       val appearanceModule = currentReactContext.getNativeModule(AppearanceModule::class.java)
       appearanceModule?.onConfigurationChanged(context)
+
+      MediaFeaturesObserver.onConfigurationChanged(context)
     }
   }
 

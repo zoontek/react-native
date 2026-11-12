@@ -190,9 +190,17 @@ let BaseImage: AbstractImageIOS = ({
   nativeProps.source = sources;
 
   const flattenedStyle = flattenStyle<ImageStyleProp>(resolvedStyle);
-  const objectFit = convertObjectFitToResizeMode(flattenedStyle?.objectFit);
-  nativeProps.resizeMode =
+  const styleObjectFit = flattenedStyle?.objectFit;
+  // A conditional value (with media queries) is not converted.
+  const objectFit =
+    typeof styleObjectFit === 'string'
+      ? convertObjectFitToResizeMode(styleObjectFit)
+      : undefined;
+  const resolvedResizeMode =
     objectFit || resizeMode || flattenedStyle?.resizeMode || 'cover';
+  // $FlowFixMe[incompatible-type] A conditional value is resolved natively.
+  nativeProps.resizeMode = resolvedResizeMode;
+  // $FlowFixMe[incompatible-type] A conditional value is resolved natively.
   nativeProps.tintColor = tintColor ?? flattenedStyle?.tintColor;
 
   // Maintain pre-existing order, accessibilityLabel takes priority over alt

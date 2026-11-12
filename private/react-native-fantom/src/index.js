@@ -722,6 +722,30 @@ export function enqueueModalSizeUpdate(
   NativeFantom.enqueueModalSizeUpdate(shadowNode, size.width, size.height);
 }
 
+/**
+ * Sets the media features that conditional style values are matched against,
+ * for example `{default: 'white', '@media (prefers-color-scheme: dark)':
+ * 'black'}`, and updates the mounted shadow trees.
+ *
+ * @example
+ * ```
+ * Fantom.runTask(() => {
+ *   Fantom.setMediaFeatures({colorScheme: 'dark'});
+ * });
+ * ```
+ */
+export function setMediaFeatures(
+  mediaFeatures: Readonly<{
+    colorScheme?: 'light' | 'dark',
+    contrast?: 'no-preference' | 'less' | 'more',
+  }>,
+) {
+  NativeFantom.setMediaFeatures(
+    mediaFeatures.colorScheme ?? 'light',
+    mediaFeatures.contrast ?? 'no-preference',
+  );
+}
+
 export const unstable_benchmark = Benchmark;
 
 export type {

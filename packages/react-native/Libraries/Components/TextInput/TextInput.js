@@ -543,7 +543,8 @@ function InternalTextInput(props: TextInputProps): React.Node {
         flattenedStyle.fontWeight.toString() as TextStyle['fontWeight'];
     }
 
-    if (flattenedStyle.verticalAlign != null) {
+    // A conditional value (with media queries) is not converted.
+    if (typeof flattenedStyle.verticalAlign === 'string') {
       overrides = overrides || ({} as {...TextStyle});
       overrides.textAlignVertical =
         verticalAlignToTextAlignVerticalMap[flattenedStyle.verticalAlign];

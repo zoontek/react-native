@@ -135,6 +135,8 @@ class FabricUIManagerBinding : public jni::HybridClass<FabricUIManagerBinding>,
 
   void reportMount(SurfaceId surfaceId);
 
+  void updateMediaFeatures(jint colorScheme, jint contrast);
+
   void pullAndExecuteTransaction(SurfaceId surfaceId);
 
   jint findNextFocusableElement(jint parentTag, jint focusedTag, jint direction);

@@ -120,6 +120,25 @@ void FabricUIManagerBinding::reportMount(SurfaceId surfaceId) {
   scheduler->reportMount(surfaceId);
 }
 
+void FabricUIManagerBinding::updateMediaFeatures(
+    jint colorScheme,
+    jint contrast) {
+  auto scheduler = getScheduler();
+  if (!scheduler) {
+    LOG(ERROR)
+        << "FabricUIManagerBinding::updateMediaFeatures: scheduler disappeared";
+    return;
+  }
+  // The values match `FabricUIManager.MEDIA_*` constants.
+  scheduler->updateMediaFeatures({
+      .colorScheme =
+          colorScheme == 1 ? MediaColorScheme::Dark : MediaColorScheme::Light,
+      .contrast = contrast == 2 ? MediaContrast::More
+          : contrast == 1       ? MediaContrast::Less
+                                : MediaContrast::NoPreference,
+  });
+}
+
 void FabricUIManagerBinding::pullAndExecuteTransaction(SurfaceId surfaceId) {
   TraceSection section("FabricUIManagerBinding::pullAndExecuteTransaction");
 
@@ -937,6 +956,8 @@ void FabricUIManagerBinding::registerNatives() {
           "drainPreallocateViewsQueue",
           FabricUIManagerBinding::drainPreallocateViewsQueue),
       makeNativeMethod("reportMount", FabricUIManagerBinding::reportMount),
+      makeNativeMethod(
+          "updateMediaFeatures", FabricUIManagerBinding::updateMediaFeatures),
       makeNativeMethod(
           "pullAndExecuteTransaction",
           FabricUIManagerBinding::pullAndExecuteTransaction),

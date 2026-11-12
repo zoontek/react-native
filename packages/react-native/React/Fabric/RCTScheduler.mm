@@ -229,6 +229,11 @@ class RCTAnimationChoreographer : public AnimationChoreographer {
   _scheduler->reportMount(surfaceId);
 }
 
+- (void)updateMediaFeatures:(const facebook::react::MediaFeatures &)mediaFeatures
+{
+  _scheduler->updateMediaFeatures(mediaFeatures);
+}
+
 - (void)dealloc
 {
   if (_animationDriver) {

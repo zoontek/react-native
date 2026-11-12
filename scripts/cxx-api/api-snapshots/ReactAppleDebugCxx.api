@@ -1594,6 +1594,7 @@ interface RCTScheduler : public NSObject {
   public virtual void reportMount:(facebook::react::SurfaceId surfaceId);
   public virtual void setupAnimationDriver:(const facebook::react::SurfaceHandler& surfaceHandler);
   public virtual void unregisterSurface:(const facebook::react::SurfaceHandler& surfaceHandler);
+  public virtual void updateMediaFeatures:(const facebook::react::MediaFeatures& mediaFeatures);
 }
 
 interface RCTScrollEvent : public NSObject <RCTEvent> {
@@ -3084,6 +3085,7 @@ struct facebook::hermes::ISetEventLoopControl : public facebook::jsi::ICast {
 
 const char facebook::react::ViewComponentName[];
 const facebook::react::EventTag facebook::react::EMPTY_EVENT_TAG;
+constexpr char* facebook::react::kConditionalPropsName;
 constexpr facebook::react::ReactNativeVersionType facebook::react::ReactNativeVersion;
 constexpr facebook::react::Tag facebook::react::kNoTag;
 constexpr uint32_t facebook::react::INITIAL_BUCKETS_SIZE;
@@ -3130,6 +3132,7 @@ using facebook::react::GradientDirection = std::variant<facebook::react::Float, 
 using facebook::react::HostPlatformTouch = facebook::react::BaseTouch;
 using facebook::react::HostPlatformViewEventEmitter = facebook::react::BaseViewEventEmitter;
 using facebook::react::ImageSources = std::vector<facebook::react::ImageSource>;
+using facebook::react::MediaFeaturesGeneration = uint32_t;
 using facebook::react::ModalHostViewSupportedOrientationsMask = uint32_t;
 using facebook::react::NativeMethodCallFunc = std::function<void()>;
 using facebook::react::PromiseSetupFunctionType = std::function<void(facebook::jsi::Runtime& rt, std::shared_ptr<facebook::react::Promise>)>;
@@ -3190,6 +3193,8 @@ bool facebook::react::areBorderRadiiCircular(const facebook::react::BorderRadii&
 bool facebook::react::hostPlatformColorIsColorMeaningful(facebook::react::Color color) noexcept;
 bool facebook::react::isColorMeaningful(const facebook::react::SharedColor& color) noexcept;
 bool facebook::react::isZero(facebook::react::Float n);
+bool facebook::react::matchMediaQuery(std::string_view query, const facebook::react::MediaFeatures& features) noexcept;
+bool facebook::react::setMediaFeatures(const facebook::react::MediaFeatures& features) noexcept;
 constexpr auto facebook::react::to_underlying(auto e) noexcept;
 constexpr char facebook::react::toLower(char c);
 constexpr uint32_t facebook::react::fnv1aLowercase(std::string_view string);
@@ -3203,6 +3208,7 @@ facebook::react::DisplayType facebook::react::displayTypeFromYGDisplay(YGDisplay
 facebook::react::Float facebook::react::floatFromYogaFloat(float value);
 facebook::react::Float facebook::react::floatFromYogaOptionalFloat(facebook::yoga::FloatOptional value);
 facebook::react::LayoutMetrics facebook::react::layoutMetricsFromYogaNode(facebook::yoga::Node& yogaNode);
+facebook::react::MediaFeaturesSnapshot facebook::react::getMediaFeaturesSnapshot() noexcept;
 facebook::react::Rect facebook::react::insetBy(const facebook::react::Rect& rect, const facebook::react::EdgeInsets& insets) noexcept;
 facebook::react::Rect facebook::react::outsetBy(const facebook::react::Rect& rect, const facebook::react::EdgeInsets& outsets) noexcept;
 facebook::react::SharedColor facebook::react::blackColor();
@@ -3221,9 +3227,11 @@ float facebook::react::blueFromHostPlatformColor(facebook::react::Color color);
 float facebook::react::greenFromHostPlatformColor(facebook::react::Color color);
 float facebook::react::redFromHostPlatformColor(facebook::react::Color color);
 float facebook::react::yogaFloatFromFloat(facebook::react::Float value);
+folly::dynamic facebook::react::resolveConditionalValue(const folly::dynamic& conditionalValue, const facebook::react::MediaFeatures& features);
 int facebook::react::toInt(const facebook::react::DisplayType& displayType);
 int facebook::react::toInt(const facebook::react::LayoutDirection& layoutDirection);
 std::optional<facebook::react::BlendMode> facebook::react::blendModeFromString(std::string_view blendModeName);
+std::optional<facebook::react::ConditionalPropsResolution> facebook::react::resolveConditionalProps(const facebook::react::Props* sourceProps, const facebook::react::RawProps& rawProps);
 std::optional<facebook::react::FilterType> facebook::react::filterTypeFromString(std::string_view filterName);
 std::optional<facebook::react::Float> facebook::react::optionalFloatFromYogaValue(const facebook::yoga::Style::Length& length, std::optional<facebook::react::Float> base = {});
 std::optional<facebook::react::Isolation> facebook::react::isolationFromString(std::string_view isolationSetting);
@@ -4297,7 +4305,9 @@ class facebook::react::Props : public virtual facebook::react::Sealable, public 
   public Props() = default;
   public Props(const facebook::react::Props& other) = default;
   public Props(const facebook::react::PropsParserContext& context, const facebook::react::Props& sourceProps, const facebook::react::RawProps& rawProps, const std::function<bool(const std::string&)>& filterObjectKeys = nullptr);
+  public facebook::react::MediaFeaturesGeneration conditionalPropsGeneration;
   public facebook::react::Props& operator=(const facebook::react::Props& other) = delete;
+  public std::shared_ptr<const folly::dynamic> conditionalProps;
   public std::string nativeId;
   public using Shared = std::shared_ptr<const facebook::react::Props>;
   public virtual ~Props() = default;
@@ -4349,6 +4359,7 @@ class facebook::react::RawProps {
   public RawProps(facebook::jsi::Runtime& runtime, const facebook::jsi::Value& value) noexcept;
   public RawProps(facebook::react::RawProps&& other) noexcept = default;
   public RawProps(folly::dynamic dynamic) noexcept;
+  public bool hasProperty(const char* name) const;
   public bool isEmpty() const noexcept;
   public const facebook::react::RawValue* at(const char* name) const noexcept;
   public const facebook::react::RawValue* at(const char* name, const char* prefix, const char* suffix) const noexcept;
@@ -4966,6 +4977,17 @@ enum facebook::react::LayoutDirection {
   Undefined,
 }
 
+enum facebook::react::MediaColorScheme : uint8_t {
+  Dark,
+  Light,
+}
+
+enum facebook::react::MediaContrast : uint8_t {
+  Less,
+  More,
+  NoPreference,
+}
+
 enum facebook::react::ModalHostViewAnimationType {
   Fade,
   None,
@@ -5282,6 +5304,12 @@ struct facebook::react::ColorStop {
   public facebook::react::ValueUnit position;
 }
 
+struct facebook::react::ConditionalPropsResolution {
+  public facebook::react::MediaFeaturesGeneration generation;
+  public facebook::react::RawProps rawProps;
+  public std::shared_ptr<const folly::dynamic> conditionalProps;
+}
+
 struct facebook::react::CornerRadii {
   public bool operator==(const facebook::react::CornerRadii& other) const = default;
   public float horizontal;
@@ -5368,6 +5396,17 @@ struct facebook::react::LinearGradient {
   public bool operator==(const facebook::react::LinearGradient& other) const = default;
   public facebook::react::GradientDirection direction;
   public std::vector<facebook::react::ColorStop> colorStops;
+}
+
+struct facebook::react::MediaFeatures {
+  public bool operator==(const facebook::react::MediaFeatures& other) const = default;
+  public facebook::react::MediaColorScheme colorScheme;
+  public facebook::react::MediaContrast contrast;
+}
+
+struct facebook::react::MediaFeaturesSnapshot {
+  public facebook::react::MediaFeatures features;
+  public facebook::react::MediaFeaturesGeneration generation;
 }
 
 struct facebook::react::ModalHostViewSupportedOrientationsMaskWrapped {

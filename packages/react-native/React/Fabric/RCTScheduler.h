@@ -70,6 +70,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)reportMount:(facebook::react::SurfaceId)surfaceId;
 
+/*
+ * Sets the media features that conditional props (for example with
+ * `@media (prefers-color-scheme: dark)`) are matched against.
+ */
+- (void)updateMediaFeatures:(const facebook::react::MediaFeatures &)mediaFeatures;
+
 - (void)addEventListener:(const std::shared_ptr<facebook::react::EventListener> &)listener;
 
 - (void)removeEventListener:(const std::shared_ptr<facebook::react::EventListener> &)listener;

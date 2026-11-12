@@ -178,6 +178,7 @@ public class FabricUIManager
   }
 
   @Nullable private FabricUIManagerBinding mBinding;
+  @Nullable private MediaFeaturesObserver mMediaFeaturesObserver;
   private final ReactApplicationContext mReactApplicationContext;
   private final MountingManager mMountingManager;
   private final FabricEventDispatcher mEventDispatcher;
@@ -463,6 +464,16 @@ public class FabricUIManager
   @Override
   public void initialize() {
     mEventDispatcher.addBatchEventDispatchedListener(mBatchEventDispatchedListener);
+    mMediaFeaturesObserver =
+        new MediaFeaturesObserver(
+            mReactApplicationContext,
+            (colorScheme, contrast) -> {
+              FabricUIManagerBinding binding = mBinding;
+              if (binding != null) {
+                binding.updateMediaFeatures(colorScheme, contrast);
+              }
+            });
+    mMediaFeaturesObserver.start();
     if (ReactNativeFeatureFlags.enableFabricLogs()) {
       mDevToolsReactPerfLogger = new DevToolsReactPerfLogger();
       mDevToolsReactPerfLogger.addDevToolsReactPerfLoggerListener(FABRIC_PERF_LOGGER);
@@ -501,6 +512,11 @@ public class FabricUIManager
 
     mReactApplicationContext.unregisterComponentCallbacks(mViewManagerRegistry);
     mViewManagerRegistry.invalidate();
+
+    if (mMediaFeaturesObserver != null) {
+      mMediaFeaturesObserver.stop();
+      mMediaFeaturesObserver = null;
+    }
 
     // Remove lifecycle listeners (onHostResume, onHostPause) since the FabricUIManager is going
     // away. Then stop the mDispatchUIFrameCallback false will cause the choreographer

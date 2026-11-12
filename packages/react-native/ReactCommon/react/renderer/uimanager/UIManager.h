@@ -220,6 +220,14 @@ class UIManager final : public ShadowTreeDelegate {
 
   void updateShadowTree(std::unordered_map<Tag, folly::dynamic> &&tagToProps);
 
+  /*
+   * Resolves again, in all shadow trees, the conditional props (for example
+   * with media queries) that were resolved with older media features, and
+   * commits the result. Call it on the JavaScript thread, so that React keeps
+   * references to the new shadow nodes.
+   */
+  void updateConditionalProps() const;
+
 #pragma mark - ContextContainer
   std::shared_ptr<const ContextContainer> getContextContainer() const;
 

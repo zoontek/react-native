@@ -114,6 +114,16 @@ class Scheduler final : public UIManagerDelegate {
 
   void reportMount(SurfaceId surfaceId) const;
 
+#pragma mark - Media features
+
+  /*
+   * Sets the media features that conditional props (for example with
+   * `@media (prefers-color-scheme: dark)`) are matched against. If they
+   * changed, the shadow trees of this scheduler are updated on the JavaScript
+   * thread. Thread-safe.
+   */
+  void updateMediaFeatures(const MediaFeatures &mediaFeatures);
+
 #pragma mark - Event listeners
   void addEventListener(std::shared_ptr<const EventListener> listener);
   void removeEventListener(const std::shared_ptr<const EventListener> &listener);
@@ -128,6 +138,10 @@ class Scheduler final : public UIManagerDelegate {
   SharedComponentDescriptorRegistry componentDescriptorRegistry_;
   RuntimeExecutor runtimeExecutor_;
   std::shared_ptr<UIManager> uiManager_;
+
+  // The generation of the media features that this scheduler last updated its
+  // shadow trees for.
+  std::atomic<MediaFeaturesGeneration> mediaFeaturesGeneration_{0};
 
   std::vector<std::shared_ptr<UIManagerCommitHook>> commitHooks_;
 
